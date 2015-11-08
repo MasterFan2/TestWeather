@@ -58,6 +58,8 @@ public class QueryCityActivity extends BaseActivity implements OnClickListener,
 	private QueryCityAdapter mSearchCityAdapter;
 	private Filter mFilter;
 
+	private String isFirst = "false";
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -149,6 +151,8 @@ public class QueryCityActivity extends BaseActivity implements OnClickListener,
 		Cursor tmpCityCursor = mContentResolver.query(
 				CityProvider.TMPCITY_CONTENT_URI, null, null, null, null);
 		mTmpCitys = SystemUtils.getTmpCities(tmpCityCursor);
+
+		isFirst = getIntent().getStringExtra("first");
 	}
 
 	@Override
@@ -300,13 +304,14 @@ public class QueryCityActivity extends BaseActivity implements OnClickListener,
 		@Override
 		public void detecting() {
 			L.i("liweiping", "detecting...");
-			showCountDownView();
+			//showCountDownView();
 		}
 
 		@Override
 		public void succeed(String name) {
 			L.i("liweiping", name);
-			dismissCountDownView();
+			//dismissCountDownView();\
+			if(dialog != null && dialog.isShowing()) dialog.dismiss();
 
 			City city = getLocationCityFromDB(name);
 			if (TextUtils.isEmpty(city.getPostID())) {
@@ -322,6 +327,8 @@ public class QueryCityActivity extends BaseActivity implements OnClickListener,
 										R.string.get_location_scuess), name));
 				mLocationTV.setText(formatBigMessage(name));
 			}
+
+			if(isFirst.equals("true")) finish();
 		}
 
 		@Override

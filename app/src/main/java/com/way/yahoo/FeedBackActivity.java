@@ -1,7 +1,5 @@
 package com.way.yahoo;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -38,13 +36,15 @@ public class FeedBackActivity extends SwipeBackActivity {
 			public void onClick(View v) {
 				String content = mFeedBackEt.getText().toString();
 				if (!TextUtils.isEmpty(content)) {
-					Intent intent = new Intent(Intent.ACTION_SENDTO);
-					intent.setType("text/plain");
-					intent.putExtra(Intent.EXTRA_SUBJECT, "威震天气 - 信息反馈");
-					intent.putExtra(Intent.EXTRA_TEXT, content);
-					intent.setData(Uri.parse("mailto:way.ping.li@gmail.com"));
-					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-					FeedBackActivity.this.startActivity(intent);
+//					Intent intent = new Intent(Intent.ACTION_SENDTO);
+//					intent.setType("text/plain");
+//					intent.putExtra(Intent.EXTRA_SUBJECT, "威震天气 - 信息反馈");
+//					intent.putExtra(Intent.EXTRA_TEXT, content);
+//					intent.setData(Uri.parse("mailto:way.ping.li@gmail.com"));
+//					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//					FeedBackActivity.this.startActivity(intent);
+					T.showShort(FeedBackActivity.this, "感谢您的宝贵意见！");
+					finish();
 				} else {
 					T.showShort(FeedBackActivity.this, "亲,多说几句嘛!么么哒！");
 				}

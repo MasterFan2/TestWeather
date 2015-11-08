@@ -129,9 +129,12 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 		if (!mTmpCities.isEmpty()) {
 			updateUI();
 		} else {
+
 			//如果第一次运行应用就需要定位
 			if(PreferenceUtils.getPrefBoolean(this, FIRST_RUN_APP, true)){
-				startActivity(new Intent(MainActivity.this, QueryCityActivity.class));
+				Intent intent = new Intent(MainActivity.this, QueryCityActivity.class);
+				intent.putExtra("first", "true");
+				startActivity(intent);
 				PreferenceUtils.setPrefBoolean(this, FIRST_RUN_APP, false);
 			}
 		}
@@ -208,94 +211,97 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 	}
 
 	private void shareTo() {
-		new AsyncTask<Void, Void, File>() {
-			Dialog dialog;
-
-			@Override
-			protected void onPreExecute() {
-				super.onPreExecute();
-				dialog = SystemUtils.getCustomeDialog(MainActivity.this,
-						R.style.load_dialog, R.layout.custom_progress_dialog);
-				TextView titleTxtv = (TextView) dialog
-						.findViewById(R.id.dialogText);
-				titleTxtv.setText(R.string.please_wait);
-				dialog.show();
-			}
-
-			@Override
-			protected File doInBackground(Void... params) {
-				try {
-					new File(getFilesDir(), "share.png").deleteOnExit();
-					FileOutputStream fileOutputStream = openFileOutput(
-							"share.png", 1);
-					mRootView.setDrawingCacheEnabled(true);
-					mRootView.getDrawingCache().compress(
-							Bitmap.CompressFormat.PNG, 100, fileOutputStream);
-					return new File(getFilesDir(), "share.png");
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-				}
-				return null;
-			}
-
-			@Override
-			protected void onPostExecute(File result) {
-				super.onPostExecute(result);
-				dialog.dismiss();
-				if (result == null) {
-					Toast.makeText(MainActivity.this, R.string.share_fail,
-							Toast.LENGTH_SHORT).show();
-					return;
-				}
-				WeatherInfo info = null;
-				City city = mTmpCities.get(
-						mMainViewPager.getCurrentItem());
-				if(city == null)
-					return;
-				try {
-					info = WeatherSpider
-						.getWeatherInfo(MainActivity.this, city.getPostID(), city.getWeatherInfoStr());
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}catch (Exception e){
-					e.printStackTrace();
-				}
-				if (info == null || info.getRealTime() == null
-						|| info.getRealTime().getAnimation_type() < 0) {
-					Toast.makeText(MainActivity.this, R.string.share_fail,
-							Toast.LENGTH_SHORT).show();
-					return;
-				}
-				String time = TimeUtils.getDateTime(System.currentTimeMillis());
-				String name = mFragmentAdapter.getPageTitle(
-						mMainViewPager.getCurrentItem()).toString();
-				String weather = info.getRealTime().getWeather_name();
-				String temp = info.getRealTime().getTemp() + "°";
-
-				String shareStr = mShareNormalStr + mAqiShareStr + mShareEndStr;
-				if (info.getAqi() == null || info.getAqi().getAqi() < 0) {
-					shareStr = mShareNormalStr + mShareEndStr;
-					shareStr = String.format(shareStr, new Object[] { time,
-							name, weather, temp });
-				} else {
-					shareStr = String.format(shareStr, new Object[] { time,
-							name, weather, temp, info.getAqi().getAqi(),
-							info.getAqi().getAqi_level(),
-							info.getAqi().getPm25(),
-							info.getAqi().getAqi_desc() });
-				}
-
-				Intent intent = new Intent("android.intent.action.SEND");
-				intent.setType("image/*");
-				intent.putExtra("sms_body", shareStr);
-				intent.putExtra("android.intent.extra.TEXT", shareStr);
-				intent.putExtra("android.intent.extra.STREAM",
-						Uri.fromFile(result));
-				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				startActivity(Intent.createChooser(intent, getResources()
-						.getString(R.string.share_to)));
-			}
-		}.execute();
+		//现在改为城市管理
+		startActivity(new Intent(MainActivity.this,
+				ManagerCityActivity.class));
+		//分享
+//		new AsyncTask<Void, Void, File>() {
+//			Dialog dialog;
+//
+//			@Override
+//			protected void onPreExecute() {
+//				super.onPreExecute();
+//				dialog = SystemUtils.getCustomeDialog(MainActivity.this,
+//						R.style.load_dialog, R.layout.custom_progress_dialog);
+//				TextView titleTxtv = (TextView) dialog
+//						.findViewById(R.id.dialogText);
+//				titleTxtv.setText(R.string.please_wait);
+//				dialog.show();
+//			}
+//
+//			@Override
+//			protected File doInBackground(Void... params) {
+//				try {
+//					new File(getFilesDir(), "share.png").deleteOnExit();
+//					FileOutputStream fileOutputStream = openFileOutput("share.png", 1);
+//					mRootView.setDrawingCacheEnabled(true);
+//					mRootView.getDrawingCache().compress(
+//							Bitmap.CompressFormat.PNG, 100, fileOutputStream);
+//					return new File(getFilesDir(), "share.png");
+//				} catch (FileNotFoundException e) {
+//					e.printStackTrace();
+//				}
+//				return null;
+//			}
+//
+//			@Override
+//			protected void onPostExecute(File result) {
+//				super.onPostExecute(result);
+//				dialog.dismiss();
+//				if (result == null) {
+//					Toast.makeText(MainActivity.this, R.string.share_fail,
+//							Toast.LENGTH_SHORT).show();
+//					return;
+//				}
+//				WeatherInfo info = null;
+//				City city = mTmpCities.get(
+//						mMainViewPager.getCurrentItem());
+//				if(city == null)
+//					return;
+//				try {
+//					info = WeatherSpider
+//						.getWeatherInfo(MainActivity.this, city.getPostID(), city.getWeatherInfoStr());
+//				} catch (JSONException e) {
+//					e.printStackTrace();
+//				}catch (Exception e){
+//					e.printStackTrace();
+//				}
+//				if (info == null || info.getRealTime() == null
+//						|| info.getRealTime().getAnimation_type() < 0) {
+//					Toast.makeText(MainActivity.this, R.string.share_fail,
+//							Toast.LENGTH_SHORT).show();
+//					return;
+//				}
+//				String time = TimeUtils.getDateTime(System.currentTimeMillis());
+//				String name = mFragmentAdapter.getPageTitle(
+//						mMainViewPager.getCurrentItem()).toString();
+//				String weather = info.getRealTime().getWeather_name();
+//				String temp = info.getRealTime().getTemp() + "°";
+//
+//				String shareStr = mShareNormalStr + mAqiShareStr + mShareEndStr;
+//				if (info.getAqi() == null || info.getAqi().getAqi() < 0) {
+//					shareStr = mShareNormalStr + mShareEndStr;
+//					shareStr = String.format(shareStr, new Object[] { time,
+//							name, weather, temp });
+//				} else {
+//					shareStr = String.format(shareStr, new Object[] { time,
+//							name, weather, temp, info.getAqi().getAqi(),
+//							info.getAqi().getAqi_level(),
+//							info.getAqi().getPm25(),
+//							info.getAqi().getAqi_desc() });
+//				}
+//
+//				Intent intent = new Intent("android.intent.action.SEND");
+//				intent.setType("image/*");
+//				intent.putExtra("sms_body", shareStr);
+//				intent.putExtra("android.intent.extra.TEXT", shareStr);
+//				intent.putExtra("android.intent.extra.STREAM",
+//						Uri.fromFile(result));
+//				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//				startActivity(Intent.createChooser(intent, getResources()
+//						.getString(R.string.share_to)));
+//			}
+//		}.execute();
 	}
 
 	@Override

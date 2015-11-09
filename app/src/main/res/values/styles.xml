@@ -101,6 +101,12 @@
         <item name="android:textSize">@dimen/text_sm</item>
     </style>
 
+    <style name="WeatherChartModule">
+        <item name="android:background">@drawable/module_bg</item>
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
     <style name="WeatherModule">
         <item name="android:background">@drawable/module_bg</item>
         <item name="android:padding">@dimen/padding_sm</item>
@@ -234,6 +240,16 @@
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowIsFloating">true</item>
         <item name="android:windowFrame">@null</item>
+    </style>
+
+    <style name="myTheme.actionBar" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:textColorPrimary">#0000ff</item>
+    </style>
+
+    <style name="myTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="actionBarTheme">@style/myTheme.actionBar</item>
+        <item name="colorPrimary">#00FF00</item>
+        <item name="actionBarSize">@dimen/iwf_actionBarSize</item>
     </style>
 
 </resources>

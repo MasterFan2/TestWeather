@@ -200,4 +200,19 @@
     <color name="gray_800">#424242</color>
     <color name="gray_900">#212121</color>
     <color name="gray_1000">#000000</color>
+
+
+    <color name="picker_pager_bg">#CA000000</color>
+    <color name="picker_selected_bg">#44000000</color>
+    <color name="picker_black_40">#282828</color>
+    <color name="picker_common_primary">#f3f3f3</color>
+
+    <color name="picker_text_40">#282828</color>
+    <color name="picker_text_80">#505050</color>
+    <color name="picker_text_120">#787878</color>
+
+    <!-- Dialog   -->
+    <color name="card_shadow">#D4D4D4</color>
+    <color name="black_overlay">#60000000</color>
+    <color name="white_overlay">#40FFFFFF</color>
 </resources>

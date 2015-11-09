@@ -10,6 +10,7 @@ import org.json.JSONException;
 import android.app.Fragment;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
@@ -30,6 +31,11 @@ import android.widget.Toast;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.StringRequest;
+import com.lidroid.xutils.HttpUtils;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
+import com.lidroid.xutils.http.client.HttpRequest;
 import com.way.adapter.WeatherListAdapter;
 import com.way.beans.City;
 import com.way.common.util.NetUtil;
@@ -44,11 +50,12 @@ import com.way.weather.plugin.bean.RealTime;
 import com.way.weather.plugin.bean.WeatherInfo;
 import com.way.weather.plugin.spider.WeatherSpider;
 import com.way.yahoo.App;
+import com.way.yahoo.CommentsActivity;
+import com.way.yahoo.ImageActivity;
 import com.way.yahoo.MainActivity;
 import com.way.yahoo.R;
 
-public class WeatherFragment extends Fragment implements ITaskManager,
-		SwipeRefreshLayout.OnRefreshListener {
+public class WeatherFragment extends Fragment implements ITaskManager,SwipeRefreshLayout.OnRefreshListener, View.OnClickListener {
 	public static final String ARG_CITY = "city";
 	public static final String ALPHA_KEY = "alpha";
 	private Handler mHandler = new Handler();
@@ -60,6 +67,12 @@ public class WeatherFragment extends Fragment implements ITaskManager,
 	private View mListHeaderView;
 
 	private int mHeaderHeight = -1;
+
+	private HttpUtils http ;
+
+	//图片 和文字描述
+	private ImageView headImg;
+	private TextView  commentsTxt;
 
 	// 当前天气的View
 	private ImageView mCurWeatherIV;
@@ -150,6 +163,13 @@ public class WeatherFragment extends Fragment implements ITaskManager,
 		return false;
 	}
 
+	/**
+	 * createView
+	 * @param inflater
+	 * @param container
+	 * @param savedInstanceState
+	 * @return
+	 */
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -162,9 +182,22 @@ public class WeatherFragment extends Fragment implements ITaskManager,
 			mHandler.removeCallbacks(delayRefresh);
 			mHandler.post(delayRefresh);
 
-			// } else {
-			// loadWeatherInfoFromLocal();
-			// }
+			//获取首页数据
+			http = new HttpUtils();
+			http.send(HttpRequest.HttpMethod.GET, "", new RequestCallBack<String>() {
+				@Override
+				public void onSuccess(ResponseInfo<String> responseInfo) {
+
+				}
+
+				@Override
+				public void onFailure(HttpException e, String s) {
+
+				}
+			});
+					// } else {
+					// loadWeatherInfoFromLocal();
+					// }
 		} else {
 			// ViewGroup mRootParent = (ViewGroup) mRootView.getParent();
 			// if (mRootParent != null) {
@@ -228,15 +261,12 @@ public class WeatherFragment extends Fragment implements ITaskManager,
 	 * @param view
 	 */
 	private void initViews(View view, Bundle savedInstanceState) {
-		mSwipeRefreshLayout = (SwipeRefreshLayout) view
-				.findViewById(R.id.swiperefresh);
+		mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swiperefresh);
 		mSwipeRefreshLayout.setOnRefreshListener(this);
 		mListView = (ListView) view.findViewById(R.id.drag_list);
 
-		mNormalImageView = (ImageView) view
-				.findViewById(R.id.weather_background);
-		mBlurredImageView = (ImageView) view
-				.findViewById(R.id.weather_background_blurred);
+		mNormalImageView = (ImageView) view.findViewById(R.id.weather_background);
+		mBlurredImageView = (ImageView) view.findViewById(R.id.weather_background_blurred);
 		if (savedInstanceState != null) {
 			float alpha = savedInstanceState.getFloat(ALPHA_KEY);
 			mBlurredImageView.setAlpha(alpha);
@@ -244,13 +274,18 @@ public class WeatherFragment extends Fragment implements ITaskManager,
 			mBlurredImageView.setAlpha(0f);// 设置默认模糊背景为透明
 		}
 
-		mListHeaderView = LayoutInflater.from(getActivity()).inflate(
-				R.layout.weather_current_condition, null);
+		mListHeaderView = LayoutInflater.from(getActivity()).inflate(R.layout.weather_current_condition, null);
+
+		headImg 	= (ImageView) mListHeaderView.findViewById(R.id.home_head_img);
+		commentsTxt	= (TextView) mListHeaderView.findViewById(R.id.home_head_comment_txt);
+
+		headImg.setOnClickListener(this);
+		commentsTxt.setOnClickListener(this);
+
 		// 获取屏幕高度
 		int displayHeight = SystemUtils.getDisplayHeight(getActivity());
 		// HeaderView高度=屏幕高度-标题栏高度
-		mHeaderHeight = displayHeight
-				- getResources().getDimensionPixelSize(
+		mHeaderHeight = displayHeight - getResources().getDimensionPixelSize(
 						R.dimen.abs__action_bar_default_height);
 		mListHeaderView.setLayoutParams(new LayoutParams(
 				LayoutParams.MATCH_PARENT, mHeaderHeight));
@@ -376,8 +411,8 @@ public class WeatherFragment extends Fragment implements ITaskManager,
 
 	private long getPubTime(String postID) {
 		Cursor c = mContentResolver.query(CityProvider.TMPCITY_CONTENT_URI,
-				new String[] { CityConstants.PUB_TIME }, CityConstants.POST_ID
-						+ "=?", new String[] { postID }, null);
+				new String[]{CityConstants.PUB_TIME}, CityConstants.POST_ID
+						+ "=?", new String[]{postID}, null);
 
 		long time = 0L;
 		if (c.moveToFirst())
@@ -440,6 +475,18 @@ public class WeatherFragment extends Fragment implements ITaskManager,
 		if (mCurCity == null)
 			mCurCity = getArguments().getParcelable(ARG_CITY);
 		new WeatherTask(mCurCity.getPostID()).execute(force);
+	}
+
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()){
+			case R.id.home_head_img:
+				startActivity(new Intent(getActivity(), ImageActivity.class));
+				break;
+			case R.id.home_head_comment_txt:
+				startActivity(new Intent(getActivity(), CommentsActivity.class));
+				break;
+		}
 	}
 
 	class WeatherTask extends WorkTask<Boolean, Void, WeatherInfo> {

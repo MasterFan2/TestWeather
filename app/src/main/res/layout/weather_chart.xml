@@ -1,9 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.way.ui.view.WeatherChartView xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/WeatherModule"
+<com.way.ui.view.WeatherChartView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/WeatherChartModule"
     android:orientation="vertical" >
+    <com.way.ui.view.WeatherTypefacedTextView
+        android:id="@+id/chart_label"
+        style="@style/Label"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:text="近日天气"
+        app:typeface="fonts/Roboto-Light.ttf" />
+
+    <ImageView
+        android:id="@+id/divider"
+        style="@style/Line.Solid"
+        android:layout_below="@id/chart_label"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:scaleType="fitXY" />
     <LinearLayout
         android:id="@+id/head"
+        android:layout_below="@id/divider"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -53,7 +71,7 @@
             android:layout_height="wrap_content"
             android:text="周二   "
             android:layout_weight="1"
-            android:gravity="right"
+            android:gravity="center"
             />
     </LinearLayout>
     <LinearLayout
@@ -111,7 +129,7 @@
             android:layout_height="wrap_content"
             android:text="-   "
             android:layout_weight="1"
-            android:gravity="right"
+            android:gravity="center"
             />
     </LinearLayout>
     <LinearLayout
@@ -166,6 +184,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:paddingLeft="20dp"
         ></LinearLayout>
     <LinearLayout
         android:id="@+id/foot_name"
@@ -174,6 +193,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:weightSum="6"
+        android:visibility="gone"
         android:layout_marginTop="8dp"
         >
         <TextView
@@ -233,6 +253,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:weightSum="6"
+        android:visibility="gone"
         >
         <ImageView
             android:id="@+id/foot_icon_1"
@@ -278,6 +299,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:weightSum="6"
+        android:layout_marginBottom="10dp"
         >
         <TextView
             android:layout_width="0dp"

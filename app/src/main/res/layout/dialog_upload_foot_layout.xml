@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/dialog_foot_background"
+    >
+    <com.way.widget.indicator.AVLoadingIndicatorView
+        android:id="@+id/dialog_upload_loadingView"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        app:indicator="BallSpinFadeLoader"
+        app:indicator_color="@android:color/holo_orange_light"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="20dp"
+        android:visibility="gone"
+        />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingBottom="@dimen/activity_horizontal_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:layout_alignParentRight="true"
+        android:paddingTop="@dimen/activity_horizontal_margin">
+
+        <Button
+            android:id="@+id/footer_upload_cancel_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="取  消"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/footer_upload_confirm_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="上  传"
+            android:layout_marginLeft="16dp"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:textSize="18sp" />
+    </LinearLayout>
+</RelativeLayout>
+
+
+

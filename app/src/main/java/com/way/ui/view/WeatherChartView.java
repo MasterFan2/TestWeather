@@ -9,6 +9,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.way.common.util.SystemUtils;
+import com.way.common.util.TimeUtils;
 import com.way.common.util.WeatherIconUtils;
 import com.way.weather.plugin.bean.WeatherInfo;
 import com.way.yahoo.R;
@@ -46,7 +47,11 @@ public class WeatherChartView extends WeatherBaseView {
     ImageView footicon6;
 
 
-    TextView w_txt_1, w_txt_2, w_txt_3, w_txt_4, w_txt_5, w_txt_6;//白天天气
+    //白天天气
+    TextView w_txt_1, w_txt_2, w_txt_3, w_txt_4, w_txt_5, w_txt_6;
+
+    //星期几
+    TextView week_txt3, week_txt4, week_txt5, week_txt6;
 
     //晚上天气
     TextView foot_txt_1;
@@ -103,6 +108,12 @@ public class WeatherChartView extends WeatherBaseView {
         foot_txt_4 = (TextView) findViewById(R.id.foot_txt_4);
         foot_txt_5 = (TextView) findViewById(R.id.foot_txt_5);
         foot_txt_6 = (TextView) findViewById(R.id.foot_txt_6);
+
+
+        week_txt3 = (TextView) findViewById(R.id.week_txt3);
+        week_txt4 = (TextView) findViewById(R.id.week_txt4);
+        week_txt5 = (TextView) findViewById(R.id.week_txt5);
+        week_txt6 = (TextView) findViewById(R.id.week_txt6);
 
         mHandler = new Handler(context.getMainLooper()) {
             @Override
@@ -179,6 +190,11 @@ public class WeatherChartView extends WeatherBaseView {
         footicon4.setImageResource(WeatherIconUtils.getWeatherIcon(weatherInfo.getForecast().getType(3)));
         footicon5.setImageResource(WeatherIconUtils.getWeatherIcon(weatherInfo.getForecast().getType(4)));
         footicon6.setImageResource(WeatherIconUtils.getWeatherIcon(weatherInfo.getForecast().getType(5)));
+
+        week_txt3.setText(TimeUtils.getWeek(1, TimeUtils.ZHOU));
+        week_txt4.setText(TimeUtils.getWeek(2, TimeUtils.ZHOU));
+        week_txt5.setText(TimeUtils.getWeek(3, TimeUtils.ZHOU));
+        week_txt6.setText(TimeUtils.getWeek(4, TimeUtils.ZHOU));
 
         int min = 999;
         int max = 0;

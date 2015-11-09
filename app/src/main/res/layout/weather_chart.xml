@@ -24,6 +24,7 @@
             android:layout_weight="1"
             />
         <TextView
+            android:id="@+id/week_txt3"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="  明天"
@@ -31,6 +32,7 @@
             android:layout_weight="1"
             />
         <TextView
+            android:id="@+id/week_txt4"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="周天"
@@ -38,6 +40,7 @@
             android:gravity="center"
             />
         <TextView
+            android:id="@+id/week_txt5"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="周一"
@@ -45,6 +48,7 @@
             android:layout_weight="1"
             />
         <TextView
+            android:id="@+id/week_txt6"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="周二   "

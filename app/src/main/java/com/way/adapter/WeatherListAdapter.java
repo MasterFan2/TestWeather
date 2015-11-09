@@ -20,10 +20,10 @@ import com.way.yahoo.R;
 public class WeatherListAdapter extends BaseAdapter {
     private final HashMap<Integer, WeatherBaseView> mWeatherBaseViews = new HashMap<Integer, WeatherBaseView>();
     public static final int CHART_TYPE = 0;
-    public static final int FORECAST_TYPE = 1;
-    public static final int WEATHER_DETAILS_TYPE = 2;
-    public static final int AQI_TYPE = 3;
-    public static final int INDEX_TYPE = 4;
+//    public static final int FORECAST_TYPE = 1;
+    public static final int WEATHER_DETAILS_TYPE = 1;
+//    public static final int AQI_TYPE = 2;
+//    public static final int INDEX_TYPE = 3;
 
     private LayoutInflater mLayoutInflater;
     private List<Integer> mTypes;
@@ -43,17 +43,17 @@ public class WeatherListAdapter extends BaseAdapter {
         convertView = (WeatherBaseView) mLayoutInflater.inflate(R.layout.weather_chart, null);//chartView
         mWeatherBaseViews.put(CHART_TYPE, convertView);
 
-        convertView = (WeatherBaseView) mLayoutInflater.inflate(R.layout.weather_forecast, null);//近几天温度
-        mWeatherBaseViews.put(FORECAST_TYPE, convertView);
+//        convertView = (WeatherBaseView) mLayoutInflater.inflate(R.layout.weather_forecast, null);//近几天温度
+//        mWeatherBaseViews.put(FORECAST_TYPE, convertView);
 
         convertView = (WeatherBaseView) mLayoutInflater.inflate(R.layout.weather_details, null);//详细
         mWeatherBaseViews.put(WEATHER_DETAILS_TYPE, convertView);
 
-        convertView = (WeatherBaseView) mLayoutInflater.inflate(R.layout.weather_aqi, null);//空气质量
-        mWeatherBaseViews.put(AQI_TYPE, convertView);
-
-        convertView = (WeatherBaseView) mLayoutInflater.inflate(R.layout.weather_index, null);//指数
-        mWeatherBaseViews.put(INDEX_TYPE, convertView);
+//        convertView = (WeatherBaseView) mLayoutInflater.inflate(R.layout.weather_aqi, null);//空气质量
+//        mWeatherBaseViews.put(AQI_TYPE, convertView);
+//
+//        convertView = (WeatherBaseView) mLayoutInflater.inflate(R.layout.weather_index, null);//指数
+//        mWeatherBaseViews.put(INDEX_TYPE, convertView);
     }
 
     public void setWeather(WeatherInfo weatherInfo) {
@@ -63,11 +63,11 @@ public class WeatherListAdapter extends BaseAdapter {
         AQI aqi = weatherInfo.getAqi();
         mTypes.clear();
         mTypes.add(CHART_TYPE);
-        mTypes.add(FORECAST_TYPE);
+//        mTypes.add(FORECAST_TYPE);
         mTypes.add(WEATHER_DETAILS_TYPE);
-        if (!WeatherSpider.isEmpty(aqi) && aqi.getAqi() >= 0)
-            mTypes.add(AQI_TYPE);
-        mTypes.add(INDEX_TYPE);
+//        if (!WeatherSpider.isEmpty(aqi) && aqi.getAqi() >= 0)
+//            mTypes.add(AQI_TYPE);
+//        mTypes.add(INDEX_TYPE);
 
         notifyDataSetChanged();
     }
@@ -117,18 +117,18 @@ public class WeatherListAdapter extends BaseAdapter {
                     case CHART_TYPE:
                         convertView = (WeatherBaseView) mLayoutInflater.inflate(R.layout.weather_chart, parent, false);
                         break;
-                    case FORECAST_TYPE:
-                        convertView = (WeatherBaseView) mLayoutInflater.inflate(R.layout.weather_forecast, parent, false);
-                        break;
+//                    case FORECAST_TYPE:
+//                        convertView = (WeatherBaseView) mLayoutInflater.inflate(R.layout.weather_forecast, parent, false);
+//                        break;
                     case WEATHER_DETAILS_TYPE:
                         convertView = (WeatherBaseView) mLayoutInflater.inflate(R.layout.weather_details, parent, false);
                         break;
-                    case AQI_TYPE:
-                        convertView = (WeatherBaseView) mLayoutInflater.inflate(R.layout.weather_aqi, parent, false);
-                        break;
-                    case INDEX_TYPE:
-                        convertView = (WeatherBaseView) mLayoutInflater.inflate(R.layout.weather_index, parent, false);
-                        break;
+//                    case AQI_TYPE:
+//                        convertView = (WeatherBaseView) mLayoutInflater.inflate(R.layout.weather_aqi, parent, false);
+//                        break;
+//                    case INDEX_TYPE:
+//                        convertView = (WeatherBaseView) mLayoutInflater.inflate(R.layout.weather_index, parent, false);
+//                        break;
                 }
                 mWeatherBaseViews.put(itemType, (WeatherBaseView) convertView);
             }

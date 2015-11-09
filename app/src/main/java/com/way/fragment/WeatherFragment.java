@@ -101,9 +101,8 @@ public class WeatherFragment extends Fragment implements ITaskManager,
 	private boolean isLoaded = false;
 
 	/**
-	 * 不提供覆写，需监听可见性的子类可覆写{@link #onFragmentVisible()}和
-	 * {@link #onFragmentInvisible()}方法
-	 * 
+	 * 不提供覆写，需监听可见性的子类可覆写和
+	 *
 	 * @param isVisibleToUser
 	 *            当前Fragment的可见性
 	 */
@@ -214,7 +213,7 @@ public class WeatherFragment extends Fragment implements ITaskManager,
 
 	/**
 	 * 如果此Fragment占用的数据量过大，可覆写此方法返回true， 表示需要当Fragment无效时进行数据清理，然后覆写
-	 * {@link #onClearDataset()}方法 对占用内存的数据进行清理和对视图控件引用的释放(否则内存不会释放)，
+	 * 方法 对占用内存的数据进行清理和对视图控件引用的释放(否则内存不会释放)，
 	 * 这样此Fragment再次回到台前时会重新加载所有的数据
 	 * 
 	 * @return true表示子类选择了数据销毁，当Fragment不可见的时候，这样下次Fragment可见时会重新加载数据

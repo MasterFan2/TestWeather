@@ -5,8 +5,11 @@ import java.util.List;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.widget.Toast;
 
 import com.way.beans.City;
@@ -19,6 +22,7 @@ import com.way.db.CityProvider.CityConstants;
 import com.way.ui.swipeback.SwipeBackActivity;
 import com.way.weather.plugin.bean.WeatherInfo;
 import com.way.weather.plugin.spider.WeatherSpider;
+import com.way.widget.MasterDialog;
 
 public class BaseActivity extends SwipeBackActivity {
 	//public static final String AUTO_LOCATION_CITY_KEY = "auto_location";
@@ -26,9 +30,18 @@ public class BaseActivity extends SwipeBackActivity {
 	protected Activity mActivity;
 	protected LocationUtils mLocationUtils;
 
+	protected MasterDialog dialog;
+	protected Context context;
+
+	public BaseActivity() {
+	}
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		dialog = new MasterDialog.Builder(this).create();
+		dialog.setCancelable(false);
+		context = this;
 		initDatas();
 	}
 
@@ -48,16 +61,26 @@ public class BaseActivity extends SwipeBackActivity {
 		return SystemUtils.getTmpCities(tmpCityCursor);
 	}
 
-	protected void startLocation(LocationListener cityNameStatus) {
+	protected void startLocation(final LocationListener cityNameStatus) {
 		if (NetUtil.getNetworkState(this) == NetUtil.NETWORN_NONE) {
 			Toast.makeText(this, R.string.net_error, Toast.LENGTH_SHORT).show();
 			return;
 		}
-		if (mLocationUtils == null)
-			mLocationUtils = new LocationUtils(this, cityNameStatus);
-		if (!mLocationUtils.isStarted()) {
-			mLocationUtils.startLocation();// 开始定位
-		}
+
+
+		dialog.show();
+		new Handler(){
+			@Override
+			public void handleMessage(Message msg) {
+				if (mLocationUtils == null)
+					mLocationUtils = new LocationUtils(context, cityNameStatus);
+				if (!mLocationUtils.isStarted()) {
+					mLocationUtils.startLocation();// 开始定位
+				}
+			}
+		}.sendEmptyMessageDelayed(0, 2000);
+
+
 	}
 
 	protected void stopLocation() {

@@ -1,20 +1,7 @@
 package com.way.yahoo;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.util.List;
-
-import net.simonvt.menudrawer.MenuDrawer;
-import net.simonvt.menudrawer.MenuDrawer.OnDrawerStateChangeListener;
-
-import org.json.JSONException;
-
-import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
@@ -27,7 +14,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.viewpagerindicator.CirclePageIndicator;
 import com.way.adapter.ParallaxPagerTransformer;
@@ -40,14 +26,15 @@ import com.way.common.util.L;
 import com.way.common.util.PreferenceUtils;
 import com.way.common.util.SystemUtils;
 import com.way.common.util.T;
-import com.way.common.util.TimeUtils;
 import com.way.util.blur.jni.BitmapUtils;
 import com.way.util.blur.jni.FrostedGlassUtil;
-import com.way.weather.plugin.bean.WeatherInfo;
-import com.way.weather.plugin.spider.WeatherSpider;
 
-public class MainActivity extends BaseActivity implements OnClickListener,
-		OnPageChangeListener {
+import net.simonvt.menudrawer.MenuDrawer;
+import net.simonvt.menudrawer.MenuDrawer.OnDrawerStateChangeListener;
+
+import java.util.List;
+
+public class MainActivity extends BaseActivity implements OnClickListener, OnPageChangeListener {
 	public static final String FIRST_RUN_APP = "firstRunApp";
 	private static final String INSTANCESTATE_TAB = "tab_index";
 	private String mShareNormalStr = "#简洁天气#提醒您:今天%s,%s,%s,%s,";// 日期、城市、天气、温度
@@ -337,26 +324,23 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 	private void initMenuDrawer() {
 		// 覆盖在View之前的侧边栏菜单
 		mMenuDrawer = MenuDrawer.attach(this, MenuDrawer.Type.BEHIND);
-		mMenuDrawer.setMenuSize(Math.round(0.6f * SystemUtils
-				.getDisplayWidth(this)));
+		mMenuDrawer.setMenuSize(Math.round(0.6f * SystemUtils.getDisplayWidth(this)));
 		// View之后的侧边栏菜单
 		// mMenuDrawer = MenuDrawer.attach(this, MenuDrawer.Type.BEHIND,
 		// Position.LEFT, MenuDrawer.MENU_DRAG_CONTENT);
-		mMenuListView = (ListView) LayoutInflater.from(this).inflate(
-				R.layout.sidemenu_listview, null);
+		mMenuListView = (ListView) LayoutInflater.from(this).inflate(R.layout.sidemenu_listview, null);
 		mMenuDrawer.setMenuView(mMenuListView);
 		mMenuDrawer.setTouchMode(MenuDrawer.TOUCH_MODE_FULLSCREEN);
-		mMenuDrawer
-				.setOnInterceptMoveEventListener(new MenuDrawer.OnInterceptMoveEventListener() {
-					@Override
-					public boolean isViewDraggable(View v, int dx, int x, int y) {
-						if (v == mMainViewPager) {
-							return !(mPagerPosition == 0 && mPagerOffsetPixels == 0)
-									|| dx < 0;
-						}
-						return false;
-					}
-				});
+		mMenuDrawer	.setOnInterceptMoveEventListener(new MenuDrawer.OnInterceptMoveEventListener() {
+			@Override
+			public boolean isViewDraggable(View v, int dx, int x, int y) {
+				if (v == mMainViewPager) {
+					return !(mPagerPosition == 0 && mPagerOffsetPixels == 0)
+							|| dx < 0;
+				}
+				return false;
+			}
+		});
 		mMenuDrawer
 				.setOnDrawerStateChangeListener(new OnDrawerStateChangeListener() {
 

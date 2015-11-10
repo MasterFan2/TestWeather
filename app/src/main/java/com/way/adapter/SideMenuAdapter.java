@@ -28,10 +28,10 @@ public class SideMenuAdapter extends BaseAdapter {
 
 	public void addContent(List<City> tmpCities) {
 		mItems.clear();
-		mItems.add(new Category("城市管理"));
-		mItems.add(new Item(Item.INFINITE_ID, "编辑地点", R.drawable.editloc));
-		for (int i = 0; i < tmpCities.size(); i++)
-			mItems.add(new Item(i, tmpCities.get(i).getName(), R.drawable.loc));
+//		mItems.add(new Category("城市管理"));
+//		mItems.add(new Item(Item.INFINITE_ID, "编辑地点", R.drawable.editloc));
+//		for (int i = 0; i < tmpCities.size(); i++)
+//			mItems.add(new Item(i, tmpCities.get(i).getName(), R.drawable.loc));
 		mItems.add(new Category("工具"));
 		// mItems.add(new Item(Item.SETTING_ID, "设置",
 		// R.drawable.sidebar_icon_settings_dark));

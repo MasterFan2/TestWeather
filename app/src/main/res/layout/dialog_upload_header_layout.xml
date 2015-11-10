@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/dialog_header_background"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:paddingBottom="@dimen/activity_horizontal_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
@@ -15,6 +15,11 @@
         android:text="确认上传图片"
         android:textSize="18sp"
         android:textColor="@color/gray_600"
+        />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.15dp"
+        android:background="@color/gray_400"
         />
 </LinearLayout>
 

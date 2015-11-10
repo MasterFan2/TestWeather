@@ -96,7 +96,7 @@
     <dimen name="text_sm">8.0sp</dimen>
     <dimen name="text_md">13.0sp</dimen>
     <dimen name="text_lg">19.0sp</dimen>
-    <dimen name="text_xl">127.0sp</dimen>
+    <dimen name="text_xl">100.0sp</dimen>
     <dimen name="temp_high_icon_margin_left">24.0dip</dimen>
     <dimen name="indicator_right_padding">10.0dip</dimen>
     <dimen name="indicator_corner_radius">12.0dip</dimen>

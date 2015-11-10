@@ -30,6 +30,6 @@
     <dimen name="text_sm">7.0sp</dimen>
     <dimen name="text_md">11.0sp</dimen>
     <dimen name="text_lg">17.0sp</dimen>
-    <dimen name="text_xl">125.0sp</dimen>
+    <dimen name="text_xl">90.0sp</dimen>
     <dimen name="temp_high_icon_margin_left">23.0dip</dimen>
 </resources>

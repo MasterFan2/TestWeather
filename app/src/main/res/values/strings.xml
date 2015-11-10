@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">简洁天气</string>
+    <string name="app_name">看天穿衣</string>
     <string name="press_again_exit">再按一次退出</string>
     <string name="speak_launch_project_weather">Launch Project Weather web site</string>
     <string name="pull_to_refresh_pull_sub_label">上次刷新:%s</string>
@@ -32,8 +32,7 @@
     <string name="please_wait">请稍后...</string>
     <string name="share_to">您想分享到？</string>
     <string name="app_information">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;\
-        本应用是以简洁作为核心要素的一款轻型实用天气软件哦!\
-        欢迎各位提出宝贵的建议！</string>
+        本应用主要是人性化穿衣建议作为核心的一款天气软件哦！欢迎各位提出宝贵建议！</string>
     <string name="all_rights_reserved">Copyright © 2012-2015 way. All Rights Reserved.</string>
     <string name="get_weatherinfo_scuessed">刷新成功</string>
     <string name="widget_loading_tips">正在加载,请稍侯...</string>
@@ -152,15 +151,15 @@
 
     <string name="picker_images">Images</string>
     <string name="picker_delete">Delete</string>
-    <string name="picker_done">Done</string>
+    <string name="picker_done">完成</string>
     <string name="picker_done_with_count">Done(%1$d/%2$d)</string>
     <string name="picker_image_index">%1$d/%2$d</string>
     <string name="picker_undo">Undo</string>
     <string name="picker_deleted_a_photo">Deleted a photo</string>
     <string name="picker_confirm_to_delete">Confirm to delete?</string>
     <string name="picker_yes">Yes</string>
-    <string name="picker_cancel">Cancel</string>
-    <string name="picker_all_image">All Images</string>
+    <string name="picker_cancel">取消</string>
+    <string name="picker_all_image">所有图片</string>
     <string name="picker_over_max_count_tips">Up to %1$d photos can be selected</string>
     <string name="picker_image_count">%1$d</string>
 </resources>

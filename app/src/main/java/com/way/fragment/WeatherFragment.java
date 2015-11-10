@@ -196,6 +196,7 @@ public class WeatherFragment extends Fragment implements ITaskManager,SwipeRefre
 					if(data != null) {
 						headImg.setVisibility(View.VISIBLE);
 						commentsTxt.setVisibility(View.VISIBLE);
+
 						Picasso.with(getActivity()).load(data.getTopImg().getUrl()).placeholder(R.mipmap.img_default).into(headImg);
 						commentsTxt.setText(data.getTopComment().getContent());
 					}
@@ -462,10 +463,8 @@ public class WeatherFragment extends Fragment implements ITaskManager,SwipeRefre
 		Forecast forecast = weatherInfo.getForecast();
 
 		int type = realTime.getAnimation_type();
-		mNormalImageView.setImageResource(WeatherIconUtils
-				.getWeatherNromalBg(type));
-		mBlurredImageView.setImageResource(WeatherIconUtils
-				.getWeatherBlurBg(type));
+//		mNormalImageView.setImageResource(WeatherIconUtils.getWeatherNromalBg(type));//动态设置背景
+//		mBlurredImageView.setImageResource(WeatherIconUtils	.getWeatherBlurBg(type));//动态设置背景
 		mCurWeatherIV.setImageResource(WeatherIconUtils.getWeatherIcon(type));
 		mCurWeatherTV.setText(realTime.getWeather_name());
 		mCurFeelsTempTV.setText(realTime.getTemp() + "");

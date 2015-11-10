@@ -21,11 +21,15 @@
         android:layout_below="@id/home_head_img"
         android:layout_marginTop="16dp"
         android:ellipsize="end"
-        android:lines="3"
+        android:maxLines="3"
         android:padding="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginLeft="8dp"
         android:text="-"
         android:visibility="gone"
-        android:textSize="38sp" />
+        android:background="@drawable/module_bg"
+        android:textColor="@android:color/white"
+        android:textSize="25sp" />
 
     <ImageView
         android:id="@+id/flickr_icon"
@@ -54,6 +58,7 @@
         android:text="未发布"
         android:layout_alignParentRight="true"
         android:layout_marginRight="8dp"
+        android:visibility="gone"
         weather:typeface="fonts/Roboto-Regular.ttf" />
     android:textColor="#ffdcdcdc"
 
@@ -70,14 +75,22 @@
         android:visibility="invisible" />
 
     <LinearLayout
+        android:id="@+id/main_bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:weightSum="2"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/module_bg"
+        android:paddingRight="8dp"
+        android:paddingTop="8dp"
         android:orientation="horizontal">
 
         <!-- 左边-->
         <LinearLayout
+            android:id="@+id/main_left"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
@@ -95,7 +108,6 @@
                 android:layout_marginLeft="2.0dip"
                 android:layout_marginRight="@dimen/current_condition_icon_right_margin"
                 android:adjustViewBounds="true"
-                android:scaleType="centerCrop"
                 android:src="@drawable/ic_default_big" />
 
             <LinearLayout
@@ -150,7 +162,6 @@
                     android:layout_alignParentLeft="true"
                     android:layout_marginBottom="@dimen/negative_margin_sm"
                     android:layout_marginRight="0.0dip"
-                    android:layout_marginTop="-30.0dip"
                     android:text="--"
                     weather:typeface="fonts/Roboto-Thin.ttf" />
 
@@ -173,13 +184,11 @@
                 android:layout_alignTop="@id/main_icon"
                 android:layout_marginLeft="4.0dip"
                 android:layout_toRightOf="@id/main_icon"
-                android:layout_marginTop="-10dp"
                 android:gravity="center"
                 android:paddingBottom="0.0dip"
                 android:text="--"
                 weather:typeface="fonts/Roboto-Light.ttf" />
 
         </LinearLayout>
-
     </LinearLayout>
 </RelativeLayout>

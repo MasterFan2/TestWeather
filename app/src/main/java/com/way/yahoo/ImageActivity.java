@@ -2,26 +2,33 @@ package com.way.yahoo;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.app.Activity;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.lidroid.xutils.DbUtils;
 import com.lidroid.xutils.HttpUtils;
+import com.lidroid.xutils.db.sqlite.Selector;
+import com.lidroid.xutils.exception.DbException;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest;
 import com.squareup.picasso.Picasso;
+import com.way.beans.GoodImageComment;
 import com.way.beans.Image;
 import com.way.beans.ImageResult;
+import com.way.beans.UploadResp;
+import com.way.common.util.SystemUtils;
 import com.way.common.util.T;
 import com.way.ui.swipeback.SwipeBackActivity;
 import com.way.widget.WaitDialog;
@@ -30,11 +37,19 @@ import com.way.widget.dialog.OnClickListener;
 import com.way.widget.dialog.ViewHolder;
 import com.way.widget.indicator.AVLoadingIndicatorView;
 import com.way.widget.recyclerviewdiviver.DividerGridItemDecoration;
-import com.way.widget.recyclerviewdiviver.HorizontalDividerItemDecoration;
-import com.way.widget.recyclerviewdiviver.VerticalDividerItemDecoration;
 
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.UUID;
 
 import photopicker.PhotoPickerActivity;
 import photopicker.utils.PhotoPickerIntent;
@@ -44,6 +59,8 @@ public class ImageActivity extends SwipeBackActivity implements OnClickListener 
     //网络数据
     private ImageResult dataList;
     private HttpUtils http ;
+
+    private DbUtils db;
 
 
     private RecyclerView recyclerView;
@@ -62,6 +79,7 @@ public class ImageActivity extends SwipeBackActivity implements OnClickListener 
     private WaitDialog waitDialog;
 
     private AVLoadingIndicatorView loadingIndicatorView;
+    private LinearLayout footLayout;
 
     private ImageView contentImg;
 
@@ -71,6 +89,8 @@ public class ImageActivity extends SwipeBackActivity implements OnClickListener 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image);
+
+        db = DbUtils.create(this);
 
         waitDialog = new WaitDialog.Builder(context).create();
 
@@ -109,6 +129,7 @@ public class ImageActivity extends SwipeBackActivity implements OnClickListener 
 
         View footView = LayoutInflater.from(context).inflate(R.layout.dialog_upload_foot_layout, null);
         loadingIndicatorView = (AVLoadingIndicatorView) footView.findViewById(R.id.dialog_upload_loadingView);
+        footLayout  = (LinearLayout) footView.findViewById(R.id.dialog_upload_foot_layout);
         dialog = new MTDialog.Builder(context)
                 .setContentHolder(holder)
                 .setCancelable(false)
@@ -119,8 +140,6 @@ public class ImageActivity extends SwipeBackActivity implements OnClickListener 
                 .create();
 
         //network data
-        http = new HttpUtils();
-
         getData();
     }
 
@@ -135,6 +154,7 @@ public class ImageActivity extends SwipeBackActivity implements OnClickListener 
      */
     private void getData(){
         waitDialog.show();
+        http = new HttpUtils();
         http.send(HttpRequest.HttpMethod.GET, "http://116.255.235.119:1280/weatherForecastServer/img/index?pageIndex=1&pageSize=20", new RequestCallBack<String>() {
             @Override
             public void onSuccess(ResponseInfo<String> responseInfo) {//new TypeToken<List<Image>>() {}.getType()
@@ -158,10 +178,163 @@ public class ImageActivity extends SwipeBackActivity implements OnClickListener 
                 dialog.dismiss();
                 break;
             case R.id.footer_upload_confirm_button:
+                footLayout.setVisibility(View.INVISIBLE);
                 loadingIndicatorView.setVisibility(View.VISIBLE);
+                doUpload();
                 break;
         }
     }
+
+
+    /**
+     * 上传图片
+     */
+    private String picUrl = "";
+    private void doUpload() {
+        new Thread(){
+            @Override
+            public void run() {
+                uploadFile(new File(picUrl), "http://116.255.235.119:1280/weatherForecastServer/img/save");
+            }
+        }.start();
+
+//
+//        RequestParams params = new RequestParams();
+//        params.addBodyParameter("uploadImg", new File(picUrl));
+//        http.send(HttpRequest.HttpMethod.POST, "http://116.255.235.119:1280/weatherForecastServer/img/save", new RequestCallBack<String>() {
+//            @Override
+//            public void onSuccess(ResponseInfo<String> responseInfo) {//new TypeToken<List<Image>>() {}.getType()
+//
+//                T.showShort(context, "赞成功");
+//            }
+//
+//            @Override
+//            public void onFailure(HttpException e, String s) {
+//                T.showShort(context, "操作失败， 请稍后再试");
+//            }
+//
+//        });
+    }
+
+    //-----------------------------------------------
+    private static final String TAG = "uploadFile";
+    private static final int TIME_OUT = 10 * 1000; // 超时时间
+    private static final String CHARSET = "utf-8"; // 设置编码
+    /**
+     * Android上传文件到服务端
+     *
+     * @param file 需要上传的文件
+     * @param RequestURL 请求的rul
+     * @return 返回响应的内容
+     */
+    public String uploadFile(File file, String RequestURL) {
+        String result = null;
+        String BOUNDARY = UUID.randomUUID().toString(); // 边界标识 随机生成
+        String PREFIX = "--", LINE_END = "\r\n";
+        String CONTENT_TYPE = "multipart/form-data"; // 内容类型
+
+
+        try {
+            URL url = new URL(RequestURL);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setReadTimeout(TIME_OUT);
+            conn.setConnectTimeout(TIME_OUT);
+            conn.setDoInput(true); // 允许输入流
+            conn.setDoOutput(true); // 允许输出流
+            conn.setUseCaches(false); // 不允许使用缓存
+            conn.setRequestMethod("POST"); // 请求方式
+            conn.setRequestProperty("Charset", CHARSET); // 设置编码
+            conn.setRequestProperty("connection", "keep-alive");
+            conn.setRequestProperty("Content-Type", CONTENT_TYPE + ";boundary=" + BOUNDARY);
+
+
+            if (file != null) {
+                /**
+                 * 当文件不为空，把文件包装并且上传
+                 */
+                DataOutputStream dos = new DataOutputStream(conn.getOutputStream());
+                StringBuffer sb = new StringBuffer();
+                sb.append(PREFIX);
+                sb.append(BOUNDARY);
+                sb.append(LINE_END);
+                /**
+                 * 这里重点注意： name里面的值为服务端需要key 只有这个key 才可以得到对应的文件
+                 * filename是文件的名字，包含后缀名的 比如:abc.png
+                 */
+
+
+                sb.append("Content-Disposition: form-data; name=\"uploadImg\"; filename=\""
+                        + file.getName() + "\"" + LINE_END);
+                sb.append("Content-Type: application/octet-stream; charset=" + CHARSET + LINE_END);
+                sb.append(LINE_END);
+                dos.write(sb.toString().getBytes());
+                InputStream is = new FileInputStream(file);
+                byte[] bytes = new byte[1024];
+                int len = 0;
+                while ((len = is.read(bytes)) != -1) {
+                    dos.write(bytes, 0, len);
+                }
+                is.close();
+                dos.write(LINE_END.getBytes());
+                byte[] end_data = (PREFIX + BOUNDARY + PREFIX + LINE_END).getBytes();
+                dos.write(end_data);
+                dos.flush();
+                /**
+                 * 获取响应码 200=成功 当响应成功，获取响应的流
+                 */
+                int res = conn.getResponseCode();
+                Log.e(TAG, "response code:" + res);
+                // if(res==200)
+                // {
+                Log.e(TAG, "request success");
+                InputStream input = conn.getInputStream();
+                StringBuffer sb1 = new StringBuffer();
+                int ss;
+                while ((ss = input.read()) != -1) {
+                    sb1.append((char) ss);
+                }
+                result = sb1.toString();
+
+                UploadResp uploadResp = new Gson().fromJson(result, UploadResp.class);
+
+                if(uploadResp != null && uploadResp.getCode() == 200) {
+                    handler.sendEmptyMessage(0);
+                }else {
+                    handler.sendEmptyMessage(1);
+                }
+                Log.e(TAG, "result : " + result);
+                // }
+                // else{
+                // Log.e(TAG, "request error");
+                // }
+            }
+        } catch (MalformedURLException e) {
+            handler.sendEmptyMessage(1);
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+            handler.sendEmptyMessage(1);
+        }
+        return result;
+    }
+
+    //-----------------------------------------------
+
+    Handler handler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what){
+                case 0:
+                    if(dialog != null && dialog.isShowing()) dialog.dismiss();
+                    T.showShort(context, "上传成功");
+                    break;
+                case 1:
+                    footLayout.setVisibility(View.VISIBLE);
+                    T.showShort(context, "上传失败， 请稍后再试");
+                    break;
+            }
+        }
+    };
 
     public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.SimpleViewHolder> {
 
@@ -179,35 +352,89 @@ public class ImageActivity extends SwipeBackActivity implements OnClickListener 
                 @Override
                 public void onClick(View v) {
 
-                    if(isGooding == false) {
-                        isGooding = true;
-                        //赞
-                        http.send(HttpRequest.HttpMethod.GET, "http://116.255.235.119:1280/weatherForecastServer/img/support?imgId=" + image.getId(), new RequestCallBack<String>() {
-                            @Override
-                            public void onSuccess(ResponseInfo<String> responseInfo) {//new TypeToken<List<Image>>() {}.getType()
+                    Calendar calendar = Calendar.getInstance();
+                    String today = calendar.get(Calendar.YEAR)+"-" + calendar.get(Calendar.MONTH)+"-" + calendar.get(Calendar.DAY_OF_MONTH);
+                    List<GoodImageComment> localData = null;
+                    try {
+                        localData = db.findAll(Selector.from(GoodImageComment.class).where("tag", "=", "image").and("itemId", "=", image.getId()));
+                        if (localData == null || localData.size() <= 0) {//save
 
-                                //赞成功， 重新获取数据
-                                if(dialog != null && dialog.isShowing()) dialog.dismiss();
-                                dataList.getResult().get(position).setSupportNum(dataList.getResult().get(position).getSupportNum() + 1);
-                                T.showShort(context, "赞成功");
-                                adapter.notifyDataSetChanged();
-                                isGooding = false;
-                            }
+                            GoodImageComment goodImageComment = new GoodImageComment("image", image.getId(), today);
+                            db.save(goodImageComment);
 
-                            @Override
-                            public void onFailure(HttpException e, String s) {
-                                if(dialog != null && dialog.isShowing()) dialog.dismiss();
-                                T.showShort(context, "操作失败， 请稍后再试");
-                                isGooding = false;
+                            if (isGooding == false) {
+                                isGooding = true;
+                                //赞
+                                http = new HttpUtils();
+                                http.send(HttpRequest.HttpMethod.GET, "http://116.255.235.119:1280/weatherForecastServer/img/support?imgId=" + image.getId(), new RequestCallBack<String>() {
+                                    @Override
+                                    public void onSuccess(ResponseInfo<String> responseInfo) {//new TypeToken<List<Image>>() {}.getType()
+
+                                        //赞成功， 重新获取数据
+                                        if (dialog != null && dialog.isShowing()) dialog.dismiss();
+                                        dataList.getResult().get(position).setSupportNum(dataList.getResult().get(position).getSupportNum() + 1);
+                                        T.showShort(context, "赞成功");
+                                        adapter.notifyDataSetChanged();
+                                        isGooding = false;
+                                    }
+
+                                    @Override
+                                    public void onFailure(HttpException e, String s) {
+                                        if (dialog != null && dialog.isShowing()) dialog.dismiss();
+                                        T.showShort(context, "操作失败， 请稍后再试");
+                                        isGooding = false;
+                                    }
+                                });
+                            } else {
+                                T.showShort(context, "请稍后， 正在处理中...");
                             }
-                        });
-                    }else {
-                        T.showShort(context, "请稍后， 正在处理中...");
+                        } else {
+                            GoodImageComment goodImageComment = localData.get(0);
+                            if(goodImageComment.getDate().equals(today)) {//今天赞过
+                                T.showShort(context, "您已经赞过啦！");
+                            }else {
+                                GoodImageComment tempGood = new GoodImageComment("image", image.getId(), today);
+                                db.update(tempGood, "date");
+
+                                if (isGooding == false) {
+                                    isGooding = true;
+                                    //赞
+                                    http = new HttpUtils();
+                                    http.send(HttpRequest.HttpMethod.GET, "http://116.255.235.119:1280/weatherForecastServer/img/support?imgId=" + image.getId(), new RequestCallBack<String>() {
+                                        @Override
+                                        public void onSuccess(ResponseInfo<String> responseInfo) {//new TypeToken<List<Image>>() {}.getType()
+
+                                            //赞成功， 重新获取数据
+                                            if (dialog != null && dialog.isShowing()) dialog.dismiss();
+                                            dataList.getResult().get(position).setSupportNum(dataList.getResult().get(position).getSupportNum() + 1);
+                                            T.showShort(context, "赞成功");
+                                            adapter.notifyDataSetChanged();
+                                            isGooding = false;
+                                        }
+
+                                        @Override
+                                        public void onFailure(HttpException e, String s) {
+                                            if (dialog != null && dialog.isShowing()) dialog.dismiss();
+                                            T.showShort(context, "操作失败， 请稍后再试");
+                                            isGooding = false;
+                                        }
+                                    });
+                                } else {
+                                    T.showShort(context, "请稍后， 正在处理中...");
+                                }
+                            }
+                        }
+                    } catch (DbException e) {
+                        e.printStackTrace();
                     }
-
                 }
             });
-            Picasso.with(context).load(image.getUrl()).placeholder(R.mipmap.img_default).into(holder.contentImg);
+
+            if(!image.getUrl().contains("http://")) {
+                Picasso.with(context).load("http://116.255.235.119:1280/WeatherForecastServerUploadImg/" + image.getUrl()).placeholder(R.mipmap.img_default).into(holder.contentImg);
+            }else {
+                Picasso.with(context).load(image.getUrl()).placeholder(R.mipmap.img_default).into(holder.contentImg);
+            }
         }
 
         @Override
@@ -243,7 +470,11 @@ public class ImageActivity extends SwipeBackActivity implements OnClickListener 
             }
 
             if(selectedPhotos != null && selectedPhotos.size() > 0){
-                Picasso.with(context).load(selectedPhotos.get(0)).placeholder(R.mipmap.img_default).into( contentImg);
+                int width =  SystemUtils.getDisplayWidth(this);
+
+                Picasso.with(context).load(new File(selectedPhotos.get(0))).placeholder(R.mipmap.img_default).error(R.mipmap.img_default).into(contentImg);
+//                Picasso.with(context).load(selectedPhotos.get(0)).placeholder(R.mipmap.img_default).into(contentImg);
+                picUrl = selectedPhotos.get(0);
                 dialog.show();
             }
 //            System.out.println(selectedPhotos.toString());

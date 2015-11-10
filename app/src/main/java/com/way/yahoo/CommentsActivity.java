@@ -17,7 +17,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.lidroid.xutils.DbUtils;
 import com.lidroid.xutils.HttpUtils;
+import com.lidroid.xutils.db.sqlite.Selector;
+import com.lidroid.xutils.exception.DbException;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.RequestParams;
 import com.lidroid.xutils.http.ResponseInfo;
@@ -25,11 +28,15 @@ import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest;
 import com.way.beans.Comments;
 import com.way.beans.CommentsResult;
+import com.way.beans.GoodImageComment;
 import com.way.beans.ImageResult;
 import com.way.common.util.T;
 import com.way.ui.swipeback.SwipeBackActivity;
 import com.way.widget.WaitDialog;
 import com.way.widget.recyclerviewdiviver.HorizontalDividerItemDecoration;
+
+import java.util.Calendar;
+import java.util.List;
 
 public class CommentsActivity extends SwipeBackActivity {
 
@@ -43,12 +50,16 @@ public class CommentsActivity extends SwipeBackActivity {
 
     private WaitDialog dialog;
 
+    private DbUtils db;
+
     private boolean isGooding = false;//判断是否在处理赞       true:正在处理        false:空闲
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comments);
+
+        db = DbUtils.create(this);
 
         dialog = new WaitDialog.Builder(context).create();
 
@@ -74,6 +85,7 @@ public class CommentsActivity extends SwipeBackActivity {
                 dialog.show();
                 RequestParams params = new RequestParams();
                 params.addBodyParameter("content", content);
+                http = new HttpUtils();
                 http.send(HttpRequest.HttpMethod.POST, "http://116.255.235.119:1280/weatherForecastServer/comment/save", params, new RequestCallBack<String>() {
                     @Override
                     public void onSuccess(ResponseInfo<String> responseInfo) {//new TypeToken<List<Image>>() {}.getType()
@@ -99,7 +111,6 @@ public class CommentsActivity extends SwipeBackActivity {
 //        recyclerView.setAdapter(new CommentsAdapter());
         adapter = new CommentsAdapter();
         listview.setAdapter(adapter);
-        http = new HttpUtils();
         initData();
     }
 
@@ -112,6 +123,7 @@ public class CommentsActivity extends SwipeBackActivity {
     private void initData() {
         //network data
         dialog.show();
+        http = new HttpUtils();
         http.send(HttpRequest.HttpMethod.GET, "http://116.255.235.119:1280/weatherForecastServer/comment/index?pageIndex=1&pageSize=20", new RequestCallBack<String>() {
             @Override
             public void onSuccess(ResponseInfo<String> responseInfo) {//new TypeToken<List<Image>>() {}.getType()
@@ -175,32 +187,81 @@ public class CommentsActivity extends SwipeBackActivity {
                 @Override
                 public void onClick(View v) {
 
-                    if(isGooding == false) {
-                        dialog.show();
-                        isGooding = true;
-                        String url = "http://116.255.235.119:1280/weatherForecastServer/comment/support?commentId=" + comments.getId();
-                        //赞
-                        http.send(HttpRequest.HttpMethod.GET, url, new RequestCallBack<String>() {
-                            @Override
-                            public void onSuccess(ResponseInfo<String> responseInfo) {//new TypeToken<List<Image>>() {}.getType()
-                                if(dialog != null && dialog.isShowing()) dialog.dismiss();
-                                data.getResult().get(position).setSupportNum(data.getResult().get(position).getSupportNum() + 1);
-                                T.showShort(context, "赞成功");
-                                adapter.notifyDataSetChanged();
-                                isGooding = false;
-                            }
+                    Calendar calendar = Calendar.getInstance();
+                    String today = calendar.get(Calendar.YEAR)+"-" + calendar.get(Calendar.MONTH)+"-" + calendar.get(Calendar.DAY_OF_MONTH);
+                    List<GoodImageComment> localData = null;
+                    try {
+                        localData = db.findAll(Selector.from(GoodImageComment.class).where("tag", "=", "comment").and("itemId", "=", comments.getId()));
+                        if (localData == null || localData.size() <= 0) {//save
 
-                            @Override
-                            public void onFailure(HttpException e, String s) {
-                                if(dialog != null && dialog.isShowing()) dialog.dismiss();
-                                T.showShort(context, "操作失败， 请稍后再试");
-                                isGooding = false;
+                            GoodImageComment goodImageComment = new GoodImageComment("comment", comments.getId(), today);
+                            db.save(goodImageComment);
+
+                            if(isGooding == false) {
+                                dialog.show();
+                                isGooding = true;
+                                String url = "http://116.255.235.119:1280/weatherForecastServer/comment/support?commentId=" + comments.getId();
+                                //赞
+                                http = new HttpUtils();
+                                http.send(HttpRequest.HttpMethod.GET, url, new RequestCallBack<String>() {
+                                    @Override
+                                    public void onSuccess(ResponseInfo<String> responseInfo) {//new TypeToken<List<Image>>() {}.getType()
+                                        if(dialog != null && dialog.isShowing()) dialog.dismiss();
+                                        data.getResult().get(position).setSupportNum(data.getResult().get(position).getSupportNum() + 1);
+                                        T.showShort(context, "赞成功");
+                                        adapter.notifyDataSetChanged();
+                                        isGooding = false;
+                                    }
+
+                                    @Override
+                                    public void onFailure(HttpException e, String s) {
+                                        if(dialog != null && dialog.isShowing()) dialog.dismiss();
+                                        T.showShort(context, "操作失败， 请稍后再试");
+                                        isGooding = false;
+                                    }
+                                });
+                            }else {
+                                T.showLong(context, "请稍后， 正在处理中...");
                             }
-                        });
-                    }else {
-                        T.showLong(context, "请稍后， 正在处理中...");
+                        } else {
+                            GoodImageComment goodImageComment = localData.get(0);
+                            if(goodImageComment.getDate().equals(today)) {//今天赞过
+                                T.showShort(context, "您已经赞过啦！");
+                            }else {
+                                GoodImageComment tempGood = new GoodImageComment("comment", comments.getId(), today);
+                                db.update(tempGood, "date");
+
+                                if(isGooding == false) {
+                                    dialog.show();
+                                    isGooding = true;
+                                    String url = "http://116.255.235.119:1280/weatherForecastServer/comment/support?commentId=" + comments.getId();
+                                    //赞
+                                    http = new HttpUtils();
+                                    http.send(HttpRequest.HttpMethod.GET, url, new RequestCallBack<String>() {
+                                        @Override
+                                        public void onSuccess(ResponseInfo<String> responseInfo) {//new TypeToken<List<Image>>() {}.getType()
+                                            if(dialog != null && dialog.isShowing()) dialog.dismiss();
+                                            data.getResult().get(position).setSupportNum(data.getResult().get(position).getSupportNum() + 1);
+                                            T.showShort(context, "赞成功");
+                                            adapter.notifyDataSetChanged();
+                                            isGooding = false;
+                                        }
+
+                                        @Override
+                                        public void onFailure(HttpException e, String s) {
+                                            if(dialog != null && dialog.isShowing()) dialog.dismiss();
+                                            T.showShort(context, "操作失败， 请稍后再试");
+                                            isGooding = false;
+                                        }
+                                    });
+                                }else {
+                                    T.showLong(context, "请稍后， 正在处理中...");
+                                }
+                            }
+                        }
+                    } catch (DbException e) {
+                        e.printStackTrace();
                     }
-
                 }
             });
 

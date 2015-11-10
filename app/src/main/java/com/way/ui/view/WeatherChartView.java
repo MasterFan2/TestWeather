@@ -230,7 +230,7 @@ public class WeatherChartView extends WeatherBaseView {
         }
         Line lowLine = new Line(valuesLows);
         lowLine.setShape(ValueShape.CIRCLE);
-        lowLine.setColor(getResources().getColor(R.color.gray_400)).setCubic(false);//setCubic:true 设置为平滑线
+        lowLine.setColor(getResources().getColor(R.color.gray_200)).setCubic(false);//setCubic:true 设置为平滑线
         lowLine.setHasLabels(true);//显示点的数字
         lowLine.setIsUp(false);
 

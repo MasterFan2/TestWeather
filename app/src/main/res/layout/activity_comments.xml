@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    >
 
     <RelativeLayout
         android:id="@+id/image_header"
@@ -31,8 +33,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="@color/gray_400"
-        android:paddingRight="16dp">
+        android:background="@color/gray_100"
+        >
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -40,19 +42,24 @@
             android:layout_alignParentRight="true"
             android:focusable="true"
             android:focusableInTouchMode="true"
+            android:padding="8dp"
             >
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.15dp"
+                android:background="@color/gray_400"
+                />
 
             <TextView
                 android:id="@+id/comments_send_txt"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_width="100dp"
+                android:layout_height="75dp"
                 android:layout_alignParentRight="true"
-                android:layout_marginLeft="10dp"
                 android:gravity="center"
-                android:text="发送"
                 android:paddingLeft="15dp"
                 android:paddingRight="15dp"
-                android:textColor="@color/gray_800" />
+                android:background="@drawable/send"
+                />
 
             <EditText
                 android:id="@+id/comments_editText"
@@ -60,7 +67,8 @@
                 android:layout_height="match_parent"
                 android:layout_toLeftOf="@id/comments_send_txt"
                 android:hint="我是这样穿的"
-                android:padding="5dp"
+                android:paddingLeft="8dp"
+                android:background="@drawable/comments_input_background"
                 android:text=""
                 android:textColor="@color/gray_800"
                 android:textColorHint="@color/gray_600" />
@@ -73,6 +81,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/comments_bottom_layout"
+        android:divider="@color/gray_400"
+        android:dividerHeight="0.15dp"
         android:layout_below="@id/image_header" />
     <!--<android.support.v7.widget.RecyclerView-->
     <!--android:id="@+id/recyclerView"-->

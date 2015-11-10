@@ -102,13 +102,11 @@
     </style>
 
     <style name="WeatherChartModule">
-        <item name="android:background">@drawable/module_bg</item>
         <item name="android:layout_width">fill_parent</item>
         <item name="android:layout_height">wrap_content</item>
     </style>
 
     <style name="WeatherModule">
-        <item name="android:background">@drawable/module_bg</item>
         <item name="android:padding">@dimen/padding_sm</item>
         <item name="android:layout_width">fill_parent</item>
         <item name="android:layout_height">wrap_content</item>

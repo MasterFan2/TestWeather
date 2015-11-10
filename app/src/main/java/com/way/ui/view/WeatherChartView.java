@@ -15,6 +15,7 @@ import com.way.weather.plugin.bean.WeatherInfo;
 import com.way.yahoo.R;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import lecho.lib.hellocharts.model.Line;
@@ -52,6 +53,8 @@ public class WeatherChartView extends WeatherBaseView {
 
     //星期几
     TextView week_txt3, week_txt4, week_txt5, week_txt6;
+
+    TextView date_txt1, date_txt2, date_txt3, date_txt4, date_txt5, date_txt6;
 
     //晚上天气
     TextView foot_txt_1;
@@ -114,6 +117,13 @@ public class WeatherChartView extends WeatherBaseView {
         week_txt4 = (TextView) findViewById(R.id.week_txt4);
         week_txt5 = (TextView) findViewById(R.id.week_txt5);
         week_txt6 = (TextView) findViewById(R.id.week_txt6);
+
+        date_txt1 = (TextView) findViewById(R.id.date_txt1);
+        date_txt2 = (TextView) findViewById(R.id.date_txt2);
+        date_txt3 = (TextView) findViewById(R.id.date_txt3);
+        date_txt4 = (TextView) findViewById(R.id.date_txt4);
+        date_txt5 = (TextView) findViewById(R.id.date_txt5);
+        date_txt6 = (TextView) findViewById(R.id.date_txt6);
 
         mHandler = new Handler(context.getMainLooper()) {
             @Override
@@ -261,5 +271,26 @@ public class WeatherChartView extends WeatherBaseView {
         lineChartView.setZoomEnabled(false);
 
         lineChartView.startDataAnimation(500);
+
+        //set date
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.add(Calendar.DAY_OF_MONTH, -1);
+        date_txt1.setText(calendar.get(Calendar.MONTH) + 1 + "/" + calendar.get(Calendar.DAY_OF_MONTH));
+
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        date_txt2.setText(calendar.get(Calendar.MONTH) + 1 + "/" + calendar.get(Calendar.DAY_OF_MONTH));
+
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        date_txt3.setText(calendar.get(Calendar.MONTH) + 1 + "/" + calendar.get(Calendar.DAY_OF_MONTH));
+
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        date_txt4.setText(calendar.get(Calendar.MONTH) + 1 + "/" + calendar.get(Calendar.DAY_OF_MONTH));
+
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        date_txt5.setText(calendar.get(Calendar.MONTH) + 1 + "/" + calendar.get(Calendar.DAY_OF_MONTH));
+
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        date_txt6.setText(calendar.get(Calendar.MONTH) + 1 + "/" + calendar.get(Calendar.DAY_OF_MONTH));
     }
 }

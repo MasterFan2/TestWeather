@@ -56,7 +56,7 @@ public class PhotoPickerActivity extends AppCompatActivity {
 
     Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
     setSupportActionBar(mToolbar);
-    setTitle(R.string.picker_images);
+    setTitle("图片选择");
 
     ActionBar actionBar = getSupportActionBar();
 

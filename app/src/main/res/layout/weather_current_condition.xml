@@ -2,36 +2,30 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:weather="http://schemas.android.com/apk/res-auto"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:layout_height="fill_parent">
 
     <ImageView
         android:id="@+id/home_head_img"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:src="@mipmap/temp_main"
+        android:layout_height="240dp"
         android:scaleType="centerCrop"
+        android:src="@mipmap/img_default"
+        android:visibility="gone"
         />
 
+    <!-- 评论文字 -->
     <TextView
         android:id="@+id/home_head_comment_txt"
-        android:layout_below="@id/home_head_img"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="可以啊"
+        android:layout_below="@id/home_head_img"
         android:layout_marginTop="16dp"
+        android:ellipsize="end"
+        android:lines="3"
         android:padding="8dp"
-        />
-
-    <com.way.ui.view.WeatherTypefacedTextView
-        android:id="@+id/temperature"
-        style="@style/Label.Shadow.ExtraLarge"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_marginBottom="@dimen/negative_margin_sm"
-        android:layout_marginRight="0.0dip"
-        android:layout_marginTop="-30.0dip"
-        android:text="--"
-        weather:typeface="fonts/Roboto-Thin.ttf" />
+        android:text="-"
+        android:visibility="gone"
+        android:textSize="38sp" />
 
     <ImageView
         android:id="@+id/flickr_icon"
@@ -44,8 +38,8 @@
         android:layout_marginRight="3.0dip"
         android:contentDescription="@string/speak_launch_project_weather"
         android:paddingBottom="@dimen/flickr_icon_padding_bottom"
-        android:visibility="invisible"
-        android:src="@drawable/flickr" />
+        android:src="@drawable/flickr"
+        android:visibility="invisible" />
 
     <com.way.ui.view.WeatherTypefacedTextView
         android:id="@+id/copyright"
@@ -58,8 +52,10 @@
         android:maxWidth="120.0dip"
         android:paddingBottom="0.0dip"
         android:text="未发布"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="8dp"
         weather:typeface="fonts/Roboto-Regular.ttf" />
-        android:textColor="#ffdcdcdc"
+    android:textColor="#ffdcdcdc"
 
     <ImageView
         android:id="@+id/copyright_icon"
@@ -70,84 +66,120 @@
         android:layout_marginRight="1.0dip"
         android:layout_toLeftOf="@id/copyright"
         android:paddingBottom="@dimen/flickr_icon_padding_bottom"
-        android:visibility="invisible"
-        android:src="@drawable/copywrite" />
+        android:src="@drawable/copywrite"
+        android:visibility="invisible" />
 
-    <ImageView
-        android:id="@+id/temp_high_icon"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/temperature"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="@dimen/temp_high_icon_margin_left"
-        android:paddingBottom="@dimen/temp_high_icon_padding_bottom"
-        android:src="@drawable/temp_high" />
+        android:layout_alignParentBottom="true"
+        android:weightSum="2"
+        android:orientation="horizontal">
 
-    <ImageView
-        android:id="@+id/main_icon"
-        android:layout_width="@dimen/current_condition_icon_size"
-        android:layout_height="@dimen/current_condition_icon_size"
-        android:layout_above="@id/temp_high_icon"
-        android:layout_alignParentLeft="true"
-        android:layout_marginBottom="@dimen/current_condition_icon_margin_bottom"
-        android:layout_marginLeft="2.0dip"
-        android:layout_marginRight="@dimen/current_condition_icon_right_margin"
-        android:adjustViewBounds="true"
-        android:scaleType="centerCrop"
-        android:src="@drawable/ic_default_big" />
+        <!-- 左边-->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:layout_marginBottom="30dp"
+            >
+            <!-- 天气图标 -->
+            <ImageView
+                android:id="@+id/main_icon"
+                android:layout_width="150dp"
+                android:layout_height="100dp"
+                android:layout_alignParentLeft="true"
+                android:layout_marginBottom="@dimen/current_condition_icon_margin_bottom"
+                android:layout_marginLeft="2.0dip"
+                android:layout_marginRight="@dimen/current_condition_icon_right_margin"
+                android:adjustViewBounds="true"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_default_big" />
 
-    <com.way.ui.view.WeatherTypefacedTextView
-        android:id="@+id/weather_description"
-        style="@style/Label.Shadow"
-        android:layout_alignBottom="@id/main_icon"
-        android:layout_alignTop="@id/main_icon"
-        android:layout_marginLeft="4.0dip"
-        android:layout_toRightOf="@id/main_icon"
-        android:gravity="center"
-        android:paddingBottom="0.0dip"
-        android:text="--"
-        weather:typeface="fonts/Roboto-Light.ttf" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
-    <com.way.ui.view.WeatherTypefacedTextView
-        android:id="@+id/temp_high"
-        style="@style/Label.Shadow"
-        android:layout_above="@id/temperature"
-        android:layout_alignLeft="@id/weather_description"
-        android:layout_marginBottom="@dimen/high_low_text_margin_bottom"
-        android:layout_marginRight="30.0dip"
-        android:layout_toRightOf="@id/temp_high_icon"
-        android:text="--°"
-        weather:typeface="fonts/Roboto-Light.ttf" />
+                <!-- 最低温 -->
+                <com.way.ui.view.WeatherTypefacedTextView
+                    android:id="@+id/temp_low"
+                    style="@style/Label.Shadow"
+                    android:layout_marginBottom="@dimen/high_low_text_margin_bottom"
+                    android:text="--°"
+                    weather:typeface="fonts/Roboto-Light.ttf" />
+                <com.way.ui.view.WeatherTypefacedTextView
+                    style="@style/Label.Shadow"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginBottom="@dimen/high_low_text_margin_bottom"
+                    android:text="~"
+                    weather:typeface="fonts/Roboto-Light.ttf" />
+                <!-- 最高温 -->
+                <com.way.ui.view.WeatherTypefacedTextView
+                    android:id="@+id/temp_high"
+                    style="@style/Label.Shadow"
+                    android:layout_marginBottom="@dimen/high_low_text_margin_bottom"
+                    android:layout_marginRight="30.0dip"
+                    android:text="--°"
+                    weather:typeface="fonts/Roboto-Light.ttf" />
+            </LinearLayout>
+        </LinearLayout>
+        <!-- end 左边-->
 
-    <ImageView
-        android:id="@+id/temp_low_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/temperature"
-        android:layout_marginRight="@dimen/temp_icon_padding"
-        android:layout_toRightOf="@id/temp_high"
-        android:paddingBottom="@dimen/temp_high_icon_padding_bottom"
-        android:src="@drawable/temp_low" />
+        <!-- 右边-->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-    <com.way.ui.view.WeatherTypefacedTextView
-        android:id="@+id/temp_low"
-        style="@style/Label.Shadow"
-        android:layout_above="@id/temperature"
-        android:layout_marginBottom="@dimen/high_low_text_margin_bottom"
-        android:layout_toRightOf="@id/temp_low_icon"
-        android:text="--°"
-        weather:typeface="fonts/Roboto-Light.ttf" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                >
+                <!-- 温度 -->
+                <com.way.ui.view.WeatherTypefacedTextView
+                    android:id="@+id/temperature"
+                    style="@style/Label.Shadow.ExtraLarge"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginBottom="@dimen/negative_margin_sm"
+                    android:layout_marginRight="0.0dip"
+                    android:layout_marginTop="-30.0dip"
+                    android:text="--"
+                    weather:typeface="fonts/Roboto-Thin.ttf" />
 
-    <ImageView
-        android:id="@+id/degree_icon"
-        android:layout_width="@dimen/degree_icon_size"
-        android:layout_height="@dimen/degree_icon_size"
-        android:layout_alignTop="@id/temperature"
-        android:layout_marginBottom="10.0dip"
-        android:layout_marginLeft="5.0dip"
-        android:layout_marginRight="14.0dip"
-        android:layout_marginTop="40.0dip"
-        android:layout_toRightOf="@id/temperature"
-        android:src="@drawable/big_temp_degree" />
+                <ImageView
+                    android:id="@+id/degree_icon"
+                    android:layout_width="@dimen/degree_icon_size"
+                    android:layout_height="@dimen/degree_icon_size"
+                    android:layout_alignTop="@id/temperature"
+                    android:layout_marginBottom="10.0dip"
+                    android:layout_marginLeft="5.0dip"
+                    android:layout_marginRight="14.0dip"
+                    android:layout_toRightOf="@id/temperature"
+                    android:src="@drawable/big_temp_degree" />
+            </LinearLayout>
+            <!-- 文字天气 -->
+            <com.way.ui.view.WeatherTypefacedTextView
+                android:id="@+id/weather_description"
+                style="@style/Label.Shadow"
+                android:layout_alignBottom="@id/main_icon"
+                android:layout_alignTop="@id/main_icon"
+                android:layout_marginLeft="4.0dip"
+                android:layout_toRightOf="@id/main_icon"
+                android:layout_marginTop="-10dp"
+                android:gravity="center"
+                android:paddingBottom="0.0dip"
+                android:text="--"
+                weather:typeface="fonts/Roboto-Light.ttf" />
 
+        </LinearLayout>
+
+    </LinearLayout>
 </RelativeLayout>

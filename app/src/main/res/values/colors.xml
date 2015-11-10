@@ -201,6 +201,7 @@
     <color name="gray_900">#212121</color>
     <color name="gray_1000">#000000</color>
 
+    <color name="title_blue">#4fc2e9</color>
 
     <color name="picker_pager_bg">#CA000000</color>
     <color name="picker_selected_bg">#44000000</color>

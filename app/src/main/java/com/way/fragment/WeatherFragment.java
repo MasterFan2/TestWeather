@@ -31,13 +31,17 @@ import android.widget.Toast;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.StringRequest;
+import com.google.gson.Gson;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest;
+import com.squareup.picasso.Picasso;
 import com.way.adapter.WeatherListAdapter;
 import com.way.beans.City;
+import com.way.beans.CommentsResult;
+import com.way.beans.MainPictureComment;
 import com.way.common.util.NetUtil;
 import com.way.common.util.SystemUtils;
 import com.way.common.util.TimeUtils;
@@ -69,6 +73,7 @@ public class WeatherFragment extends Fragment implements ITaskManager,SwipeRefre
 	private int mHeaderHeight = -1;
 
 	private HttpUtils http ;
+	private MainPictureComment data;
 
 	//图片 和文字描述
 	private ImageView headImg;
@@ -184,10 +189,16 @@ public class WeatherFragment extends Fragment implements ITaskManager,SwipeRefre
 
 			//获取首页数据
 			http = new HttpUtils();
-			http.send(HttpRequest.HttpMethod.GET, "", new RequestCallBack<String>() {
+			http.send(HttpRequest.HttpMethod.GET, "http://116.255.235.119:1280/weatherForecastServer/index/index", new RequestCallBack<String>() {
 				@Override
 				public void onSuccess(ResponseInfo<String> responseInfo) {
-
+					data = new Gson().fromJson(responseInfo.result, MainPictureComment.class);
+					if(data != null) {
+						headImg.setVisibility(View.VISIBLE);
+						commentsTxt.setVisibility(View.VISIBLE);
+						Picasso.with(getActivity()).load(data.getTopImg().getUrl()).placeholder(R.mipmap.img_default).into(headImg);
+						commentsTxt.setText(data.getTopComment().getContent());
+					}
 				}
 
 				@Override

@@ -127,9 +127,9 @@ public class CommentsActivity extends SwipeBackActivity {
         http.send(HttpRequest.HttpMethod.GET, "http://116.255.235.119:1280/weatherForecastServer/comment/index?pageIndex=1&pageSize=20", new RequestCallBack<String>() {
             @Override
             public void onSuccess(ResponseInfo<String> responseInfo) {//new TypeToken<List<Image>>() {}.getType()
-                data = new Gson().fromJson(responseInfo.result, CommentsResult.class);
                 if(dialog != null && dialog.isShowing()) dialog.dismiss();
-                handler.sendEmptyMessage(0);
+                data = new Gson().fromJson(responseInfo.result, CommentsResult.class);
+                adapter.notifyDataSetChanged();
             }
 
             @Override

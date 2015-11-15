@@ -6,6 +6,7 @@ import android.app.Application;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.way.common.util.SystemUtils;
+import com.way.net.HttpClient;
 
 public class App extends Application {
 	private static App mApplication;
@@ -27,5 +28,6 @@ public class App extends Application {
 		super.onCreate();
 		mApplication = this;
 		SystemUtils.copyDB(this);// 程序第一次运行将数据库copy过去
+		HttpClient.getInstance().init(this);
 	}
 }

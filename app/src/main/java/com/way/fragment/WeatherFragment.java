@@ -50,6 +50,7 @@ import com.way.common.util.WeatherIconUtils;
 import com.way.db.CityProvider;
 import com.way.db.CityProvider.CityConstants;
 import com.way.fragment.BaseFragment.ABaseTask;
+import com.way.net.HttpClient;
 import com.way.weather.plugin.bean.Forecast;
 import com.way.weather.plugin.bean.RealTime;
 import com.way.weather.plugin.bean.WeatherInfo;
@@ -59,6 +60,10 @@ import com.way.yahoo.CommentsActivity;
 import com.way.yahoo.ImageActivity;
 import com.way.yahoo.MainActivity;
 import com.way.yahoo.R;
+
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 public class WeatherFragment extends Fragment implements ITaskManager,SwipeRefreshLayout.OnRefreshListener, View.OnClickListener {
 	public static final String ARG_CITY = "city";
@@ -112,6 +117,49 @@ public class WeatherFragment extends Fragment implements ITaskManager,SwipeRefre
 		mActivity = (MainActivity) getActivity();
 		mContentResolver = getActivity().getContentResolver();
 	}
+
+	Callback<MainPictureComment> cb = new Callback<MainPictureComment>() {
+		@Override
+		public void success(MainPictureComment mainPictureComment, Response response) {
+			if(mainPictureComment != null){
+				data = mainPictureComment;
+
+				headImg.setVisibility(View.VISIBLE);
+				commentsTxt.setVisibility(View.VISIBLE);
+
+				Picasso.with(getActivity()).load(data.getTopImg().getUrl()).placeholder(R.mipmap.img_default).into(headImg);
+				commentsTxt.setText(data.getTopComment().getContent());
+			}
+		}
+
+		@Override
+		public void failure(RetrofitError error) {
+
+		}
+	};
+
+//	private void getImageAndComment(){
+//		//获取首页数据
+//		http = new HttpUtils();
+//		http.send(HttpRequest.HttpMethod.GET, "http://116.255.235.119:1280/weatherForecastServer/index/index", new RequestCallBack<String>() {
+//			@Override
+//			public void onSuccess(ResponseInfo<String> responseInfo) {
+//				data = new Gson().fromJson(responseInfo.result, MainPictureComment.class);
+//				if (data != null) {
+//					headImg.setVisibility(View.VISIBLE);
+//					commentsTxt.setVisibility(View.VISIBLE);
+//
+//					Picasso.with(getActivity()).load(data.getTopImg().getUrl()).placeholder(R.mipmap.img_default).into(headImg);
+//					commentsTxt.setText(data.getTopComment().getContent());
+//				}
+//			}
+//
+//			@Override
+//			public void onFailure(HttpException e, String s) {
+//
+//			}
+//		});
+//	}
 
 	private View mRootView;
 	// 分别表示当前Fragment是否可见,是否已准备(表示已经走过onCreateView方法)以及是否数据已加载
@@ -169,29 +217,6 @@ public class WeatherFragment extends Fragment implements ITaskManager,SwipeRefre
 		return false;
 	}
 
-	private void getImageAndComment(){
-		//获取首页数据
-		http = new HttpUtils();
-		http.send(HttpRequest.HttpMethod.GET, "http://116.255.235.119:1280/weatherForecastServer/index/index", new RequestCallBack<String>() {
-			@Override
-			public void onSuccess(ResponseInfo<String> responseInfo) {
-				data = new Gson().fromJson(responseInfo.result, MainPictureComment.class);
-				if(data != null) {
-					headImg.setVisibility(View.VISIBLE);
-					commentsTxt.setVisibility(View.VISIBLE);
-
-					Picasso.with(getActivity()).load(data.getTopImg().getUrl()).placeholder(R.mipmap.img_default).into(headImg);
-					commentsTxt.setText(data.getTopComment().getContent());
-				}
-			}
-
-			@Override
-			public void onFailure(HttpException e, String s) {
-
-			}
-		});
-	}
-
 	/**
 	 * createView
 	 * @param inflater
@@ -214,7 +239,7 @@ public class WeatherFragment extends Fragment implements ITaskManager,SwipeRefre
 					// } else {
 					// loadWeatherInfoFromLocal();
 					// }
-			getImageAndComment();
+			HttpClient.getInstance().getMainCommentsImages(cb);
 		} else {
 			// ViewGroup mRootParent = (ViewGroup) mRootView.getParent();
 			// if (mRootParent != null) {
@@ -491,7 +516,7 @@ public class WeatherFragment extends Fragment implements ITaskManager,SwipeRefre
 	@Override
 	public void onRefresh() {
 		requestData(true);
-		getImageAndComment();
+		HttpClient.getInstance().getMainCommentsImages(cb);
 	}
 
 	public void requestData(boolean force) {

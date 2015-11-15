@@ -14,7 +14,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.lidroid.xutils.DbUtils;
@@ -27,17 +26,21 @@ import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest;
 import com.umeng.analytics.MobclickAgent;
+import com.way.beans.BaseEntity;
 import com.way.beans.Comments;
 import com.way.beans.CommentsResult;
 import com.way.beans.GoodImageComment;
-import com.way.beans.ImageResult;
 import com.way.common.util.T;
+import com.way.net.HttpClient;
 import com.way.ui.swipeback.SwipeBackActivity;
 import com.way.widget.WaitDialog;
-import com.way.widget.recyclerviewdiviver.HorizontalDividerItemDecoration;
 
 import java.util.Calendar;
 import java.util.List;
+
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 public class CommentsActivity extends SwipeBackActivity {
 
@@ -82,26 +85,8 @@ public class CommentsActivity extends SwipeBackActivity {
                     T.showShort(context, "请输入内容");
                     return;
                 }
-
                 dialog.show();
-                RequestParams params = new RequestParams();
-                params.addBodyParameter("content", content);
-                http = new HttpUtils();
-                http.send(HttpRequest.HttpMethod.POST, "http://116.255.235.119:1280/weatherForecastServer/comment/save", params, new RequestCallBack<String>() {
-                    @Override
-                    public void onSuccess(ResponseInfo<String> responseInfo) {//new TypeToken<List<Image>>() {}.getType()
-
-                        if(dialog != null && dialog.isShowing()) dialog.dismiss();
-                        editText.setText("");
-                        initData();
-                    }
-
-                    @Override
-                    public void onFailure(HttpException e, String s) {
-                        if(dialog != null && dialog.isShowing()) dialog.dismiss();
-                        T.showShort(context, "发送失败， 请稍后重试...");
-                    }
-                });
+                HttpClient.getInstance().sendComments(content, commentCallback);
 
             }
         });
@@ -112,8 +97,43 @@ public class CommentsActivity extends SwipeBackActivity {
 //        recyclerView.setAdapter(new CommentsAdapter());
         adapter = new CommentsAdapter();
         listview.setAdapter(adapter);
-        initData();
+
+        HttpClient.getInstance().getComments(1, 30, cb);
     }
+
+    private Callback<BaseEntity> commentCallback = new Callback<BaseEntity>() {
+        @Override
+        public void success(BaseEntity baseEntity, Response response) {
+            if(dialog != null && dialog.isShowing()) dialog.dismiss();
+            if(baseEntity.getCode() == 200) {
+                editText.setText("");
+                HttpClient.getInstance().getComments(1, 30, cb);
+            }
+        }
+
+        @Override
+        public void failure(RetrofitError error) {
+            if(dialog != null && dialog.isShowing()) dialog.dismiss();
+            T.showShort(context, "评论失败");
+        }
+    };
+
+
+
+    private Callback<CommentsResult> cb = new Callback<CommentsResult>() {
+        @Override
+        public void success(CommentsResult commentsResult, Response response) {
+            if(commentsResult != null) {
+                data = commentsResult;
+                adapter.notifyDataSetChanged();
+            }
+        }
+
+        @Override
+        public void failure(RetrofitError error) {
+
+        }
+    };
 
     @Override
     protected void onDestroy() {
@@ -121,25 +141,27 @@ public class CommentsActivity extends SwipeBackActivity {
         data = null;
     }
 
-    private void initData() {
-        //network data
-        dialog.show();
-        http = new HttpUtils();
-        http.send(HttpRequest.HttpMethod.GET, "http://116.255.235.119:1280/weatherForecastServer/comment/index?pageIndex=1&pageSize=20", new RequestCallBack<String>() {
-            @Override
-            public void onSuccess(ResponseInfo<String> responseInfo) {//new TypeToken<List<Image>>() {}.getType()
-                if(dialog != null && dialog.isShowing()) dialog.dismiss();
-                data = new Gson().fromJson(responseInfo.result, CommentsResult.class);
-                adapter.notifyDataSetChanged();
-            }
 
-            @Override
-            public void onFailure(HttpException e, String s) {
-                if(dialog != null && dialog.isShowing()) dialog.dismiss();
-                T.showShort(context, "获取数据错误， 请稍后再试");
-            }
-        });
-    }
+
+//    private void getData() {
+//        //network data
+//        dialog.show();
+//        http = new HttpUtils();
+//        http.send(HttpRequest.HttpMethod.GET, "http://116.255.235.119:1280/weatherForecastServer/comment/index?pageIndex=1&pageSize=20", new RequestCallBack<String>() {
+//            @Override
+//            public void onSuccess(ResponseInfo<String> responseInfo) {//new TypeToken<List<Image>>() {}.getType()
+//                if(dialog != null && dialog.isShowing()) dialog.dismiss();
+//                data = new Gson().fromJson(responseInfo.result, CommentsResult.class);
+//                adapter.notifyDataSetChanged();
+//            }
+//
+//            @Override
+//            public void onFailure(HttpException e, String s) {
+//                if(dialog != null && dialog.isShowing()) dialog.dismiss();
+//                T.showShort(context, "获取数据错误， 请稍后再试");
+//            }
+//        });
+//    }
 
     private Handler handler = new Handler(){
         @Override
@@ -151,6 +173,96 @@ public class CommentsActivity extends SwipeBackActivity {
             }
         }
     };
+    //------------------------
+    private int currentPosition = -1;
+    private Callback<BaseEntity> goodCallback = new Callback<BaseEntity>() {
+        @Override
+        public void success(BaseEntity baseEntity, Response response) {
+            if(dialog != null && dialog.isShowing()) dialog.dismiss();
+            if(baseEntity.getCode() == 200) {
+                T.showShort(context, "赞成功");
+                if(saveTempGoodImageComment != null) {
+                    try {
+                        db.save(saveTempGoodImageComment);
+                    } catch (DbException e) {
+                        e.printStackTrace();
+                    }
+                    saveTempGoodImageComment = null;
+                }
+
+                if(updateTempGoodImageComment != null){
+                    try {
+                        db.update(updateTempGoodImageComment, "date");
+                    } catch (DbException e) {
+                        e.printStackTrace();
+                    }
+                    updateTempGoodImageComment = null;
+                }
+
+                if(currentPosition != -1){
+                    data.getResult().get(currentPosition).setSupportNum(data.getResult().get(currentPosition).getSupportNum() + 1);
+                    adapter.notifyDataSetChanged();
+                    currentPosition = -1;
+                }
+            }
+            isGooding = false;
+        }
+
+        @Override
+        public void failure(RetrofitError error) {
+            if(dialog != null && dialog.isShowing()) dialog.dismiss();
+            isGooding = false;
+            T.showShort(context, "赞失败，请稍后再试");
+        }
+    };
+
+    private GoodImageComment updateTempGoodImageComment;
+    private GoodImageComment saveTempGoodImageComment;
+    private void doGood(int position) {
+        Comments comments = data.getResult().get(position);
+
+        Calendar calendar = Calendar.getInstance();
+        String today = calendar.get(Calendar.YEAR)+"-" + calendar.get(Calendar.MONTH)+"-" + calendar.get(Calendar.DAY_OF_MONTH);
+        List<GoodImageComment> localData = null;
+        try {
+            localData = db.findAll(Selector.from(GoodImageComment.class).where("tag", "=", "comment").and("itemId", "=", comments.getId()));
+            if (localData == null || localData.size() <= 0) {//save
+
+                saveTempGoodImageComment = new GoodImageComment("comment", comments.getId(), today);
+
+                if(isGooding == false) {
+                    dialog.show();
+                    isGooding = true;
+                    currentPosition = position;
+
+                    HttpClient.getInstance().goodComments(comments.getId(), goodCallback);
+
+                }else {
+                    T.showLong(context, "请稍后， 正在处理中...");
+                }
+            } else {
+                GoodImageComment goodImageComment = localData.get(0);
+                if(goodImageComment.getDate().equals(today)) {//今天赞过
+                    T.showShort(context, "您已经赞过啦！");
+                }else {
+                    updateTempGoodImageComment = new GoodImageComment("comment", comments.getId(), today);
+
+                    if(isGooding == false) {
+                        dialog.show();
+                        isGooding = true;
+                        currentPosition = position;
+
+                        HttpClient.getInstance().goodComments(comments.getId(), goodCallback);
+                    }else {
+                        T.showLong(context, "请稍后， 正在处理中...");
+                    }
+                }
+            }
+        } catch (DbException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     class CommentsAdapter extends BaseAdapter {
 
@@ -187,82 +299,7 @@ public class CommentsActivity extends SwipeBackActivity {
             holder.goodsImg.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
-                    Calendar calendar = Calendar.getInstance();
-                    String today = calendar.get(Calendar.YEAR)+"-" + calendar.get(Calendar.MONTH)+"-" + calendar.get(Calendar.DAY_OF_MONTH);
-                    List<GoodImageComment> localData = null;
-                    try {
-                        localData = db.findAll(Selector.from(GoodImageComment.class).where("tag", "=", "comment").and("itemId", "=", comments.getId()));
-                        if (localData == null || localData.size() <= 0) {//save
-
-                            GoodImageComment goodImageComment = new GoodImageComment("comment", comments.getId(), today);
-                            db.save(goodImageComment);
-
-                            if(isGooding == false) {
-                                dialog.show();
-                                isGooding = true;
-                                String url = "http://116.255.235.119:1280/weatherForecastServer/comment/support?commentId=" + comments.getId();
-                                //赞
-                                http = new HttpUtils();
-                                http.send(HttpRequest.HttpMethod.GET, url, new RequestCallBack<String>() {
-                                    @Override
-                                    public void onSuccess(ResponseInfo<String> responseInfo) {//new TypeToken<List<Image>>() {}.getType()
-                                        if(dialog != null && dialog.isShowing()) dialog.dismiss();
-                                        data.getResult().get(position).setSupportNum(data.getResult().get(position).getSupportNum() + 1);
-                                        T.showShort(context, "赞成功");
-                                        adapter.notifyDataSetChanged();
-                                        isGooding = false;
-                                    }
-
-                                    @Override
-                                    public void onFailure(HttpException e, String s) {
-                                        if(dialog != null && dialog.isShowing()) dialog.dismiss();
-                                        T.showShort(context, "操作失败， 请稍后再试");
-                                        isGooding = false;
-                                    }
-                                });
-                            }else {
-                                T.showLong(context, "请稍后， 正在处理中...");
-                            }
-                        } else {
-                            GoodImageComment goodImageComment = localData.get(0);
-                            if(goodImageComment.getDate().equals(today)) {//今天赞过
-                                T.showShort(context, "您已经赞过啦！");
-                            }else {
-                                GoodImageComment tempGood = new GoodImageComment("comment", comments.getId(), today);
-                                db.update(tempGood, "date");
-
-                                if(isGooding == false) {
-                                    dialog.show();
-                                    isGooding = true;
-                                    String url = "http://116.255.235.119:1280/weatherForecastServer/comment/support?commentId=" + comments.getId();
-                                    //赞
-                                    http = new HttpUtils();
-                                    http.send(HttpRequest.HttpMethod.GET, url, new RequestCallBack<String>() {
-                                        @Override
-                                        public void onSuccess(ResponseInfo<String> responseInfo) {//new TypeToken<List<Image>>() {}.getType()
-                                            if(dialog != null && dialog.isShowing()) dialog.dismiss();
-                                            data.getResult().get(position).setSupportNum(data.getResult().get(position).getSupportNum() + 1);
-                                            T.showShort(context, "赞成功");
-                                            adapter.notifyDataSetChanged();
-                                            isGooding = false;
-                                        }
-
-                                        @Override
-                                        public void onFailure(HttpException e, String s) {
-                                            if(dialog != null && dialog.isShowing()) dialog.dismiss();
-                                            T.showShort(context, "操作失败， 请稍后再试");
-                                            isGooding = false;
-                                        }
-                                    });
-                                }else {
-                                    T.showLong(context, "请稍后， 正在处理中...");
-                                }
-                            }
-                        }
-                    } catch (DbException e) {
-                        e.printStackTrace();
-                    }
+                   doGood(position);
                 }
             });
 

@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.umeng.analytics.MobclickAgent;
 import com.way.yahoo.R;
 
 import java.util.ArrayList;
@@ -44,6 +45,17 @@ public class PhotoPickerActivity extends AppCompatActivity {
 
   private boolean showGif = false;
 
+  @Override
+  protected void onResume() {
+    MobclickAgent.onResume(this);
+    super.onResume();
+  }
+
+  @Override
+  protected void onPause() {
+    MobclickAgent.onPause(this);
+    super.onPause();
+  }
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);

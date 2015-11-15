@@ -15,6 +15,8 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.umeng.analytics.MobclickAgent;
+import com.umeng.update.UmengUpdateAgent;
 import com.viewpagerindicator.CirclePageIndicator;
 import com.way.adapter.ParallaxPagerTransformer;
 import com.way.adapter.SideMenuAdapter;
@@ -60,6 +62,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPag
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		UmengUpdateAgent.update(this);
 		initMenuDrawer();
 		mMenuDrawer.setContentView(R.layout.activity_main);
 		initViews();
@@ -112,6 +115,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPag
 	@Override
 	protected void onResume() {
 		super.onResume();
+		MobclickAgent.onResume(this);
 		mTmpCities = getTmpCities();
 		if (!mTmpCities.isEmpty()) {
 			updateUI();
@@ -131,8 +135,9 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPag
 	protected void onPause() {
 		super.onPause();
 		// 保存默认选择页
-		PreferenceUtils.setPrefInt(this, INSTANCESTATE_TAB,
-				mMainViewPager.getCurrentItem());
+		PreferenceUtils.setPrefInt(this, INSTANCESTATE_TAB, mMainViewPager.getCurrentItem());
+
+		MobclickAgent.onPause(this);
 	}
 
 	private void visibleAddCityBtn() {

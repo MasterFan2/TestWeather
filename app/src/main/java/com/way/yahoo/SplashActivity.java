@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.umeng.analytics.MobclickAgent;
+
 public class SplashActivity extends Activity {
 	private static final int ACTIVITY_TIMEOUT_GOTO_NEXT = 0;
 	private static final int ACTIVITY_TIME = 2000;
@@ -21,13 +23,11 @@ public class SplashActivity extends Activity {
 
 		mWindow = getWindow();
 		WindowManager.LayoutParams params = mWindow.getAttributes();
-		params.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
-				| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+		params.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
 		mWindow.setAttributes(params);
 
 		setContentView(R.layout.splash_activity_layout);
-		mHandler.sendEmptyMessageDelayed(ACTIVITY_TIMEOUT_GOTO_NEXT,
-				ACTIVITY_TIME);
+		mHandler.sendEmptyMessageDelayed(ACTIVITY_TIMEOUT_GOTO_NEXT, ACTIVITY_TIME);
 	}
 	@Override
 	public void onBackPressed() {
@@ -37,6 +37,15 @@ public class SplashActivity extends Activity {
 	protected void onDestroy() {
 		super.onDestroy();
 		mHandler.removeMessages(ACTIVITY_TIMEOUT_GOTO_NEXT);
+	}
+
+	public void onResume() {
+		super.onResume();
+		MobclickAgent.onResume(this);       //统计时长
+	}
+	public void onPause() {
+		super.onPause();
+		MobclickAgent.onPause(this);
 	}
 
 	private Handler mHandler = new Handler() {

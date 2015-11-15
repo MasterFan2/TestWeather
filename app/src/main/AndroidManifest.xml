@@ -92,34 +92,48 @@
             android:name="api_token"
             android:value="b6bb01fe261cafbabf03e16a9bdf33ad" />
 
+
         <service
-            android:name="com.baidu.location.f"
-            android:enabled="true"
-            android:process=":remote" >
+        android:name="com.baidu.location.f"
+        android:enabled="true"
+        android:process=":remote" >
         </service>
 
         <meta-data
-            android:name="com.baidu.lbsapi.API_KEY"
-            android:value="W9xG4m71Ek8xz2GyhZvGiuWb" />
+        android:name="com.baidu.lbsapi.API_KEY"
+        android:value="W9xG4m71Ek8xz2GyhZvGiuWb" />
 
         <activity
-            android:name=".ImageActivity"
-            android:theme="@style/AppTheme"
-            >
+        android:name=".ImageActivity"
+        android:theme="@style/AppTheme"
+        >
         </activity>
         <activity
-            android:name=".CommentsActivity"
-            >
+        android:name=".CommentsActivity"
+        >
         </activity>
 
         <activity
-            android:theme="@style/myTheme"
-            android:name="photopicker.PhotoPickerActivity"
-            />
+        android:theme="@style/myTheme"
+        android:name="photopicker.PhotoPickerActivity"
+        />
 
         <activity
-            android:name="photopicker.PhotoPagerActivity"
-            />
+        android:name="photopicker.PhotoPagerActivity"
+        />
+        <!-- umeng -->
+        <meta-data android:value="56481e9d67e58eb80d001531" android:name="UMENG_APPKEY"></meta-data>
+        <meta-data android:value="self" android:name="UMENG_CHANNEL"/>
+
+        <service
+            android:name="com.umeng.update.net.DownloadingService"
+            android:process=":DownloadingService" >
+        </service>
+        <activity
+            android:name="com.umeng.update.UpdateDialogActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+        </activity>
+
     </application>
 
 </manifest>

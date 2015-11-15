@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.TextView;
 
+import com.umeng.analytics.MobclickAgent;
 import com.way.ui.swipeback.SwipeBackActivity;
 
 public class AboutActivity extends SwipeBackActivity {
@@ -40,6 +41,19 @@ public class AboutActivity extends SwipeBackActivity {
 //					upgradeMangeer.askForNewVersion();
 //			}
 //		});
+	}
+
+
+	@Override
+	protected void onResume() {
+		MobclickAgent.onResume(this);
+		super.onResume();
+	}
+
+	@Override
+	protected void onPause() {
+		MobclickAgent.onPause(this);
+		super.onPause();
 	}
 
 }

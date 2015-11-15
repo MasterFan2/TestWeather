@@ -38,6 +38,7 @@ import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest;
 import com.squareup.picasso.Picasso;
+import com.umeng.analytics.MobclickAgent;
 import com.way.adapter.WeatherListAdapter;
 import com.way.beans.City;
 import com.way.beans.CommentsResult;
@@ -168,6 +169,29 @@ public class WeatherFragment extends Fragment implements ITaskManager,SwipeRefre
 		return false;
 	}
 
+	private void getImageAndComment(){
+		//获取首页数据
+		http = new HttpUtils();
+		http.send(HttpRequest.HttpMethod.GET, "http://116.255.235.119:1280/weatherForecastServer/index/index", new RequestCallBack<String>() {
+			@Override
+			public void onSuccess(ResponseInfo<String> responseInfo) {
+				data = new Gson().fromJson(responseInfo.result, MainPictureComment.class);
+				if(data != null) {
+					headImg.setVisibility(View.VISIBLE);
+					commentsTxt.setVisibility(View.VISIBLE);
+
+					Picasso.with(getActivity()).load(data.getTopImg().getUrl()).placeholder(R.mipmap.img_default).into(headImg);
+					commentsTxt.setText(data.getTopComment().getContent());
+				}
+			}
+
+			@Override
+			public void onFailure(HttpException e, String s) {
+
+			}
+		});
+	}
+
 	/**
 	 * createView
 	 * @param inflater
@@ -187,29 +211,10 @@ public class WeatherFragment extends Fragment implements ITaskManager,SwipeRefre
 			mHandler.removeCallbacks(delayRefresh);
 			mHandler.post(delayRefresh);
 
-			//获取首页数据
-			http = new HttpUtils();
-			http.send(HttpRequest.HttpMethod.GET, "http://116.255.235.119:1280/weatherForecastServer/index/index", new RequestCallBack<String>() {
-				@Override
-				public void onSuccess(ResponseInfo<String> responseInfo) {
-					data = new Gson().fromJson(responseInfo.result, MainPictureComment.class);
-					if(data != null) {
-						headImg.setVisibility(View.VISIBLE);
-						commentsTxt.setVisibility(View.VISIBLE);
-
-						Picasso.with(getActivity()).load(data.getTopImg().getUrl()).placeholder(R.mipmap.img_default).into(headImg);
-						commentsTxt.setText(data.getTopComment().getContent());
-					}
-				}
-
-				@Override
-				public void onFailure(HttpException e, String s) {
-
-				}
-			});
 					// } else {
 					// loadWeatherInfoFromLocal();
 					// }
+			getImageAndComment();
 		} else {
 			// ViewGroup mRootParent = (ViewGroup) mRootView.getParent();
 			// if (mRootParent != null) {
@@ -334,6 +339,13 @@ public class WeatherFragment extends Fragment implements ITaskManager,SwipeRefre
 	@Override
 	public void onResume() {
 		super.onResume();
+		MobclickAgent.onPageStart("WeatherFragment"); //统计页面
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		MobclickAgent.onPageEnd("WeatherFragment"); //统计页面
 	}
 
 	// ListView滑动监听，更新背景模糊度和移动距离
@@ -479,6 +491,7 @@ public class WeatherFragment extends Fragment implements ITaskManager,SwipeRefre
 	@Override
 	public void onRefresh() {
 		requestData(true);
+		getImageAndComment();
 	}
 
 	public void requestData(boolean force) {

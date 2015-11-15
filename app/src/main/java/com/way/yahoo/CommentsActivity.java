@@ -26,6 +26,7 @@ import com.lidroid.xutils.http.RequestParams;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest;
+import com.umeng.analytics.MobclickAgent;
 import com.way.beans.Comments;
 import com.way.beans.CommentsResult;
 import com.way.beans.GoodImageComment;
@@ -321,5 +322,18 @@ public class CommentsActivity extends SwipeBackActivity {
 //            }
 //        }
 //    }
+
+
+    @Override
+    protected void onResume() {
+        MobclickAgent.onResume(this);
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        MobclickAgent.onPause(this);
+        super.onPause();
+    }
 
 }

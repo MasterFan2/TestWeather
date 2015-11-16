@@ -26,6 +26,7 @@ import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest;
 import com.squareup.picasso.Picasso;
+import com.umeng.analytics.MobclickAgent;
 import com.way.beans.GoodImageComment;
 import com.way.beans.Image;
 import com.way.beans.ImageResult;
@@ -487,5 +488,18 @@ public class ImageActivity extends AppCompatActivity implements OnClickListener 
 //            System.out.println(selectedPhotos.toString());
         }
 
+    }
+
+
+    @Override
+    protected void onResume() {
+        MobclickAgent.onResume(this);
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        MobclickAgent.onPause(this);
+        super.onPause();
     }
 }

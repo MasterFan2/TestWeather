@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.umeng.analytics.MobclickAgent;
 import com.way.beans.City;
 import com.way.common.util.L;
 import com.way.common.util.NetUtil;
@@ -33,8 +34,7 @@ import com.way.ui.view.DragSortGridView;
 import com.way.weather.plugin.bean.WeatherInfo;
 import com.way.weather.plugin.spider.WeatherSpider;
 
-public class ManagerCityActivity extends BaseActivity implements
-		OnClickListener {
+public class ManagerCityActivity extends BaseActivity implements OnClickListener {
 	public static final int MAX_CITY_NUM = 9;
 	private DragSortGridView mGridView;
 	private CityGridAdapter mAdapter;
@@ -54,11 +54,18 @@ public class ManagerCityActivity extends BaseActivity implements
 	}
 
 	@Override
+	protected void onResume() {
+		MobclickAgent.onResume(this);
+		super.onResume();
+	}
+
+	@Override
 	protected void onPause() {
 		super.onPause();
 		L.i("liweiping", ManagerCityActivity.this.getClass().getName()
 				+ " onPause...");
 		updateRefreshMode(false);// 暂停时更新刷新模式
+		MobclickAgent.onPause(this);
 	}
 
 	@Override

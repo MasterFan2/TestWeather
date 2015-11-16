@@ -104,12 +104,11 @@
 
         <activity
             android:name=".ImageActivity"
-            android:theme="@style/myTheme"
+            android:theme="@style/AppTheme"
             >
         </activity>
         <activity
             android:name=".CommentsActivity"
-            android:theme="@style/myTheme"
             >
         </activity>
 
@@ -119,8 +118,21 @@
             />
 
         <activity
-            android:name="photopicker.PhotoPagerActivity"
-            />
+        android:name="photopicker.PhotoPagerActivity"
+        />
+        <!-- umeng -->
+        <meta-data android:value="56481e9d67e58eb80d001531" android:name="UMENG_APPKEY"></meta-data>
+        <meta-data android:value="self" android:name="UMENG_CHANNEL"/>
+
+        <service
+            android:name="com.umeng.update.net.DownloadingService"
+            android:process=":DownloadingService" >
+        </service>
+        <activity
+            android:name="com.umeng.update.UpdateDialogActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+        </activity>
+
     </application>
 
 </manifest>

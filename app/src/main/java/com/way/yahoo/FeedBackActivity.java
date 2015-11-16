@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.umeng.analytics.MobclickAgent;
 import com.way.common.util.T;
 import com.way.ui.swipeback.SwipeBackActivity;
 
@@ -50,5 +51,18 @@ public class FeedBackActivity extends SwipeBackActivity {
 				}
 			}
 		});
+	}
+
+
+	@Override
+	protected void onResume() {
+		MobclickAgent.onResume(this);
+		super.onResume();
+	}
+
+	@Override
+	protected void onPause() {
+		MobclickAgent.onPause(this);
+		super.onPause();
 	}
 }

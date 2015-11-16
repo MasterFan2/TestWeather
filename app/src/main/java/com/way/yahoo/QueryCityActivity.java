@@ -29,6 +29,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.umeng.analytics.MobclickAgent;
 import com.way.adapter.QueryCityAdapter;
 import com.way.beans.City;
 import com.way.common.util.L;
@@ -70,8 +71,15 @@ public class QueryCityActivity extends BaseActivity implements OnClickListener,
 	}
 
 	@Override
+	protected void onPause() {
+		MobclickAgent.onPause(this);
+		super.onPause();
+	}
+
+	@Override
 	protected void onResume() {
 		super.onResume();
+		MobclickAgent.onResume(this);
 		L.i("liweiping", "QueryCityActivity onResume...");
 	}
 

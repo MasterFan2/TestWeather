@@ -1,9 +1,11 @@
 package com.way.yahoo;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
@@ -54,7 +56,7 @@ import java.util.UUID;
 import photopicker.PhotoPickerActivity;
 import photopicker.utils.PhotoPickerIntent;
 
-public class ImageActivity extends SwipeBackActivity implements OnClickListener {
+public class ImageActivity extends AppCompatActivity implements OnClickListener {
 
     //网络数据
     private ImageResult dataList;
@@ -85,9 +87,14 @@ public class ImageActivity extends SwipeBackActivity implements OnClickListener 
 
     private boolean isGooding = false;//判断是否在处理赞       true:正在处理        false:空闲
 
+    private Context context;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        context = this;
+
         setContentView(R.layout.activity_image);
 
         db = DbUtils.create(this);

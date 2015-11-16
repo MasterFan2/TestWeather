@@ -104,11 +104,12 @@
 
         <activity
             android:name=".ImageActivity"
-            android:theme="@style/AppTheme"
+            android:theme="@style/myTheme"
             >
         </activity>
         <activity
             android:name=".CommentsActivity"
+            android:theme="@style/myTheme"
             >
         </activity>
 

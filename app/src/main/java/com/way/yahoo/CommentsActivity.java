@@ -1,8 +1,10 @@
 package com.way.yahoo;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -38,15 +40,17 @@ import com.way.widget.recyclerviewdiviver.HorizontalDividerItemDecoration;
 import java.util.Calendar;
 import java.util.List;
 
-public class CommentsActivity extends SwipeBackActivity {
+public class CommentsActivity extends AppCompatActivity {
 
-//    private RecyclerView recyclerView;
+    //    private RecyclerView recyclerView;
     private CommentsAdapter adapter;
     private HttpUtils http;
     private ListView listview;
-    private CommentsResult data ;
+    private CommentsResult data;
     private EditText editText;
     private TextView sendTxt;
+
+    private Context context;
 
     private WaitDialog dialog;
 
@@ -57,6 +61,7 @@ public class CommentsActivity extends SwipeBackActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        context = this;
         setContentView(R.layout.activity_comments);
 
         db = DbUtils.create(this);
@@ -72,12 +77,12 @@ public class CommentsActivity extends SwipeBackActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         editText = (EditText) findViewById(R.id.comments_editText);
-        sendTxt  = (TextView) findViewById(R.id.comments_send_txt);
+        sendTxt = (TextView) findViewById(R.id.comments_send_txt);
         sendTxt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String content = editText.getText().toString();
-                if(TextUtils.isEmpty(content)) {
+                if (TextUtils.isEmpty(content)) {
                     T.showShort(context, "请输入内容");
                     return;
                 }
@@ -90,14 +95,14 @@ public class CommentsActivity extends SwipeBackActivity {
                     @Override
                     public void onSuccess(ResponseInfo<String> responseInfo) {//new TypeToken<List<Image>>() {}.getType()
 
-                        if(dialog != null && dialog.isShowing()) dialog.dismiss();
+                        if (dialog != null && dialog.isShowing()) dialog.dismiss();
                         editText.setText("");
                         initData();
                     }
 
                     @Override
                     public void onFailure(HttpException e, String s) {
-                        if(dialog != null && dialog.isShowing()) dialog.dismiss();
+                        if (dialog != null && dialog.isShowing()) dialog.dismiss();
                         T.showShort(context, "发送失败， 请稍后重试...");
                     }
                 });
@@ -128,22 +133,22 @@ public class CommentsActivity extends SwipeBackActivity {
             @Override
             public void onSuccess(ResponseInfo<String> responseInfo) {//new TypeToken<List<Image>>() {}.getType()
                 data = new Gson().fromJson(responseInfo.result, CommentsResult.class);
-                if(dialog != null && dialog.isShowing()) dialog.dismiss();
-                handler.sendEmptyMessage(0);
+                if (dialog != null && dialog.isShowing()) dialog.dismiss();
+                adapter.notifyDataSetChanged();
             }
 
             @Override
             public void onFailure(HttpException e, String s) {
-                if(dialog != null && dialog.isShowing()) dialog.dismiss();
+                if (dialog != null && dialog.isShowing()) dialog.dismiss();
                 T.showShort(context, "获取数据错误， 请稍后再试");
             }
         });
     }
 
-    private Handler handler = new Handler(){
+    private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            switch (msg.what){
+            switch (msg.what) {
                 case 0:
                     adapter.notifyDataSetChanged();
                     break;
@@ -171,11 +176,11 @@ public class CommentsActivity extends SwipeBackActivity {
         @Override
         public View getView(final int position, View convertView, ViewGroup parent) {
             SimpleViewHolder holder = null;
-            if(holder == null){
+            if (holder == null) {
                 convertView = LayoutInflater.from(context).inflate(R.layout.item_comments, parent, false);
                 holder = new SimpleViewHolder(convertView);
                 convertView.setTag(holder);
-            }else {
+            } else {
                 holder = (SimpleViewHolder) convertView.getTag();
             }
 
@@ -188,7 +193,7 @@ public class CommentsActivity extends SwipeBackActivity {
                 public void onClick(View v) {
 
                     Calendar calendar = Calendar.getInstance();
-                    String today = calendar.get(Calendar.YEAR)+"-" + calendar.get(Calendar.MONTH)+"-" + calendar.get(Calendar.DAY_OF_MONTH);
+                    String today = calendar.get(Calendar.YEAR) + "-" + calendar.get(Calendar.MONTH) + "-" + calendar.get(Calendar.DAY_OF_MONTH);
                     List<GoodImageComment> localData = null;
                     try {
                         localData = db.findAll(Selector.from(GoodImageComment.class).where("tag", "=", "comment").and("itemId", "=", comments.getId()));
@@ -197,7 +202,7 @@ public class CommentsActivity extends SwipeBackActivity {
                             GoodImageComment goodImageComment = new GoodImageComment("comment", comments.getId(), today);
                             db.save(goodImageComment);
 
-                            if(isGooding == false) {
+                            if (isGooding == false) {
                                 dialog.show();
                                 isGooding = true;
                                 String url = "http://116.255.235.119:1280/weatherForecastServer/comment/support?commentId=" + comments.getId();
@@ -206,7 +211,7 @@ public class CommentsActivity extends SwipeBackActivity {
                                 http.send(HttpRequest.HttpMethod.GET, url, new RequestCallBack<String>() {
                                     @Override
                                     public void onSuccess(ResponseInfo<String> responseInfo) {//new TypeToken<List<Image>>() {}.getType()
-                                        if(dialog != null && dialog.isShowing()) dialog.dismiss();
+                                        if (dialog != null && dialog.isShowing()) dialog.dismiss();
                                         data.getResult().get(position).setSupportNum(data.getResult().get(position).getSupportNum() + 1);
                                         T.showShort(context, "赞成功");
                                         adapter.notifyDataSetChanged();
@@ -215,23 +220,23 @@ public class CommentsActivity extends SwipeBackActivity {
 
                                     @Override
                                     public void onFailure(HttpException e, String s) {
-                                        if(dialog != null && dialog.isShowing()) dialog.dismiss();
+                                        if (dialog != null && dialog.isShowing()) dialog.dismiss();
                                         T.showShort(context, "操作失败， 请稍后再试");
                                         isGooding = false;
                                     }
                                 });
-                            }else {
+                            } else {
                                 T.showLong(context, "请稍后， 正在处理中...");
                             }
                         } else {
                             GoodImageComment goodImageComment = localData.get(0);
-                            if(goodImageComment.getDate().equals(today)) {//今天赞过
+                            if (goodImageComment.getDate().equals(today)) {//今天赞过
                                 T.showShort(context, "您已经赞过啦！");
-                            }else {
+                            } else {
                                 GoodImageComment tempGood = new GoodImageComment("comment", comments.getId(), today);
                                 db.update(tempGood, "date");
 
-                                if(isGooding == false) {
+                                if (isGooding == false) {
                                     dialog.show();
                                     isGooding = true;
                                     String url = "http://116.255.235.119:1280/weatherForecastServer/comment/support?commentId=" + comments.getId();
@@ -240,7 +245,7 @@ public class CommentsActivity extends SwipeBackActivity {
                                     http.send(HttpRequest.HttpMethod.GET, url, new RequestCallBack<String>() {
                                         @Override
                                         public void onSuccess(ResponseInfo<String> responseInfo) {//new TypeToken<List<Image>>() {}.getType()
-                                            if(dialog != null && dialog.isShowing()) dialog.dismiss();
+                                            if (dialog != null && dialog.isShowing()) dialog.dismiss();
                                             data.getResult().get(position).setSupportNum(data.getResult().get(position).getSupportNum() + 1);
                                             T.showShort(context, "赞成功");
                                             adapter.notifyDataSetChanged();
@@ -249,12 +254,12 @@ public class CommentsActivity extends SwipeBackActivity {
 
                                         @Override
                                         public void onFailure(HttpException e, String s) {
-                                            if(dialog != null && dialog.isShowing()) dialog.dismiss();
+                                            if (dialog != null && dialog.isShowing()) dialog.dismiss();
                                             T.showShort(context, "操作失败， 请稍后再试");
                                             isGooding = false;
                                         }
                                     });
-                                }else {
+                                } else {
                                     T.showLong(context, "请稍后， 正在处理中...");
                                 }
                             }
@@ -276,8 +281,8 @@ public class CommentsActivity extends SwipeBackActivity {
             public SimpleViewHolder(View view) {
                 super(view);
                 goodsNumTxt = (TextView) view.findViewById(R.id.item_comments_goodsNum_txt);
-                contentTxt  = (TextView) view.findViewById(R.id.item_comments_content_txt);
-                goodsImg    = (ImageView)  view.findViewById(R.id.item_comments_goods_img);
+                contentTxt = (TextView) view.findViewById(R.id.item_comments_content_txt);
+                goodsImg = (ImageView) view.findViewById(R.id.item_comments_goods_img);
             }
         }
     }

@@ -101,12 +101,15 @@ public class CommentsActivity extends SwipeBackActivity {
         HttpClient.getInstance().getComments(1, 30, cb);
     }
 
+    //---------------------------
+    private boolean isSendComment = false;
     private Callback<BaseEntity> commentCallback = new Callback<BaseEntity>() {
         @Override
         public void success(BaseEntity baseEntity, Response response) {
             if(dialog != null && dialog.isShowing()) dialog.dismiss();
             if(baseEntity.getCode() == 200) {
                 editText.setText("");
+                isSendComment = true;
                 HttpClient.getInstance().getComments(1, 30, cb);
             }
         }
@@ -126,6 +129,10 @@ public class CommentsActivity extends SwipeBackActivity {
             if(commentsResult != null) {
                 data = commentsResult;
                 adapter.notifyDataSetChanged();
+                if(isSendComment == true){
+                    listview.smoothScrollToPosition(data.getResult().size());
+                    isSendComment = false;
+                }
             }
         }
 

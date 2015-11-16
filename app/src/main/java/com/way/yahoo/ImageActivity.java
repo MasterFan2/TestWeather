@@ -25,12 +25,15 @@ import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest;
 import com.squareup.picasso.Picasso;
 import com.umeng.analytics.MobclickAgent;
+import com.way.beans.BaseEntity;
+import com.way.beans.Comments;
 import com.way.beans.GoodImageComment;
 import com.way.beans.Image;
 import com.way.beans.ImageResult;
 import com.way.beans.UploadResp;
 import com.way.common.util.SystemUtils;
 import com.way.common.util.T;
+import com.way.net.HttpClient;
 import com.way.ui.swipeback.SwipeBackActivity;
 import com.way.widget.WaitDialog;
 import com.way.widget.dialog.MTDialog;
@@ -54,6 +57,9 @@ import java.util.UUID;
 
 import photopicker.PhotoPickerActivity;
 import photopicker.utils.PhotoPickerIntent;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 public class ImageActivity extends SwipeBackActivity implements OnClickListener {
 
@@ -150,26 +156,45 @@ public class ImageActivity extends SwipeBackActivity implements OnClickListener 
         dataList = null;
     }
 
+
+    private Callback<ImageResult> cb = new Callback<ImageResult>() {
+        @Override
+        public void success(ImageResult imageResult, Response response) {
+            if(waitDialog != null && waitDialog.isShowing()) waitDialog.dismiss();
+            dataList = imageResult;
+            adapter.notifyDataSetChanged();
+        }
+
+        @Override
+        public void failure(RetrofitError error) {
+            if(waitDialog != null && waitDialog.isShowing()) waitDialog.dismiss();
+            T.showShort(context, "获取数据错误， 请稍后再试");
+        }
+    };
+
     /**
      * 获取数据
      */
     private void getData(){
-        waitDialog.show();
-        http = new HttpUtils();
-        http.send(HttpRequest.HttpMethod.GET, "http://116.255.235.119:1280/weatherForecastServer/img/index?pageIndex=1&pageSize=20", new RequestCallBack<String>() {
-            @Override
-            public void onSuccess(ResponseInfo<String> responseInfo) {//new TypeToken<List<Image>>() {}.getType()
-                if(waitDialog != null && waitDialog.isShowing()) waitDialog.dismiss();
-                dataList = new Gson().fromJson(responseInfo.result, ImageResult.class);
-                adapter.notifyDataSetChanged();
-            }
 
-            @Override
-            public void onFailure(HttpException e, String s) {
-                if(waitDialog != null && waitDialog.isShowing()) waitDialog.dismiss();
-                T.showShort(context, "获取数据错误， 请稍后再试");
-            }
-        });
+        waitDialog.show();
+
+        HttpClient.getInstance().getImages(0, 20, cb);
+//        http = new HttpUtils();
+//        http.send(HttpRequest.HttpMethod.GET, "http://116.255.235.119:1280/weatherForecastServer/img/index?pageIndex=1&pageSize=20", new RequestCallBack<String>() {
+//            @Override
+//            public void onSuccess(ResponseInfo<String> responseInfo) {//new TypeToken<List<Image>>() {}.getType()
+//                if(waitDialog != null && waitDialog.isShowing()) waitDialog.dismiss();
+//                dataList = new Gson().fromJson(responseInfo.result, ImageResult.class);
+//                adapter.notifyDataSetChanged();
+//            }
+//
+//            @Override
+//            public void onFailure(HttpException e, String s) {
+//                if(waitDialog != null && waitDialog.isShowing()) waitDialog.dismiss();
+//                T.showShort(context, "获取数据错误， 请稍后再试");
+//            }
+//        });
     }
 
     @Override
@@ -327,7 +352,10 @@ public class ImageActivity extends SwipeBackActivity implements OnClickListener 
             switch (msg.what){
                 case 0:
                     if(dialog != null && dialog.isShowing()) dialog.dismiss();
+                    footLayout.setVisibility(View.VISIBLE);
+                    loadingIndicatorView.setVisibility(View.INVISIBLE);
                     T.showShort(context, "上传成功");
+                    getData();
                     break;
                 case 1:
                     footLayout.setVisibility(View.VISIBLE);
@@ -336,6 +364,97 @@ public class ImageActivity extends SwipeBackActivity implements OnClickListener 
             }
         }
     };
+
+
+    //------------------------
+    private int currentPosition = -1;
+    private Callback<BaseEntity> goodCallback = new Callback<BaseEntity>() {
+        @Override
+        public void success(BaseEntity baseEntity, Response response) {
+            if(waitDialog != null && waitDialog.isShowing()) waitDialog.dismiss();
+            if(baseEntity.getCode() == 200) {
+                T.showShort(context, "赞成功");
+                if(saveTempGoodImageComment != null) {
+                    try {
+                        db.save(saveTempGoodImageComment);
+                    } catch (DbException e) {
+                        e.printStackTrace();
+                    }
+                    saveTempGoodImageComment = null;
+                }
+
+                if(updateTempGoodImageComment != null){
+                    try {
+                        db.update(updateTempGoodImageComment, "date");
+                    } catch (DbException e) {
+                        e.printStackTrace();
+                    }
+                    updateTempGoodImageComment = null;
+                }
+
+                if(currentPosition != -1){
+                    dataList.getResult().get(currentPosition).setSupportNum(dataList.getResult().get(currentPosition).getSupportNum() + 1);
+                    adapter.notifyDataSetChanged();
+                    currentPosition = -1;
+                }
+            }
+            isGooding = false;
+        }
+
+        @Override
+        public void failure(RetrofitError error) {
+            if(waitDialog != null && waitDialog.isShowing()) waitDialog.dismiss();
+            isGooding = false;
+            T.showShort(context, "赞失败，请稍后再试");
+        }
+    };
+
+    private GoodImageComment updateTempGoodImageComment;
+    private GoodImageComment saveTempGoodImageComment;
+    private void doGood(int position) {
+        Image image = dataList.getResult().get(position);
+
+        Calendar calendar = Calendar.getInstance();
+        String today = calendar.get(Calendar.YEAR)+"-" + calendar.get(Calendar.MONTH)+"-" + calendar.get(Calendar.DAY_OF_MONTH);
+        List<GoodImageComment> localData = null;
+        try {
+            localData = db.findAll(Selector.from(GoodImageComment.class).where("tag", "=", "comment").and("itemId", "=", image.getId()));
+            if (localData == null || localData.size() <= 0) {//save
+
+                saveTempGoodImageComment = new GoodImageComment("comment", image.getId(), today);
+
+                if(isGooding == false) {
+                    waitDialog.show();
+                    isGooding = true;
+                    currentPosition = position;
+
+                    HttpClient.getInstance().goodImage(image.getId(), goodCallback);
+
+                }else {
+                    T.showLong(context, "请稍后， 正在处理中...");
+                }
+            } else {
+                GoodImageComment goodImageComment = localData.get(0);
+                if(goodImageComment.getDate().equals(today)) {//今天赞过
+                    T.showShort(context, "您已经赞过啦！");
+                }else {
+                    updateTempGoodImageComment = new GoodImageComment("comment", image.getId(), today);
+
+                    if(isGooding == false) {
+                        waitDialog.show();
+                        isGooding = true;
+                        currentPosition = position;
+
+                        HttpClient.getInstance().goodImage(image.getId(), goodCallback);
+                    }else {
+                        T.showLong(context, "请稍后， 正在处理中...");
+                    }
+                }
+            }
+        } catch (DbException e) {
+            e.printStackTrace();
+        }
+    }
 
     public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.SimpleViewHolder> {
 
@@ -353,81 +472,83 @@ public class ImageActivity extends SwipeBackActivity implements OnClickListener 
                 @Override
                 public void onClick(View v) {
 
-                    Calendar calendar = Calendar.getInstance();
-                    String today = calendar.get(Calendar.YEAR)+"-" + calendar.get(Calendar.MONTH)+"-" + calendar.get(Calendar.DAY_OF_MONTH);
-                    List<GoodImageComment> localData = null;
-                    try {
-                        localData = db.findAll(Selector.from(GoodImageComment.class).where("tag", "=", "image").and("itemId", "=", image.getId()));
-                        if (localData == null || localData.size() <= 0) {//save
+                    doGood(position);
 
-                            GoodImageComment goodImageComment = new GoodImageComment("image", image.getId(), today);
-                            db.save(goodImageComment);
-
-                            if (isGooding == false) {
-                                isGooding = true;
-                                //赞
-                                http = new HttpUtils();
-                                http.send(HttpRequest.HttpMethod.GET, "http://116.255.235.119:1280/weatherForecastServer/img/support?imgId=" + image.getId(), new RequestCallBack<String>() {
-                                    @Override
-                                    public void onSuccess(ResponseInfo<String> responseInfo) {//new TypeToken<List<Image>>() {}.getType()
-
-                                        //赞成功， 重新获取数据
-                                        if (dialog != null && dialog.isShowing()) dialog.dismiss();
-                                        dataList.getResult().get(position).setSupportNum(dataList.getResult().get(position).getSupportNum() + 1);
-                                        T.showShort(context, "赞成功");
-                                        adapter.notifyDataSetChanged();
-                                        isGooding = false;
-                                    }
-
-                                    @Override
-                                    public void onFailure(HttpException e, String s) {
-                                        if (dialog != null && dialog.isShowing()) dialog.dismiss();
-                                        T.showShort(context, "操作失败， 请稍后再试");
-                                        isGooding = false;
-                                    }
-                                });
-                            } else {
-                                T.showShort(context, "请稍后， 正在处理中...");
-                            }
-                        } else {
-                            GoodImageComment goodImageComment = localData.get(0);
-                            if(goodImageComment.getDate().equals(today)) {//今天赞过
-                                T.showShort(context, "您已经赞过啦！");
-                            }else {
-                                GoodImageComment tempGood = new GoodImageComment("image", image.getId(), today);
-                                db.update(tempGood, "date");
-
-                                if (isGooding == false) {
-                                    isGooding = true;
-                                    //赞
-                                    http = new HttpUtils();
-                                    http.send(HttpRequest.HttpMethod.GET, "http://116.255.235.119:1280/weatherForecastServer/img/support?imgId=" + image.getId(), new RequestCallBack<String>() {
-                                        @Override
-                                        public void onSuccess(ResponseInfo<String> responseInfo) {//new TypeToken<List<Image>>() {}.getType()
-
-                                            //赞成功， 重新获取数据
-                                            if (dialog != null && dialog.isShowing()) dialog.dismiss();
-                                            dataList.getResult().get(position).setSupportNum(dataList.getResult().get(position).getSupportNum() + 1);
-                                            T.showShort(context, "赞成功");
-                                            adapter.notifyDataSetChanged();
-                                            isGooding = false;
-                                        }
-
-                                        @Override
-                                        public void onFailure(HttpException e, String s) {
-                                            if (dialog != null && dialog.isShowing()) dialog.dismiss();
-                                            T.showShort(context, "操作失败， 请稍后再试");
-                                            isGooding = false;
-                                        }
-                                    });
-                                } else {
-                                    T.showShort(context, "请稍后， 正在处理中...");
-                                }
-                            }
-                        }
-                    } catch (DbException e) {
-                        e.printStackTrace();
-                    }
+//                    Calendar calendar = Calendar.getInstance();
+//                    String today = calendar.get(Calendar.YEAR)+"-" + calendar.get(Calendar.MONTH)+"-" + calendar.get(Calendar.DAY_OF_MONTH);
+//                    List<GoodImageComment> localData = null;
+//                    try {
+//                        localData = db.findAll(Selector.from(GoodImageComment.class).where("tag", "=", "image").and("itemId", "=", image.getId()));
+//                        if (localData == null || localData.size() <= 0) {//save
+//
+//                            GoodImageComment goodImageComment = new GoodImageComment("image", image.getId(), today);
+//                            db.save(goodImageComment);
+//
+//                            if (isGooding == false) {
+//                                isGooding = true;
+//                                //赞
+//                                http = new HttpUtils();
+//                                http.send(HttpRequest.HttpMethod.GET, "http://116.255.235.119:1280/weatherForecastServer/img/support?imgId=" + image.getId(), new RequestCallBack<String>() {
+//                                    @Override
+//                                    public void onSuccess(ResponseInfo<String> responseInfo) {//new TypeToken<List<Image>>() {}.getType()
+//
+//                                        //赞成功， 重新获取数据
+//                                        if (dialog != null && dialog.isShowing()) dialog.dismiss();
+//                                        dataList.getResult().get(position).setSupportNum(dataList.getResult().get(position).getSupportNum() + 1);
+//                                        T.showShort(context, "赞成功");
+//                                        adapter.notifyDataSetChanged();
+//                                        isGooding = false;
+//                                    }
+//
+//                                    @Override
+//                                    public void onFailure(HttpException e, String s) {
+//                                        if (dialog != null && dialog.isShowing()) dialog.dismiss();
+//                                        T.showShort(context, "操作失败， 请稍后再试");
+//                                        isGooding = false;
+//                                    }
+//                                });
+//                            } else {
+//                                T.showShort(context, "请稍后， 正在处理中...");
+//                            }
+//                        } else {
+//                            GoodImageComment goodImageComment = localData.get(0);
+//                            if(goodImageComment.getDate().equals(today)) {//今天赞过
+//                                T.showShort(context, "您已经赞过啦！");
+//                            }else {
+//                                GoodImageComment tempGood = new GoodImageComment("image", image.getId(), today);
+//                                db.update(tempGood, "date");
+//
+//                                if (isGooding == false) {
+//                                    isGooding = true;
+//                                    //赞
+//                                    http = new HttpUtils();
+//                                    http.send(HttpRequest.HttpMethod.GET, "http://116.255.235.119:1280/weatherForecastServer/img/support?imgId=" + image.getId(), new RequestCallBack<String>() {
+//                                        @Override
+//                                        public void onSuccess(ResponseInfo<String> responseInfo) {//new TypeToken<List<Image>>() {}.getType()
+//
+//                                            //赞成功， 重新获取数据
+//                                            if (dialog != null && dialog.isShowing()) dialog.dismiss();
+//                                            dataList.getResult().get(position).setSupportNum(dataList.getResult().get(position).getSupportNum() + 1);
+//                                            T.showShort(context, "赞成功");
+//                                            adapter.notifyDataSetChanged();
+//                                            isGooding = false;
+//                                        }
+//
+//                                        @Override
+//                                        public void onFailure(HttpException e, String s) {
+//                                            if (dialog != null && dialog.isShowing()) dialog.dismiss();
+//                                            T.showShort(context, "操作失败， 请稍后再试");
+//                                            isGooding = false;
+//                                        }
+//                                    });
+//                                } else {
+//                                    T.showShort(context, "请稍后， 正在处理中...");
+//                                }
+//                            }
+//                        }
+//                    } catch (DbException e) {
+//                        e.printStackTrace();
+//                    }
                 }
             });
 

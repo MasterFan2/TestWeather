@@ -341,6 +341,7 @@ public class QueryCityActivity extends BaseActivity implements OnClickListener,
 
 		@Override
 		public void failed() {
+			if(dialog != null && dialog.isShowing()) dialog.dismiss();
 			Toast.makeText(QueryCityActivity.this, R.string.getlocation_fail,
 					Toast.LENGTH_SHORT).show();
 		}

@@ -2,6 +2,7 @@ package com.way.yahoo;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -27,6 +28,7 @@ import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest;
 import com.squareup.picasso.Picasso;
 import com.umeng.analytics.MobclickAgent;
+import com.way.BitmapUtil;
 import com.way.beans.BaseEntity;
 import com.way.beans.Comments;
 import com.way.beans.GoodImageComment;
@@ -47,6 +49,8 @@ import com.way.widget.recyclerviewdiviver.DividerGridItemDecoration;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -63,7 +67,7 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-public class ImageActivity extends AppCompatActivity implements OnClickListener {
+public class ImageActivity extends SwipeBackActivity implements OnClickListener {
 
     //网络数据
     private ImageResult dataList;
@@ -213,6 +217,8 @@ public class ImageActivity extends AppCompatActivity implements OnClickListener 
             case R.id.footer_upload_confirm_button:
                 footLayout.setVisibility(View.INVISIBLE);
                 loadingIndicatorView.setVisibility(View.VISIBLE);
+
+
                 doUpload();
                 break;
         }
@@ -601,9 +607,28 @@ public class ImageActivity extends AppCompatActivity implements OnClickListener 
             if(selectedPhotos != null && selectedPhotos.size() > 0){
                 int width =  SystemUtils.getDisplayWidth(this);
 
-                Picasso.with(context).load(new File(selectedPhotos.get(0))).placeholder(R.mipmap.img_default).error(R.mipmap.img_default).into(contentImg);
-//                Picasso.with(context).load(selectedPhotos.get(0)).placeholder(R.mipmap.img_default).into(contentImg);
                 picUrl = selectedPhotos.get(0);
+
+                Bitmap bmp = BitmapUtil.getimage(picUrl);
+
+                File file = new File(BitmapUtil.saveUrl);
+                if(file.exists()) file.delete();
+                try {
+                    FileOutputStream out = new FileOutputStream(file);
+                    bmp.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                    out.flush();
+                    out.close();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                Picasso.with(context).load(new File(BitmapUtil.saveUrl)).placeholder(R.mipmap.img_default).error(R.mipmap.img_default).into(contentImg);
+                picUrl = BitmapUtil.saveUrl;
+
+//                Picasso.with(context).load(selectedPhotos.get(0)).placeholder(R.mipmap.img_default).into(contentImg);
+                //
                 dialog.show();
             }
 //            System.out.println(selectedPhotos.toString());

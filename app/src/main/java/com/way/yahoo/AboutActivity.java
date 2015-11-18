@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.umeng.analytics.MobclickAgent;
+import com.way.BitmapUtil;
 import com.way.ui.swipeback.SwipeBackActivity;
 
 import java.io.ByteArrayInputStream;
@@ -38,30 +39,6 @@ public class AboutActivity extends SwipeBackActivity {
 				finish();
 			}
 		});
-
-		check();
-	}
-
-	private void check() {
-		String url = Environment.getExternalStorageDirectory().getAbsolutePath() + "/img.jpg";
-		String saveUrl = Environment.getExternalStorageDirectory().getAbsolutePath() + "/temp_img.jpg";
-
-		Bitmap bmp = getimage(url);
-		img.setImageBitmap(bmp);
-
-		File file = new File(saveUrl);
-		if(file.exists()) file.delete();
-
-		try {
-			FileOutputStream out = new FileOutputStream(file);
-			bmp.compress(Bitmap.CompressFormat.JPEG, 100, out);
-			out.flush();
-			out.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 //	private Bitmap getA(Bitmap bmp, double newWidth, double newHeight){

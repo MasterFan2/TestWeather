@@ -342,10 +342,6 @@ public class ImageActivity extends SwipeBackActivity implements OnClickListener 
                     handler.sendEmptyMessage(1);
                 }
                 Log.e(TAG, "result : " + result);
-                // }
-                // else{
-                // Log.e(TAG, "request error");
-                // }
             }
         } catch (MalformedURLException e) {
             handler.sendEmptyMessage(1);
@@ -367,6 +363,8 @@ public class ImageActivity extends SwipeBackActivity implements OnClickListener 
                     if(dialog != null && dialog.isShowing()) dialog.dismiss();
                     footLayout.setVisibility(View.VISIBLE);
                     loadingIndicatorView.setVisibility(View.INVISIBLE);
+                    File file = new File(BitmapUtil.saveUrl);
+                    if(file.exists()) file.delete();
                     T.showShort(context, "上传成功");
                     getData();
                     break;

@@ -74,7 +74,7 @@
             android:windowSoftInputMode="stateHidden|adjustPan" />
 
         <!-- 接受下载apk成功广播，更新apk使用 -->
-        <receiver android:name="com.way.upgrade.receiver.DownloadCompleteReveiver">
+        <receiver android:name="com.way.upgrade.receiver.DownloadCompleteReveiver" >
             <intent-filter>
                 <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
                 <action android:name="android.intent.action.DOWNLOAD_NOTIFICATION_CLICKED" />
@@ -101,13 +101,23 @@
             android:value="W9xG4m71Ek8xz2GyhZvGiuWb" />
 
         <activity
-            android:name=".ImageActivity"
-            android:theme="@style/AppTheme" />
-        <activity android:name=".CommentsActivity" />
+        android:name=".ImageActivity"
+        android:theme="@style/AppTheme"
+        >
+        </activity>
         <activity
-            android:name="photopicker.PhotoPickerActivity"
-            android:theme="@style/myTheme" />
-        <activity android:name="photopicker.PhotoPagerActivity" />
+        android:name=".CommentsActivity"
+        >
+        </activity>
+
+        <activity
+        android:theme="@style/myTheme"
+        android:name="photopicker.PhotoPickerActivity"
+        />
+
+        <activity
+        android:name="photopicker.PhotoPagerActivity"
+        />
         <!-- umeng -->
         <meta-data
             android:name="UMENG_APPKEY"

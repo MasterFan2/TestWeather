@@ -1,9 +1,12 @@
 package com.way.yahoo;
 
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
@@ -25,6 +28,7 @@ import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest;
 import com.squareup.picasso.Picasso;
 import com.umeng.analytics.MobclickAgent;
+import com.way.BitmapUtil;
 import com.way.beans.BaseEntity;
 import com.way.beans.Comments;
 import com.way.beans.GoodImageComment;
@@ -45,6 +49,8 @@ import com.way.widget.recyclerviewdiviver.DividerGridItemDecoration;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -92,9 +98,14 @@ public class ImageActivity extends SwipeBackActivity implements OnClickListener 
 
     private boolean isGooding = false;//判断是否在处理赞       true:正在处理        false:空闲
 
+    private Context context;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        context = this;
+
         setContentView(R.layout.activity_image);
 
         db = DbUtils.create(this);
@@ -206,6 +217,8 @@ public class ImageActivity extends SwipeBackActivity implements OnClickListener 
             case R.id.footer_upload_confirm_button:
                 footLayout.setVisibility(View.INVISIBLE);
                 loadingIndicatorView.setVisibility(View.VISIBLE);
+
+
                 doUpload();
                 break;
         }
@@ -329,10 +342,6 @@ public class ImageActivity extends SwipeBackActivity implements OnClickListener 
                     handler.sendEmptyMessage(1);
                 }
                 Log.e(TAG, "result : " + result);
-                // }
-                // else{
-                // Log.e(TAG, "request error");
-                // }
             }
         } catch (MalformedURLException e) {
             handler.sendEmptyMessage(1);
@@ -354,6 +363,8 @@ public class ImageActivity extends SwipeBackActivity implements OnClickListener 
                     if(dialog != null && dialog.isShowing()) dialog.dismiss();
                     footLayout.setVisibility(View.VISIBLE);
                     loadingIndicatorView.setVisibility(View.INVISIBLE);
+                    File file = new File(BitmapUtil.saveUrl);
+                    if(file.exists()) file.delete();
                     T.showShort(context, "上传成功");
                     getData();
                     break;
@@ -594,9 +605,28 @@ public class ImageActivity extends SwipeBackActivity implements OnClickListener 
             if(selectedPhotos != null && selectedPhotos.size() > 0){
                 int width =  SystemUtils.getDisplayWidth(this);
 
-                Picasso.with(context).load(new File(selectedPhotos.get(0))).placeholder(R.mipmap.img_default).error(R.mipmap.img_default).into(contentImg);
-//                Picasso.with(context).load(selectedPhotos.get(0)).placeholder(R.mipmap.img_default).into(contentImg);
                 picUrl = selectedPhotos.get(0);
+
+                Bitmap bmp = BitmapUtil.getimage(picUrl);
+
+                File file = new File(BitmapUtil.saveUrl);
+                if(file.exists()) file.delete();
+                try {
+                    FileOutputStream out = new FileOutputStream(file);
+                    bmp.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                    out.flush();
+                    out.close();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                Picasso.with(context).load(new File(BitmapUtil.saveUrl)).placeholder(R.mipmap.img_default).error(R.mipmap.img_default).into(contentImg);
+                picUrl = BitmapUtil.saveUrl;
+
+//                Picasso.with(context).load(selectedPhotos.get(0)).placeholder(R.mipmap.img_default).into(contentImg);
+                //
                 dialog.show();
             }
 //            System.out.println(selectedPhotos.toString());

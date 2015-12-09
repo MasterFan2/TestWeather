@@ -11,27 +11,26 @@
             android:id="@+id/sidebarButton"
             android:layout_width="48dip"
             android:layout_height="48dip"
-            android:layout_alignParentLeft="true"
-            android:layout_centerInParent="true"
             android:layout_marginLeft="8dip"
             android:minHeight="@dimen/topbar_icon_size"
             android:minWidth="@dimen/topbar_icon_size"
             android:padding="12dip"
-            android:src="@drawable/topbar_icon_side_selector" />
-            android:scaleType="centerCrop"
-
-        <ImageView
-            android:id="@+id/shareButton"
-            android:layout_width="48dip"
-            android:layout_height="48dip"
             android:layout_alignParentRight="true"
-            android:layout_centerInParent="true"
-            android:layout_marginRight="8dip"
-            android:minHeight="@dimen/topbar_icon_size"
-            android:minWidth="@dimen/topbar_icon_size"
-            android:padding="12dip"
-            android:src="@mipmap/ic_position" />
-            android:scaleType="centerCrop"
+            android:src="@drawable/topbar_icon_side_selector" />
+            <!--android:scaleType="centerCrop"-->
+
+        <!--<ImageView-->
+            <!--android:id="@+id/shareButton"-->
+            <!--android:layout_width="48dip"-->
+            <!--android:layout_height="48dip"-->
+            <!--android:layout_alignParentRight="true"-->
+            <!--android:layout_centerInParent="true"-->
+            <!--android:layout_marginRight="8dip"-->
+            <!--android:minHeight="@dimen/topbar_icon_size"-->
+            <!--android:minWidth="@dimen/topbar_icon_size"-->
+            <!--android:padding="12dip"-->
+            <!--android:src="@mipmap/ic_position" />-->
+            <!--android:scaleType="centerCrop"-->
 
         <!--
              <com.viewpagerindicator.TitlePageIndicator

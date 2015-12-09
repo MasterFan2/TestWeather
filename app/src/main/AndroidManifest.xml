@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.way.yahoo" >
+    package="com.way.yahoo">
 
     <!-- 这个权限用于进行网络定位 -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -30,11 +30,11 @@
         android:name=".App"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <activity
             android:name=".SplashActivity"
             android:label="@string/app_name"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -45,8 +45,7 @@
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait" >
-        </activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ManagerCityActivity"
             android:screenOrientation="portrait"
@@ -75,7 +74,7 @@
             android:windowSoftInputMode="stateHidden|adjustPan" />
 
         <!-- 接受下载apk成功广播，更新apk使用 -->
-        <receiver android:name="com.way.upgrade.receiver.DownloadCompleteReveiver" >
+        <receiver android:name="com.way.upgrade.receiver.DownloadCompleteReveiver">
             <intent-filter>
                 <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
                 <action android:name="android.intent.action.DOWNLOAD_NOTIFICATION_CLICKED" />
@@ -92,48 +91,47 @@
             android:name="api_token"
             android:value="b6bb01fe261cafbabf03e16a9bdf33ad" />
 
-
         <service
-        android:name="com.baidu.location.f"
-        android:enabled="true"
-        android:process=":remote" >
-        </service>
+            android:name="com.baidu.location.f"
+            android:enabled="true"
+            android:process=":remote" />
 
         <meta-data
-        android:name="com.baidu.lbsapi.API_KEY"
-        android:value="W9xG4m71Ek8xz2GyhZvGiuWb" />
+            android:name="com.baidu.lbsapi.API_KEY"
+            android:value="W9xG4m71Ek8xz2GyhZvGiuWb" />
 
         <activity
-        android:name=".ImageActivity"
-        android:theme="@style/AppTheme"
-        >
-        </activity>
+            android:name=".ImageActivity"
+            android:theme="@style/AppTheme" />
+        <activity android:name=".CommentsActivity" />
         <activity
-        android:name=".CommentsActivity"
-        >
-        </activity>
-
-        <activity
-        android:theme="@style/myTheme"
-        android:name="photopicker.PhotoPickerActivity"
-        />
-
-        <activity
-        android:name="photopicker.PhotoPagerActivity"
-        />
+            android:name="photopicker.PhotoPickerActivity"
+            android:theme="@style/myTheme" />
+        <activity android:name="photopicker.PhotoPagerActivity" />
         <!-- umeng -->
-        <meta-data android:value="56481e9d67e58eb80d001531" android:name="UMENG_APPKEY"></meta-data>
-        <meta-data android:value="self" android:name="UMENG_CHANNEL"/>
+        <meta-data
+            android:name="UMENG_APPKEY"
+            android:value="56481e9d67e58eb80d001531" />
+        <meta-data
+            android:name="UMENG_CHANNEL"
+            android:value="self" />
 
         <service
             android:name="com.umeng.update.net.DownloadingService"
-            android:process=":DownloadingService" >
-        </service>
+            android:process=":DownloadingService" />
+
         <activity
             android:name="com.umeng.update.UpdateDialogActivity"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
-        </activity>
-
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
+            android:name=".ImageCommentActivity"
+            android:label="@string/title_activity_image_comment" />
+        <activity
+            android:name=".AddConmentActivity"
+            android:label="@string/title_activity_add_conment" />
+        <activity
+            android:name=".CommentDetailActivity"
+            android:label="@string/title_activity_comment_detail"></activity>
     </application>
 
 </manifest>

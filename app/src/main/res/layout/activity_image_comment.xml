@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/gray_100"
+    >
+    <RelativeLayout
+        android:id="@+id/image_header"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        android:background="@color/title_blue"
+        >
+
+        <ImageView
+            android:id="@+id/image_header_img"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:src="@mipmap/ic_back" />
+
+        <TextView
+            android:id="@+id/image_header_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:text="穿衣"
+            android:textColor="@color/gray_100"
+            android:textSize="20sp" />
+        <ImageView
+            android:id="@+id/header_add_img"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:src="@mipmap/ic_back" />
+    </RelativeLayout>
+    <photopicker.widget.PinnedSectionListView
+        android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@color/gray_400"
+        android:dividerHeight="0.15dp"
+        android:footerDividersEnabled="false"
+        android:headerDividersEnabled="false"
+        />
+</LinearLayout>

@@ -37,12 +37,13 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SectionIndexer;
 
+import com.way.widget.component.MyListView;
 import com.way.yahoo.BuildConfig;
 
 /**
  * ListView, which is capable to pin section views at its top while the rest is still scrolled.
  */
-public class PinnedSectionListView extends ListView {
+public class PinnedSectionListView extends MyListView {
 
     //-- inner classes
 

@@ -4,7 +4,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/abs__action_bar_default_height"
+        android:layout_height="?android:attr/actionBarSize"
         android:background="@android:color/transparent" >
 
         <ImageView

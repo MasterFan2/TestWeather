@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <View
+            android:id="@+id/status_bar"
+            android:layout_width="match_parent"
+            android:layout_height="12dp"
+            android:background="@color/title_blue"
+            android:visibility="gone" />
+        <RelativeLayout
+            android:id="@+id/header"
+            android:layout_width="match_parent"
+            android:layout_height="?android:attr/actionBarSize"
+            android:background="@color/title_blue">
+
+            <ImageView
+                android:id="@+id/header_left"
+                android:layout_width="50dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentLeft="true"
+                android:src="@mipmap/ic_back" />
+
+            <TextView
+                android:id="@+id/image_header_txt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:text="详情"
+                android:textColor="@color/gray_100"
+                android:textSize="20sp" />
+        </RelativeLayout>
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/gray_100">
+
+        <!--<LinearLayout-->
+        <!--android:id="@+id/input_layout"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="62dp"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:orientation="vertical">-->
+
+        <!--<View-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="0.15dp"-->
+        <!--android:background="@color/title_blue" />-->
+
+        <RelativeLayout
+            android:id="@+id/input_layout"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_alignParentBottom="true"
+            android:background="@color/gray_twitters_comment"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:padding="8dp">
+
+            <com.way.widget.MaterialRippleLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/send_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentRight="true"
+                android:layout_marginLeft="10dp"
+                app:rippleAlpha="0.1"
+                app:rippleColor_="@color/gray_600"
+                app:rippleDelayClick="false"
+                app:rippleHover="true"
+                app:rippleOverlay="true">
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/blue_button_background"
+                    android:text="发送" />
+            </com.way.widget.MaterialRippleLayout>
+
+            <EditText
+                android:id="@+id/input_edit"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_toLeftOf="@id/send_btn"
+                android:background="@drawable/twitter_comment_input_background"
+                android:hint="我是这样穿的"
+                android:paddingLeft="5dp"
+                android:textColor="@color/gray_800"
+                android:textColorHint="@color/gray_400"
+                android:textCursorDrawable="@null" />
+        </RelativeLayout>
+        <!--</LinearLayout>-->
+
+        <ListView
+            android:id="@+id/listView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/input_layout"
+            android:background="@color/gray_twitters_comment"
+            android:divider="@android:color/white"
+            android:dividerHeight="0.15dp" />
+    </RelativeLayout>
+</LinearLayout>
+

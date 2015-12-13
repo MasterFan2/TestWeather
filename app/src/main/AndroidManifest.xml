@@ -134,13 +134,16 @@
             android:name="com.umeng.update.UpdateDialogActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <activity
-            android:name=".ImageCommentActivity"
+            android:name=".TwitterListActivity"
+            android:theme="@style/SecondAppTheme"
             android:label="@string/title_activity_image_comment" />
         <activity
-            android:name=".AddConmentActivity"
+            android:name=".AddTwitterActivity"
+            android:theme="@style/SecondAppTheme"
             android:label="@string/title_activity_add_conment" />
         <activity
-            android:name=".CommentDetailActivity"
+            android:name=".TwitterDetailActivity"
+            android:theme="@style/SecondAppTheme"
             android:label="@string/title_activity_comment_detail"></activity>
     </application>
 

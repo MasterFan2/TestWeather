@@ -2,12 +2,15 @@ package com.way.yahoo;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -30,6 +33,7 @@ import com.way.common.util.SystemUtils;
 import com.way.common.util.T;
 import com.way.util.blur.jni.BitmapUtils;
 import com.way.util.blur.jni.FrostedGlassUtil;
+import com.way.utils.SystemBarTintManager;
 
 import net.simonvt.menudrawer.MenuDrawer;
 import net.simonvt.menudrawer.MenuDrawer.OnDrawerStateChangeListener;
@@ -62,7 +66,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPag
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		UmengUpdateAgent.update(this);
+
 		initMenuDrawer();
 		mMenuDrawer.setContentView(R.layout.activity_main);
 		initViews();
@@ -188,7 +192,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPag
 		switch (v.getId()) {
 		case R.id.sidebarButton:
 //			mMenuDrawer.toggleMenu(true);
-			startActivity(new Intent(MainActivity.this, ImageCommentActivity.class));
+			startActivity(new Intent(MainActivity.this, TwitterListActivity.class));
 			break;
 //		case R.id.shareButton:
 //			shareTo();

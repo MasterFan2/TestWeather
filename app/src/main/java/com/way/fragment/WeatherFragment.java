@@ -1,6 +1,7 @@
 package com.way.fragment;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -51,6 +52,8 @@ import com.way.db.CityProvider;
 import com.way.db.CityProvider.CityConstants;
 import com.way.fragment.BaseFragment.ABaseTask;
 import com.way.net.HttpClient;
+import com.way.net.bean.TwitterMain;
+import com.way.net.bean.TwitterMainResp;
 import com.way.weather.plugin.bean.Forecast;
 import com.way.weather.plugin.bean.RealTime;
 import com.way.weather.plugin.bean.WeatherInfo;
@@ -60,6 +63,7 @@ import com.way.yahoo.CommentsActivity;
 import com.way.yahoo.ImageActivity;
 import com.way.yahoo.MainActivity;
 import com.way.yahoo.R;
+import com.way.yahoo.TwitterListActivity;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -79,7 +83,7 @@ public class WeatherFragment extends Fragment implements ITaskManager,SwipeRefre
 	private int mHeaderHeight = -1;
 
 	private HttpUtils http ;
-	private MainPictureComment data;
+	private TwitterMain data;
 
 	//图片 和文字描述
 	private ImageView headImg;
@@ -118,17 +122,18 @@ public class WeatherFragment extends Fragment implements ITaskManager,SwipeRefre
 		mContentResolver = getActivity().getContentResolver();
 	}
 
-	Callback<MainPictureComment> cb = new Callback<MainPictureComment>() {
+	Callback<TwitterMainResp> cb = new Callback<TwitterMainResp>() {
 		@Override
-		public void success(MainPictureComment mainPictureComment, Response response) {
-			if(mainPictureComment != null){
-				data = mainPictureComment;
+		public void success(TwitterMainResp mainResp, Response response) {
+			if(mainResp != null){
+
+				data = mainResp.getTopTwitter();
 
 				headImg.setVisibility(View.VISIBLE);
 				commentsTxt.setVisibility(View.VISIBLE);
 
-				Picasso.with(getActivity()).load(data.getTopImg().getUrl()).placeholder(R.mipmap.img_default).into(headImg);
-				commentsTxt.setText(data.getTopComment().getContent());
+				Picasso.with(getActivity()).load(data.getImgs()).placeholder(R.mipmap.img_default).into(headImg);
+				commentsTxt.setText(data.getContent());
 			}
 		}
 
@@ -529,10 +534,10 @@ public class WeatherFragment extends Fragment implements ITaskManager,SwipeRefre
 	public void onClick(View v) {
 		switch (v.getId()){
 			case R.id.home_head_img:
-				startActivity(new Intent(getActivity(), ImageActivity.class));
+				startActivity(new Intent(getActivity(), TwitterListActivity.class));
 				break;
 			case R.id.home_head_comment_txt:
-				startActivity(new Intent(getActivity(), CommentsActivity.class));
+				startActivity(new Intent(getActivity(), TwitterListActivity.class));
 				break;
 		}
 	}

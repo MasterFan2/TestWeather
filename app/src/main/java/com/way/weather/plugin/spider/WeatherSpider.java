@@ -25,25 +25,25 @@ import com.way.weather.plugin.bean.Forecast;
 import com.way.weather.plugin.bean.Index;
 import com.way.weather.plugin.bean.RealTime;
 import com.way.weather.plugin.bean.WeatherInfo;
-import com.way.yahoo.App;
+import com.way.yahoo.MasterApplication;
 
 public class WeatherSpider {
 
 	public static final String WEATHER_ALL = "http://weatherapi.market.xiaomi.com/wtr-v2/weather?cityId=%s";
 
 	public static WeatherInfo getWeatherInfo(String postID) throws TaskException {
-		if (NetUtil.getNetworkState(App.getApplication()) == NetUtil.NETWORN_NONE)
+		if (NetUtil.getNetworkState(MasterApplication.getApplication()) == NetUtil.NETWORN_NONE)
 			throw new TaskException(
 					TaskException.TaskError.noneNetwork.toString());
 		RequestFuture<String> future = RequestFuture.newFuture();
 		StringRequest request = new StringRequest(String.format(
 				WeatherSpider.WEATHER_ALL, postID), future, future);
-		App.getVolleyRequestQueue().add(request);
+		MasterApplication.getVolleyRequestQueue().add(request);
 		try {
 			String result = future.get(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS,
 					TimeUnit.MILLISECONDS);
 			WeatherInfo weatherInfo = WeatherSpider.getWeatherInfo(
-					App.getApplication(), postID, result);
+					MasterApplication.getApplication(), postID, result);
 			if (!WeatherSpider.isEmpty(weatherInfo)) {
 				save2Database(weatherInfo, postID, result);// 保存到数据库
 				return weatherInfo;
@@ -73,7 +73,7 @@ public class WeatherSpider {
 					System.currentTimeMillis());
 			contentValues.put(CityConstants.PUB_TIME, pubTime);
 			contentValues.put(CityConstants.WEATHER_INFO, response);
-			App.getApplication()
+			MasterApplication.getApplication()
 					.getContentResolver()
 					.update(CityProvider.TMPCITY_CONTENT_URI, contentValues,
 							CityConstants.POST_ID + "=?",
@@ -82,7 +82,7 @@ public class WeatherSpider {
 	}
 
 	public static long getPubTime(String postID) {
-		Cursor c = App
+		Cursor c = MasterApplication
 				.getApplication()
 				.getContentResolver()
 				.query(CityProvider.TMPCITY_CONTENT_URI,

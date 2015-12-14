@@ -4,7 +4,7 @@ package com.way.fragment;
 import android.content.res.Resources;
 import android.text.TextUtils;
 
-import com.way.yahoo.App;
+import com.way.yahoo.MasterApplication;
 import com.way.yahoo.R;
 
 /**
@@ -60,7 +60,7 @@ public class TaskException extends Exception {
 		}
 
         try {
-            Resources res = App.getApplication().getResources();
+            Resources res = MasterApplication.getApplication().getResources();
 
             TaskError error = TaskError.valueOf(code);
             if (error == TaskError.noneNetwork)

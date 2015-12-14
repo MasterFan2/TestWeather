@@ -1,26 +1,49 @@
 package com.way.net.bean;
 
+import org.xutils.db.annotation.Column;
+import org.xutils.db.annotation.Table;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Created by Administrator on 2015/12/11.
  */
+@Table(name = "TwitterInfo")
 public class TwitterInfo implements Serializable{
 
     public static final int ITEM = 0;
     public static final int SECTION = 1;
 
+    @Column(name = "id", isId = true)
     private int id;
+
+    @Column(name = "commentNum")
     private int commentNum;
+
     private ArrayList<Comments> comments;
+
+    @Column(name = "content")
     private String content;
+
+    @Column(name = "dateCreated")
     private String dateCreated;
+
+    @Column(name = "imgs")
     private String imgs;
+
+    @Column(name = "lastUpdated")
     private String lastUpdated;
+
+    @Column(name = "supportNum")
     private int supportNum;
+
     private UserInfo user;
+
+    @Column(name = "isLike")
     private boolean isLike;//是否赞过
+
+    @Column(name = "type")
     private int type;
 
     public boolean isLike() {
@@ -114,6 +137,9 @@ public class TwitterInfo implements Serializable{
     public TwitterInfo(int t, String d){
         this.type = t;
         this.dateCreated = d;
+    }
+
+    public TwitterInfo() {
     }
 
     public TwitterInfo(int id, int commentNum, ArrayList<Comments> comments, String content, String dateCreated, String imgs, String lastUpdated, int supportNum, UserInfo user) {

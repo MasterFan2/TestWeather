@@ -14,18 +14,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.lidroid.xutils.DbUtils;
-import com.lidroid.xutils.HttpUtils;
-import com.lidroid.xutils.db.sqlite.Selector;
-import com.lidroid.xutils.exception.DbException;
-import com.lidroid.xutils.exception.HttpException;
-import com.lidroid.xutils.http.RequestParams;
-import com.lidroid.xutils.http.ResponseInfo;
-import com.lidroid.xutils.http.callback.RequestCallBack;
-import com.lidroid.xutils.http.client.HttpRequest;
 import com.umeng.analytics.MobclickAgent;
 import com.way.beans.BaseEntity;
 import com.way.beans.Comments;
@@ -34,7 +23,12 @@ import com.way.beans.GoodImageComment;
 import com.way.common.util.T;
 import com.way.net.HttpClient;
 import com.way.ui.swipeback.SwipeBackActivity;
+import com.way.utils.Dbutils;
 import com.way.widget.WaitDialog;
+
+import org.xutils.DbManager;
+import org.xutils.ex.DbException;
+import org.xutils.x;
 
 import java.util.Calendar;
 import java.util.List;
@@ -47,7 +41,6 @@ public class CommentsActivity extends SwipeBackActivity {
 
 //    private RecyclerView recyclerView;
     private CommentsAdapter adapter;
-    private HttpUtils http;
     private ListView listview;
     private CommentsResult data ;
     private EditText editText;
@@ -55,7 +48,7 @@ public class CommentsActivity extends SwipeBackActivity {
 
     private WaitDialog dialog;
 
-    private DbUtils db;
+    private DbManager db;
 
     private boolean isGooding = false;//判断是否在处理赞       true:正在处理        false:空闲
 
@@ -64,7 +57,7 @@ public class CommentsActivity extends SwipeBackActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comments);
 
-        db = DbUtils.create(this);
+        db = x.getDb(Dbutils.getConfig());
 
         dialog = new WaitDialog.Builder(context).create();
 
@@ -233,7 +226,7 @@ public class CommentsActivity extends SwipeBackActivity {
         String today = calendar.get(Calendar.YEAR)+"-" + calendar.get(Calendar.MONTH)+"-" + calendar.get(Calendar.DAY_OF_MONTH);
         List<GoodImageComment> localData = null;
         try {
-            localData = db.findAll(Selector.from(GoodImageComment.class).where("tag", "=", "comment").and("itemId", "=", comments.getId()));
+            localData = db.selector(GoodImageComment.class).where("tag", "=", "comment").and("itemId", "=", comments.getId()).findAll();
             if (localData == null || localData.size() <= 0) {//save
 
                 saveTempGoodImageComment = new GoodImageComment("comment", comments.getId(), today);

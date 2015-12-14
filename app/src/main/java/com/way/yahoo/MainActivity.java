@@ -84,7 +84,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPag
 			return;
 		}
 		if (System.currentTimeMillis() - firstTime < 3000) {
-			finish();
+			moveTaskToBack(false);
 		} else {
 			firstTime = System.currentTimeMillis();
 			T.showShort(this, R.string.press_again_exit);

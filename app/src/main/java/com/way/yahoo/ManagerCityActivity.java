@@ -136,7 +136,7 @@ public class ManagerCityActivity extends BaseActivity implements OnClickListener
 		} else {
 			mIndex = -1;
 			mAdapter.setRefreshingIndex(mIndex);
-			App.getVolleyRequestQueue().cancelAll("All");
+			MasterApplication.getVolleyRequestQueue().cancelAll("All");
 		}
 
 	}
@@ -505,7 +505,7 @@ public class ManagerCityActivity extends BaseActivity implements OnClickListener
 					}
 				});
 		sr.setTag(postID);
-		App.getVolleyRequestQueue().add(sr);
+		MasterApplication.getVolleyRequestQueue().add(sr);
 
 	}
 
@@ -583,7 +583,7 @@ public class ManagerCityActivity extends BaseActivity implements OnClickListener
 				}
 			});
 			sr.setTag("All");
-			App.getVolleyRequestQueue().add(sr);
+			MasterApplication.getVolleyRequestQueue().add(sr);
 		}
 	}
 

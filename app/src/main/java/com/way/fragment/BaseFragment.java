@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.way.yahoo.App;
+import com.way.yahoo.MasterApplication;
 import com.way.yahoo.R;
 
 /**
@@ -259,7 +259,7 @@ public abstract class BaseFragment extends Fragment implements ITaskManager {
      */
     protected void showMessage(CharSequence msg) {
         if (!TextUtils.isEmpty(msg))
-        	Toast.makeText(App.getApplication(), msg.toString(), Toast.LENGTH_SHORT).show();
+        	Toast.makeText(MasterApplication.getApplication(), msg.toString(), Toast.LENGTH_SHORT).show();
     }
 
     /**

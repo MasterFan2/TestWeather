@@ -1,7 +1,8 @@
 package com.way.net.bean;
 
-import com.lidroid.xutils.db.annotation.Column;
-import com.lidroid.xutils.db.annotation.Table;
+
+import org.xutils.db.annotation.Column;
+import org.xutils.db.annotation.Table;
 
 /**
  * Created by Administrator on 2015/12/12.
@@ -9,12 +10,13 @@ import com.lidroid.xutils.db.annotation.Table;
 @Table(name = "TwitterLikeStatus")
 public class TwitterLikeStatus {
 
+    @Column(name = "id", isId = true)
     private int id ;
 
-    @Column(column = "twitterId")
+    @Column(name = "twitterId")
     private int twitterId;
 
-    @Column(column = "imie")
+    @Column(name = "imie")
     private String imie;
 
     public int getId() {

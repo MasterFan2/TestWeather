@@ -4,41 +4,29 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout
+    <RelativeLayout
+        android:id="@+id/header"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="?android:attr/actionBarSize"
+        android:background="@color/title_blue">
 
-        <View
-            android:id="@+id/status_bar"
-            android:layout_width="match_parent"
-            android:layout_height="12dp"
-            android:background="@color/title_blue"
-            android:visibility="gone" />
-        <RelativeLayout
-            android:id="@+id/header"
-            android:layout_width="match_parent"
-            android:layout_height="?android:attr/actionBarSize"
-            android:background="@color/title_blue">
+        <ImageView
+            android:id="@+id/header_left"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:src="@mipmap/ic_back" />
 
-            <ImageView
-                android:id="@+id/header_left"
-                android:layout_width="50dp"
-                android:layout_height="match_parent"
-                android:layout_alignParentLeft="true"
-                android:src="@mipmap/ic_back" />
-
-            <TextView
-                android:id="@+id/image_header_txt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:text="详情"
-                android:textColor="@color/gray_100"
-                android:textSize="20sp" />
-        </RelativeLayout>
-    </LinearLayout>
+        <TextView
+            android:id="@+id/image_header_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="详情"
+            android:textColor="@color/gray_100"
+            android:textSize="20sp" />
+    </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"

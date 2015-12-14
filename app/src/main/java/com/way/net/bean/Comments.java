@@ -1,19 +1,39 @@
 package com.way.net.bean;
 
+
+import org.xutils.db.annotation.Column;
+import org.xutils.db.annotation.Table;
+
 import java.io.Serializable;
 
 /**
  * Created by Administrator on 2015/12/11.
  */
+@Table(name = "Comments")
 public class Comments implements Serializable {
 
+    @Column(name = "id", isId = true)
     private int id;
+
+    @Column(name = "content")
     private String content;
+
+    @Column(name = "dateCreated")
     private String dateCreated;
+
+    @Column(name = "lastUpdated")
     private String lastUpdated;
+
+    @Column(name = "supportNum")
     private int supportNum;
+
+    @Column(name = "twitter")
     private String twitter;
+
+    @Column(name = "userinfo")
     private String userinfo;
+
+    @Column(name = "isLike")
     private boolean isLike;
 
     public boolean isLike() {

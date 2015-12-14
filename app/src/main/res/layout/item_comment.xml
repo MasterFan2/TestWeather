@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@android:color/white"
+    android:background="@drawable/item_twitter_bg"
     android:orientation="vertical"
     >
         <LinearLayout
@@ -11,15 +10,15 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <com.way.widget.MaterialRippleLayout
-                android:id="@+id/comment_mrl"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:rippleAlpha="0.2"
-                app:rippleColor_="@color/title_blue"
-                app:rippleDelayClick="false"
-                app:rippleHover="true"
-                app:rippleOverlay="true">
+            <!--<com.way.widget.MaterialRippleLayout-->
+                <!--android:id="@+id/comment_mrl"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--app:rippleAlpha="0.2"-->
+                <!--app:rippleColor_="@color/title_blue"-->
+                <!--app:rippleDelayClick="false"-->
+                <!--app:rippleHover="true"-->
+                <!--app:rippleOverlay="true">-->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -32,6 +31,7 @@
                         android:id="@+id/content_img"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center"
                         android:src="@drawable/ic_cloudy_big" />
 
                     <TextView
@@ -43,7 +43,7 @@
                         android:textColor="@color/gray_900"
                         android:textSize="18sp" />
                 </LinearLayout>
-                </com.way.widget.MaterialRippleLayout>
+                <!--</com.way.widget.MaterialRippleLayout>-->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="50dp"

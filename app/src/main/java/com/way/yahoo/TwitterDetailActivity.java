@@ -2,9 +2,7 @@ package com.way.yahoo;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-import android.app.Activity;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,15 +10,11 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.lidroid.xutils.DbUtils;
-import com.lidroid.xutils.db.sqlite.Selector;
-import com.lidroid.xutils.exception.DbException;
 import com.squareup.picasso.Picasso;
 import com.umeng.analytics.MobclickAgent;
 import com.way.common.util.T;
@@ -30,11 +24,15 @@ import com.way.net.bean.Comments;
 import com.way.net.bean.Resp;
 import com.way.net.bean.TwitterDetailResp;
 import com.way.net.bean.TwitterInfo;
-import com.way.net.bean.TwitterLikeStatus;
 import com.way.ui.swipeback.SwipeBackActivity;
+import com.way.utils.Dbutils;
 import com.way.utils.HardwareUtil;
-import com.way.utils.SystemBarTintManager;
+import com.way.utils.NetworkUtil;
 import com.way.widget.MaterialRippleLayout;
+
+import org.xutils.DbManager;
+import org.xutils.ex.DbException;
+import org.xutils.x;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -50,11 +48,11 @@ import retrofit.client.Response;
  */
 public class TwitterDetailActivity extends SwipeBackActivity implements View.OnClickListener {
 
-    private DbUtils db;
+    private DbManager db;
 
     private ListView listView;
     private EditText contentEdit;
-    private View statusBar;
+//    private View statusBar;
     private MaterialRippleLayout sendBtn;
 
     private View headerView;
@@ -79,13 +77,12 @@ public class TwitterDetailActivity extends SwipeBackActivity implements View.OnC
         setContentView(R.layout.activity_twitter_detail);
         context = this;
 
+        db = x.getDb(Dbutils.getConfig());
+
         setSwipeBackEnable(false);
 
-        db = DbUtils.create(context);
-        db.configAllowTransaction(true);
-
-        statusBar = findViewById(R.id.status_bar);
-        setStatusBar();
+//        statusBar = findViewById(R.id.status_bar);
+//        setStatusBar();
 
         findViewById(R.id.header_left).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,7 +103,7 @@ public class TwitterDetailActivity extends SwipeBackActivity implements View.OnC
             commentsList = info.getComments();
             for (Comments comments: commentsList){
                 try {
-                    List<CommentLikeStatus> likeTempList = db.findAll(Selector.from(CommentLikeStatus.class).where("twitterId", "=", comments.getId()));
+                    List<CommentLikeStatus> likeTempList = db.selector(CommentLikeStatus.class).where("twitterId", "=", comments.getId()).findAll();
                     if(likeTempList != null && likeTempList.size() > 0){
                         comments.setIsLike(true);
                     }else {
@@ -119,6 +116,7 @@ public class TwitterDetailActivity extends SwipeBackActivity implements View.OnC
         }
 
         headerView = LayoutInflater.from(this).inflate(R.layout.item_comment, null);
+        headerView.setEnabled(false);
 
         contentEdit = (EditText) findViewById(R.id.input_edit);
         sendBtn = (MaterialRippleLayout) findViewById(R.id.send_btn);
@@ -135,15 +133,15 @@ public class TwitterDetailActivity extends SwipeBackActivity implements View.OnC
     }
 
     public void setStatusBar() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            setTranslucentStatus(true);
-            statusBar.setVisibility(View.VISIBLE);
-        }else {
-            statusBar.setVisibility(View.GONE);
-        }
-        SystemBarTintManager tintManager = new SystemBarTintManager(this);
-        tintManager.setStatusBarTintEnabled(true);
-        tintManager.setStatusBarTintResource(R.color.title_blue);//通知栏所需颜色
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+//            setTranslucentStatus(true);
+//            statusBar.setVisibility(View.VISIBLE);
+//        }else {
+//            statusBar.setVisibility(View.GONE);
+//        }
+//        SystemBarTintManager tintManager = new SystemBarTintManager(this);
+//        tintManager.setStatusBarTintEnabled(true);
+//        tintManager.setStatusBarTintResource(R.color.title_blue);//通知栏所需颜色
     }
 
     private void setTranslucentStatus(boolean on) {
@@ -191,8 +189,12 @@ public class TwitterDetailActivity extends SwipeBackActivity implements View.OnC
             return;
         }
 
-        //对微博评论
-        HttpClient.getInstance().commentTwitter(info.getId(), content, HardwareUtil.getDeviceUniqueCode(context), callback);
+        if(NetworkUtil.hasConnection(context)){
+            //对微博评论
+            HttpClient.getInstance().commentTwitter(info.getId(), content, HardwareUtil.getDeviceUniqueCode(context), callback);
+        }else{
+            T.showLong(context, "当前无网络连接， 请检查");
+        }
     }
 
     private Callback<Resp> callback = new Callback<Resp>() {
@@ -266,7 +268,7 @@ public class TwitterDetailActivity extends SwipeBackActivity implements View.OnC
                     commentsList = info.getComments();
                     for (Comments comments: commentsList){
                         try {
-                            List<CommentLikeStatus> likeTempList = db.findAll(Selector.from(CommentLikeStatus.class).where("twitterId", "=", comments.getId()));
+                            List<CommentLikeStatus> likeTempList = db.selector(CommentLikeStatus.class).where("twitterId", "=", comments.getId()).findAll();
                             if(likeTempList != null && likeTempList.size() > 0){
                                 comments.setIsLike(true);
                             }else {
@@ -340,12 +342,17 @@ public class TwitterDetailActivity extends SwipeBackActivity implements View.OnC
             holder.goodImg.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(!comments.isLike()) {
-                        currentPosition = position;
-                        HttpClient.getInstance().twitterCommentSupport(comments.getId(), twitterCommentSupportCallback);
+                    if(NetworkUtil.hasConnection(context)){
+                        if(!comments.isLike()) {
+                            currentPosition = position;
+                            HttpClient.getInstance().twitterCommentSupport(comments.getId(), twitterCommentSupportCallback);
+                        }else{
+                            T.showLong(context, "您已经赞过啦.");
+                        }
                     }else{
-                        T.showLong(context, "您已经赞过啦.");
+                        T.showLong(context, "当前无网络连接， 请检查");
                     }
+
                 }
             });
             return convertView;

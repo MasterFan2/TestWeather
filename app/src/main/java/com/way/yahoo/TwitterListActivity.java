@@ -2,10 +2,8 @@ package com.way.yahoo;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
-import android.app.Activity;
+import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,10 +15,6 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.lidroid.xutils.DbUtils;
-import com.lidroid.xutils.db.sqlite.Selector;
-import com.lidroid.xutils.db.sqlite.WhereBuilder;
-import com.lidroid.xutils.exception.DbException;
 import com.squareup.picasso.Picasso;
 import com.umeng.analytics.MobclickAgent;
 import com.way.common.util.T;
@@ -31,13 +25,18 @@ import com.way.net.bean.TwitterInfo;
 import com.way.net.bean.TwitterLikeStatus;
 import com.way.net.bean.TwitterResp;
 import com.way.ui.swipeback.SwipeBackActivity;
+import com.way.utils.Dbutils;
 import com.way.utils.HardwareUtil;
-import com.way.utils.SystemBarTintManager;
-import com.way.widget.MaterialRippleLayout;
+import com.way.utils.NetworkUtil;
 import com.way.widget.WaitDialog;
 import com.way.widget.component.MasterListView;
-import com.way.widget.component.MasterListViewHeader;
 
+import org.xutils.DbManager;
+import org.xutils.db.sqlite.WhereBuilder;
+import org.xutils.ex.DbException;
+import org.xutils.x;
+
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -53,17 +52,15 @@ import retrofit.client.Response;
  */
 public class TwitterListActivity extends SwipeBackActivity implements View.OnClickListener, MasterListView.OnRefreshListener {
 
-    private DbUtils db;
-
     private PinnedSectionListView listView;
     private MyAdapter adapter;
 
     private ImageView leftImg, rightImg;
-    private View statusBar;
+//    private View statusBar;
 
     private Context context;
     private ArrayList<DatBean> finalData = new ArrayList<>();
-    private ArrayList<TwitterInfo> finalInfoList = new ArrayList<>();
+    private List<TwitterInfo> finalInfoList = new ArrayList<>();
     private ArrayList<TwitterInfo> tempList = new ArrayList<>();
 
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -76,6 +73,7 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
     private int pageSize = 30;
     private int pageIndex = 1;
 
+    private DbManager db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,19 +82,26 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
         setContentView(R.layout.activity_twitter_list);
         context = this;
 
-        db = DbUtils.create(context);
-        db.configAllowTransaction(true);
-
+        db = x.getDb(Dbutils.getConfig());
 
         waitDialog = new WaitDialog.Builder(context).create();
 
         //init widget
-        statusBar = findViewById(R.id.status_bar);
-        setStatusBar();
+//        statusBar = findViewById(R.id.status_bar);
+//        setStatusBar();
         listView = (PinnedSectionListView) findViewById(R.id.listView);
         listView.setPullLoadEnable(false);
         listView.setPullRefreshEnable(false);
         listView.setOnRefreshListener(this, 0);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                Intent intent = new Intent(context, TwitterDetailActivity.class);
+                TwitterInfo info = finalInfoList.get(position - 1);
+                intent.putExtra("info", info);
+                startActivityForResult(intent, 505);
+            }
+        });
 
         leftImg = (ImageView) findViewById(R.id.header_left);
         leftImg.setOnClickListener(this);
@@ -106,22 +111,33 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
         //加载网络数据
         adapter = new MyAdapter();
         listView.setAdapter(adapter);
-        waitDialog.show();
-        HttpClient.getInstance().twitterList(pageIndex, pageSize, callback);
+
+
+        if (NetworkUtil.hasConnection(context)) {
+            waitDialog.show();
+            HttpClient.getInstance().twitterList(pageIndex, pageSize, callback);
+        } else {
+            try {
+                finalInfoList = db.findAll(TwitterInfo.class);
+                adapter.notifyDataSetChanged();
+            } catch (DbException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void setStatusBar() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            setTranslucentStatus(true);
-            statusBar.setVisibility(View.VISIBLE);
-        } else {
-            statusBar.setVisibility(View.GONE);
-        }
-        SystemBarTintManager tintManager = new SystemBarTintManager(this);
-        tintManager.setStatusBarTintEnabled(true);
-        tintManager.setStatusBarTintResource(R.color.red);//通知栏所需颜色
-        tintManager.setTintColor(R.color.green);
-        tintManager.setNavigationBarTintColor(R.color.yellow);
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+//            setTranslucentStatus(true);
+//            statusBar.setVisibility(View.VISIBLE);
+//        } else {
+//            statusBar.setVisibility(View.GONE);
+//        }
+//        SystemBarTintManager tintManager = new SystemBarTintManager(this);
+//        tintManager.setStatusBarTintEnabled(true);
+//        tintManager.setStatusBarTintResource(R.color.red);//通知栏所需颜色
+//        tintManager.setTintColor(R.color.green);
+//        tintManager.setNavigationBarTintColor(R.color.yellow);
     }
 
     private void setTranslucentStatus(boolean on) {
@@ -157,28 +173,30 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
                     }
                 }
 
-                if(resp.getResult() != null && resp.getResult().size() >= pageSize){
+                if (resp.getResult() != null && resp.getResult().size() >= pageSize) {
                     listView.setPullLoadEnable(true);
-                }else{
+                } else {
                     listView.setPullLoadEnable(false);
                 }
 
+                List<TwitterLikeStatus> likeStatusList = null;
                 try {
-                    List<TwitterLikeStatus> likeStatusList = db.findAll(TwitterLikeStatus.class);
+                    likeStatusList = db.findAll(TwitterLikeStatus.class);
                     if (likeStatusList != null && likeStatusList.size() > 0) {
                         for (TwitterInfo info : tempList) {
-                            List<TwitterLikeStatus> likeTempList = db.findAll(Selector.from(TwitterLikeStatus.class).where("twitterId", "=", info.getId()));
+                            List<TwitterLikeStatus> likeTempList = db.selector(TwitterLikeStatus.class).where("twitterId", "=", info.getId()).findAll();
                             if (likeTempList != null && likeTempList.size() > 0)
                                 info.setIsLike(true);
                             else info.setIsLike(false);
                         }
                     }
+                    finalInfoList.addAll(tempList);
                 } catch (DbException e) {
                     e.printStackTrace();
                 }
-                finalInfoList.addAll(tempList);
+
                 adapter.notifyDataSetChanged();
-            }else{
+            } else {
                 listView.setPullLoadEnable(false);
             }
         }
@@ -217,7 +235,7 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
                     List<TwitterLikeStatus> likeStatusList = db.findAll(TwitterLikeStatus.class);
                     if (likeStatusList != null && likeStatusList.size() > 0) {
                         for (TwitterInfo info : tempList) {
-                            List<TwitterLikeStatus> likeTempList = db.findAll(Selector.from(TwitterLikeStatus.class).where("twitterId", "=", info.getId()));
+                            List<TwitterLikeStatus> likeTempList = db.selector(TwitterLikeStatus.class).where("twitterId", "=", info.getId()).findAll();
                             if (likeTempList != null && likeTempList.size() > 0)
                                 info.setIsLike(true);
                             else info.setIsLike(false);
@@ -231,7 +249,23 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
                 adapter.notifyDataSetChanged();
                 listView.setPullRefreshEnable(true);
                 listView.stopRefresh();
-            }else{
+
+                //cache
+                try {
+                    List<TwitterInfo> localList = db.findAll(TwitterInfo.class);
+                    if(localList != null && localList.size() > 0){
+                        db.dropTable(TwitterInfo.class);
+                    }
+
+
+                    for (TwitterInfo twitterInfo : finalInfoList) {
+                        db.save(twitterInfo);
+                    }
+                } catch (DbException e) {
+                    e.printStackTrace();
+                }
+
+            } else {
                 listView.setPullLoadEnable(false);
             }
         }
@@ -371,7 +405,7 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
             final TwitterInfo info = finalInfoList.get(position);
 
 
-            if (getItemViewType(position) == DatBean.SECTION) {
+            if (getItemViewType(position) == DatBean.SECTION) {//section
                 SectionViewHolder sectionViewHolder;
                 if (convertView == null) {
                     convertView = LayoutInflater.from(context).inflate(R.layout.item_section, null);
@@ -387,7 +421,7 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
                     e.printStackTrace();
                 }
 
-            } else if (getItemViewType(position) == DatBean.ITEM) {
+            } else if (getItemViewType(position) == DatBean.ITEM) {//item
 
                 ViewHolder holder;
                 if (convertView == null) {
@@ -404,16 +438,6 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
                     holder.goodImg.setImageResource(R.drawable.icon_like);
                 }
 
-                holder.mrl.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(context, TwitterDetailActivity.class);
-                        TwitterInfo info = finalInfoList.get(position);
-                        intent.putExtra("info", info);
-                        startActivityForResult(intent, 505);
-                    }
-                });
-
                 holder.goodImg.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -426,10 +450,24 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
                     }
                 });
 
-                //set data
+                //set support number
                 holder.descTxt.setText(info.getContent());
-                holder.goodNumTxt.setText("" + info.getSupportNum());
-                holder.commentNumTxt.setText("" + info.getCommentNum());
+                if (info.getSupportNum() <= 0) {
+                    holder.goodNumTxt.setVisibility(View.GONE);
+                } else {
+                    holder.goodNumTxt.setVisibility(View.VISIBLE);
+                    holder.goodNumTxt.setText("" + info.getSupportNum());
+                }
+
+                if (info.getCommentNum() <= 0) {
+                    holder.commentNumTxt.setVisibility(View.GONE);
+                } else {
+                    holder.commentNumTxt.setVisibility(View.VISIBLE);
+                    holder.commentNumTxt.setText("" + info.getCommentNum());
+                }
+
+
+                //set time
                 try {
                     holder.timeTxt.setText(sdfHourMinute.format(sdf.parse(info.getDateCreated())));
                 } catch (ParseException e) {
@@ -461,7 +499,7 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
             ImageView goodImg;
             TextView goodNumTxt;
             TextView commentNumTxt;
-            MaterialRippleLayout mrl;
+//            MaterialRippleLayout mrl;
 
             public ViewHolder(View view) {
                 contentImg = (ImageView) view.findViewById(R.id.content_img);
@@ -470,7 +508,7 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
                 goodImg = (ImageView) view.findViewById(R.id.good_img);
                 goodNumTxt = (TextView) view.findViewById(R.id.good_number_txt);
                 commentNumTxt = (TextView) view.findViewById(R.id.comment_number_txt);
-                mrl = (MaterialRippleLayout) view.findViewById(R.id.comment_mrl);
+//                mrl = (MaterialRippleLayout) view.findViewById(R.id.comment_mrl);
             }
         }
     }

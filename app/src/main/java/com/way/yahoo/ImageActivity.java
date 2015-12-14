@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
@@ -18,19 +17,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
-import com.lidroid.xutils.DbUtils;
-import com.lidroid.xutils.HttpUtils;
-import com.lidroid.xutils.db.sqlite.Selector;
-import com.lidroid.xutils.exception.DbException;
-import com.lidroid.xutils.exception.HttpException;
-import com.lidroid.xutils.http.ResponseInfo;
-import com.lidroid.xutils.http.callback.RequestCallBack;
-import com.lidroid.xutils.http.client.HttpRequest;
 import com.squareup.picasso.Picasso;
 import com.umeng.analytics.MobclickAgent;
 import com.way.BitmapUtil;
 import com.way.beans.BaseEntity;
-import com.way.beans.Comments;
 import com.way.beans.GoodImageComment;
 import com.way.beans.Image;
 import com.way.beans.ImageResult;
@@ -39,12 +29,17 @@ import com.way.common.util.SystemUtils;
 import com.way.common.util.T;
 import com.way.net.HttpClient;
 import com.way.ui.swipeback.SwipeBackActivity;
+import com.way.utils.Dbutils;
 import com.way.widget.WaitDialog;
 import com.way.widget.dialog.MTDialog;
 import com.way.widget.dialog.OnClickListener;
 import com.way.widget.dialog.ViewHolder;
 import com.way.widget.indicator.AVLoadingIndicatorView;
 import com.way.widget.recyclerviewdiviver.DividerGridItemDecoration;
+
+import org.xutils.DbManager;
+import org.xutils.ex.DbException;
+import org.xutils.x;
 
 import java.io.DataOutputStream;
 import java.io.File;
@@ -71,9 +66,8 @@ public class ImageActivity extends SwipeBackActivity implements OnClickListener 
 
     //网络数据
     private ImageResult dataList;
-    private HttpUtils http ;
 
-    private DbUtils db;
+    private DbManager db;
 
 
     private RecyclerView recyclerView;
@@ -108,7 +102,7 @@ public class ImageActivity extends SwipeBackActivity implements OnClickListener 
 
         setContentView(R.layout.activity_image);
 
-        db = DbUtils.create(this);
+        db = x.getDb(Dbutils.getConfig());
 
         waitDialog = new WaitDialog.Builder(context).create();
 
@@ -429,7 +423,7 @@ public class ImageActivity extends SwipeBackActivity implements OnClickListener 
         String today = calendar.get(Calendar.YEAR)+"-" + calendar.get(Calendar.MONTH)+"-" + calendar.get(Calendar.DAY_OF_MONTH);
         List<GoodImageComment> localData = null;
         try {
-            localData = db.findAll(Selector.from(GoodImageComment.class).where("tag", "=", "comment").and("itemId", "=", image.getId()));
+            localData = db.selector(GoodImageComment.class).where("tag", "=", "comment").and("itemId", "=", image.getId()).findAll();
             if (localData == null || localData.size() <= 0) {//save
 
                 saveTempGoodImageComment = new GoodImageComment("comment", image.getId(), today);

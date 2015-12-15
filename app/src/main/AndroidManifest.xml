@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.way.yahoo" >
+    package="com.way.yahoo">
 
     <!-- 这个权限用于进行网络定位 -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -27,14 +27,14 @@
     <uses-permission android:name="android.permission.GET_TASKS" />
 
     <application
-        android:name=".App"
+        android:name=".MasterApplication"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <activity
             android:name=".SplashActivity"
             android:label="@string/app_name"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -45,8 +45,7 @@
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait" >
-        </activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ManagerCityActivity"
             android:screenOrientation="portrait"
@@ -95,44 +94,57 @@
         <service
             android:name="com.baidu.location.f"
             android:enabled="true"
-            android:process=":remote" >
-        </service>
+            android:process=":remote" />
 
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="W9xG4m71Ek8xz2GyhZvGiuWb" />
 
         <activity
-            android:name=".ImageActivity"
-            android:theme="@style/AppTheme"
-            >
+        android:name=".ImageActivity"
+        android:theme="@style/AppTheme"
+        >
         </activity>
         <activity
-            android:name=".CommentsActivity"
-            >
+        android:name=".CommentsActivity"
+        >
         </activity>
 
         <activity
-            android:theme="@style/myTheme"
-            android:name="photopicker.PhotoPickerActivity"
-            />
+        android:theme="@style/myTheme"
+        android:name="photopicker.PhotoPickerActivity"
+        />
 
         <activity
         android:name="photopicker.PhotoPagerActivity"
         />
         <!-- umeng -->
-        <meta-data android:value="56481e9d67e58eb80d001531" android:name="UMENG_APPKEY"></meta-data>
-        <meta-data android:value="self" android:name="UMENG_CHANNEL"/>
+        <meta-data
+            android:name="UMENG_APPKEY"
+            android:value="56481e9d67e58eb80d001531" />
+        <meta-data
+            android:name="UMENG_CHANNEL"
+            android:value="self" />
 
         <service
             android:name="com.umeng.update.net.DownloadingService"
-            android:process=":DownloadingService" >
-        </service>
+            android:process=":DownloadingService" />
+
         <activity
             android:name="com.umeng.update.UpdateDialogActivity"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
-        </activity>
-
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
+            android:name=".TwitterListActivity"
+            android:theme="@style/SecondAppTheme"
+            android:label="@string/title_activity_image_comment" />
+        <activity
+            android:name=".AddTwitterActivity"
+            android:theme="@style/SecondAppTheme"
+            android:label="@string/title_activity_add_conment" />
+        <activity
+            android:name=".TwitterDetailActivity"
+            android:theme="@style/SecondAppTheme"
+            android:label="@string/title_activity_comment_detail"></activity>
     </application>
 
 </manifest>

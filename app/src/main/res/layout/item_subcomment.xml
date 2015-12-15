@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/gray_twitters_comment"
+    android:orientation="vertical">
+    <LinearLayout
+        android:id="@+id/right_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_alignParentRight="true"
+        android:gravity="center"
+        >
+        <ImageView
+            android:id="@+id/subcomment_good_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_like"
+            android:padding="10dp"
+            />
+        <TextView
+            android:id="@+id/subcomment_good_num_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="15"
+            android:textColor="@color/gray_700"
+            />
+    </LinearLayout>
+    <TextView
+        android:id="@+id/subcomment_content_txt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="哈哈只哈哈只wkkw侃侃保侃侃 保佑哈哈中保保保保w中w哈哈哈哈保 保佑哈哈"
+        android:paddingLeft="16dp"
+        android:textColor="@color/gray_700"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:paddingRight="8dp"
+        android:textSize="12sp"
+        android:layout_toLeftOf="@id/right_layout"
+        />
+</RelativeLayout>

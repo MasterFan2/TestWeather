@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/dialog_foot_background"
+    android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <com.way.widget.MaterialRippleLayout
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            app:rippleAlpha="0.1"
+            app:rippleColor_="#585858"
+            app:rippleDelayClick="false"
+            app:rippleHover="true"
+            app:rippleOverlay="true">
+            <TextView
+                android:id="@+id/cancel_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:padding="16dp"
+                android:text="取 消"
+                android:textColor="@color/gray_900"
+                android:textSize="14sp" />
+        </com.way.widget.MaterialRippleLayout>
+
+        <View
+            android:layout_width="0.15dp"
+            android:layout_height="match_parent"
+            android:background="@color/gray_400" />
+
+        <com.way.widget.MaterialRippleLayout
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            app:rippleAlpha="0.1"
+            app:rippleColor_="#585858"
+            app:rippleDelayClick="false"
+            app:rippleHover="true"
+            app:rippleOverlay="true">
+            <TextView
+                android:id="@+id/confirm_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:padding="16dp"
+                android:text="确 定"
+                android:textColor="@color/gray_900"
+                android:textSize="14sp" />
+            </com.way.widget.MaterialRippleLayout>
+
+
+    </LinearLayout>
+</LinearLayout>

@@ -2,12 +2,15 @@ package com.way.yahoo;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -30,6 +33,7 @@ import com.way.common.util.SystemUtils;
 import com.way.common.util.T;
 import com.way.util.blur.jni.BitmapUtils;
 import com.way.util.blur.jni.FrostedGlassUtil;
+import com.way.utils.SystemBarTintManager;
 
 import net.simonvt.menudrawer.MenuDrawer;
 import net.simonvt.menudrawer.MenuDrawer.OnDrawerStateChangeListener;
@@ -48,7 +52,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPag
 	private int mPagerPosition;
 	private TextView mTitleTextView;
 	private ImageView mBlurImageView;
-	private ImageView mShareBtn;
+//	private ImageView mShareBtn;
 	private ImageView mLocationIV;
 	private Button mAddCityBtn;
 
@@ -62,7 +66,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPag
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		UmengUpdateAgent.update(this);
+
 		initMenuDrawer();
 		mMenuDrawer.setContentView(R.layout.activity_main);
 		initViews();
@@ -80,7 +84,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPag
 			return;
 		}
 		if (System.currentTimeMillis() - firstTime < 3000) {
-			finish();
+			moveTaskToBack(false);
 		} else {
 			firstTime = System.currentTimeMillis();
 			T.showShort(this, R.string.press_again_exit);
@@ -108,8 +112,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPag
 
 		mTitleTextView.setOnClickListener(this);
 		findViewById(R.id.sidebarButton).setOnClickListener(this);
-		mShareBtn = (ImageView) findViewById(R.id.shareButton);
-		mShareBtn.setOnClickListener(this);
+//		mShareBtn = (ImageView) findViewById(R.id.shareButton);
+//		mShareBtn.setOnClickListener(this);
 	}
 
 	@Override
@@ -145,7 +149,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPag
 		mTitleTextView.setText("--");
 		mLocationIV.setVisibility(View.GONE);
 		mAddCityBtn.setVisibility(View.VISIBLE);
-		mShareBtn.setEnabled(false);
+//		mShareBtn.setEnabled(false);
 	}
 
 	private void updateUI() {
@@ -169,7 +173,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPag
 			mCirclePageIndicator.setVisibility(View.VISIBLE);
 		else
 			mCirclePageIndicator.setVisibility(View.GONE);
-		mShareBtn.setEnabled(true);
+//		mShareBtn.setEnabled(true);
 
 		int defaultTab = PreferenceUtils.getPrefInt(this, INSTANCESTATE_TAB, 0);
 		if (defaultTab > (mTmpCities.size() - 1))// 防止手动删除城市之后出现数组越界
@@ -187,15 +191,15 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPag
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.sidebarButton:
-			mMenuDrawer.toggleMenu(true);
+//			mMenuDrawer.toggleMenu(true);
+			startActivity(new Intent(MainActivity.this, TwitterListActivity.class));
 			break;
-		case R.id.shareButton:
-			shareTo();
-			break;
+//		case R.id.shareButton:
+//			shareTo();
+//			break;
 		case R.id.location_city_textview:
 		case R.id.add_city_btn:
-			startActivity(new Intent(MainActivity.this,
-					ManagerCityActivity.class));
+			startActivity(new Intent(MainActivity.this, ManagerCityActivity.class));
 			break;
 		default:
 			break;
@@ -204,8 +208,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPag
 
 	private void shareTo() {
 		//现在改为城市管理
-		startActivity(new Intent(MainActivity.this,
-				ManagerCityActivity.class));
+		startActivity(new Intent(MainActivity.this, ManagerCityActivity.class));
 		//分享
 //		new AsyncTask<Void, Void, File>() {
 //			Dialog dialog;
@@ -335,8 +338,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPag
 		// Position.LEFT, MenuDrawer.MENU_DRAG_CONTENT);
 		mMenuListView = (ListView) LayoutInflater.from(this).inflate(R.layout.sidemenu_listview, null);
 		mMenuDrawer.setMenuView(mMenuListView);
-		mMenuDrawer.setTouchMode(MenuDrawer.TOUCH_MODE_FULLSCREEN);
-		mMenuDrawer	.setOnInterceptMoveEventListener(new MenuDrawer.OnInterceptMoveEventListener() {
+		mMenuDrawer.setTouchMode(MenuDrawer.TOUCH_MODE_NONE);
+		mMenuDrawer.setOnInterceptMoveEventListener(new MenuDrawer.OnInterceptMoveEventListener() {
 			@Override
 			public boolean isViewDraggable(View v, int dx, int x, int y) {
 				if (v == mMainViewPager) {
@@ -346,21 +349,20 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPag
 				return false;
 			}
 		});
-		mMenuDrawer
-				.setOnDrawerStateChangeListener(new OnDrawerStateChangeListener() {
+		mMenuDrawer	.setOnDrawerStateChangeListener(new OnDrawerStateChangeListener() {
 
-					@Override
-					public void onDrawerStateChange(int oldState, int newState) {
-						// TODO Auto-generated method stub
+			@Override
+			public void onDrawerStateChange(int oldState, int newState) {
+				// TODO Auto-generated method stub
 
-					}
+			}
 
-					@Override
-					public void onDrawerSlide(float openRatio, int offsetPixels) {
-						// TODO Auto-generated method stub
-						changeBlurImageViewAlpha(openRatio);
-					}
-				});
+			@Override
+			public void onDrawerSlide(float openRatio, int offsetPixels) {
+				// TODO Auto-generated method stub
+				changeBlurImageViewAlpha(openRatio);
+			}
+		});
 		mMenuAdapter = new SideMenuAdapter(this);
 		// mMenuAdapter.addContent(mTmpCities);
 		mMenuListView.setAdapter(mMenuAdapter);

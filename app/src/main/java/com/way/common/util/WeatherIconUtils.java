@@ -96,11 +96,11 @@ public class WeatherIconUtils {
 		}
 	}
 	
-//	/**
-//	 * 获取天气清晰背景
-//	 * @param type
-//	 * @return
-//	 */
+	/**
+	 * 获取天气清晰背景
+	 * @param type
+	 * @return
+	 */
 //	public static int getWeatherNromalBg(int type) {
 //		if (isNight(System.currentTimeMillis()))
 //			switch (type) {
@@ -167,11 +167,10 @@ public class WeatherIconUtils {
 //			return R.drawable.bg_na;
 //		}
 //	}
-//	/**
-//	 * 获取天气模糊背景
-//	 * @param type
-//	 * @return
-//	 */
+	/**
+	 * 获取天气模糊背景
+	 * @return
+	 */
 //	public static int getWeatherBlurBg(int type) {
 //		if (isNight(System.currentTimeMillis()))
 //			switch (type) {
@@ -328,11 +327,11 @@ public class WeatherIconUtils {
 //			return R.drawable.bg_na;
 //		}
 //	}
-	/**
-	 * 获取天气模糊背景
-	 * @param type
-	 * @return
-	 */
+//	/**
+//	 * 获取天气模糊背景
+//	 * @param type
+//	 * @return
+//	 */
 //	public static int getRawBlurBg(int type) {
 //		if (isNight(System.currentTimeMillis()))
 //			switch (type) {

@@ -1,9 +1,6 @@
 package com.way.fragment;
 
 import java.io.Serializable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import org.json.JSONException;
 
@@ -15,7 +12,6 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,21 +24,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.toolbox.RequestFuture;
-import com.android.volley.toolbox.StringRequest;
-import com.google.gson.Gson;
-import com.lidroid.xutils.HttpUtils;
-import com.lidroid.xutils.exception.HttpException;
-import com.lidroid.xutils.http.ResponseInfo;
-import com.lidroid.xutils.http.callback.RequestCallBack;
-import com.lidroid.xutils.http.client.HttpRequest;
 import com.squareup.picasso.Picasso;
 import com.umeng.analytics.MobclickAgent;
 import com.way.adapter.WeatherListAdapter;
 import com.way.beans.City;
-import com.way.beans.CommentsResult;
-import com.way.beans.MainPictureComment;
 import com.way.common.util.NetUtil;
 import com.way.common.util.SystemUtils;
 import com.way.common.util.TimeUtils;
@@ -51,15 +36,15 @@ import com.way.db.CityProvider;
 import com.way.db.CityProvider.CityConstants;
 import com.way.fragment.BaseFragment.ABaseTask;
 import com.way.net.HttpClient;
+import com.way.net.bean.TwitterMain;
+import com.way.net.bean.TwitterMainResp;
 import com.way.weather.plugin.bean.Forecast;
 import com.way.weather.plugin.bean.RealTime;
 import com.way.weather.plugin.bean.WeatherInfo;
 import com.way.weather.plugin.spider.WeatherSpider;
-import com.way.yahoo.App;
-import com.way.yahoo.CommentsActivity;
-import com.way.yahoo.ImageActivity;
 import com.way.yahoo.MainActivity;
 import com.way.yahoo.R;
+import com.way.yahoo.TwitterListActivity;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -78,8 +63,7 @@ public class WeatherFragment extends Fragment implements ITaskManager,SwipeRefre
 
 	private int mHeaderHeight = -1;
 
-	private HttpUtils http ;
-	private MainPictureComment data;
+	private TwitterMain data;
 
 	//图片 和文字描述
 	private ImageView headImg;
@@ -118,17 +102,18 @@ public class WeatherFragment extends Fragment implements ITaskManager,SwipeRefre
 		mContentResolver = getActivity().getContentResolver();
 	}
 
-	Callback<MainPictureComment> cb = new Callback<MainPictureComment>() {
+	Callback<TwitterMainResp> cb = new Callback<TwitterMainResp>() {
 		@Override
-		public void success(MainPictureComment mainPictureComment, Response response) {
-			if(mainPictureComment != null){
-				data = mainPictureComment;
+		public void success(TwitterMainResp mainResp, Response response) {
+			if(mainResp != null){
+
+				data = mainResp.getTopTwitter();
 
 				headImg.setVisibility(View.VISIBLE);
 				commentsTxt.setVisibility(View.VISIBLE);
 
-				Picasso.with(getActivity()).load(data.getTopImg().getUrl()).placeholder(R.mipmap.img_default).into(headImg);
-				commentsTxt.setText(data.getTopComment().getContent());
+				Picasso.with(getActivity()).load(data.getImgs()).placeholder(R.mipmap.img_default).into(headImg);
+				commentsTxt.setText(data.getContent());
 			}
 		}
 
@@ -529,10 +514,10 @@ public class WeatherFragment extends Fragment implements ITaskManager,SwipeRefre
 	public void onClick(View v) {
 		switch (v.getId()){
 			case R.id.home_head_img:
-				startActivity(new Intent(getActivity(), ImageActivity.class));
+				startActivity(new Intent(getActivity(), TwitterListActivity.class));
 				break;
 			case R.id.home_head_comment_txt:
-				startActivity(new Intent(getActivity(), CommentsActivity.class));
+				startActivity(new Intent(getActivity(), TwitterListActivity.class));
 				break;
 		}
 	}

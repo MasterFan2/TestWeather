@@ -40,7 +40,7 @@
     <color name="account_splash_mask">#88ffffff</color>
     <color name="account_sso_text">#ff3f3f3f</color>
     <color name="account_settings_items_text">#ff19191a</color>
-    <item type="color" name="account_loginScreen_background">@*android:color/white</item>
+    <item type="color" name="account_loginScreen_background">@android:color/white</item>
     <color name="account_header_text">#ff19191a</color>
     <item type="color" name="account_button_text">@color/yapps_purple_accent</item>
     <color name="account_edit_hint">#ff7e7d80</color>
@@ -126,12 +126,12 @@
     <item type="color" name="abs__bright_foreground_inverse_holo_dark">@color/abs__bright_foreground_holo_light</item>
     <item type="color" name="abs__bright_foreground_inverse_holo_light">@color/abs__bright_foreground_holo_dark</item>
     <color name="abs__holo_blue_light">#ff33b5e5</color>
-    <item type="color" name="common_signin_btn_dark_text_default">@*android:color/white</item>
-    <item type="color" name="common_signin_btn_dark_text_pressed">@*android:color/white</item>
+    <item type="color" name="common_signin_btn_dark_text_default">@android:color/white</item>
+    <item type="color" name="common_signin_btn_dark_text_pressed">@android:color/white</item>
     <color name="common_signin_btn_dark_text_disabled">#ffaaaaaa</color>
-    <item type="color" name="common_signin_btn_dark_text_focused">@*android:color/white</item>
+    <item type="color" name="common_signin_btn_dark_text_focused">@android:color/white</item>
     <color name="common_signin_btn_light_text_default">#ff737373</color>
-    <item type="color" name="common_signin_btn_light_text_pressed">@*android:color/white</item>
+    <item type="color" name="common_signin_btn_light_text_pressed">@android:color/white</item>
     <color name="common_signin_btn_light_text_disabled">#ffaaaaaa</color>
     <color name="common_signin_btn_light_text_focused">#ff737373</color>
     <color name="common_signin_btn_default_background">#ffdd4b39</color>
@@ -201,7 +201,11 @@
     <color name="gray_900">#212121</color>
     <color name="gray_1000">#000000</color>
 
+    <color name="gray_twitters_comment">#eef0f3</color>
+
     <color name="title_blue">#4fc2e9</color>
+
+    <color name="section_blue">#9dd9ee</color>
 
     <color name="picker_pager_bg">#CA000000</color>
     <color name="picker_selected_bg">#44000000</color>

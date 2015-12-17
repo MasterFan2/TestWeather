@@ -3,7 +3,6 @@ package com.way.yahoo;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,7 +35,6 @@ import org.xutils.db.sqlite.WhereBuilder;
 import org.xutils.ex.DbException;
 import org.xutils.x;
 
-import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -119,7 +117,12 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
         } else {
             try {
                 finalInfoList = db.findAll(TwitterInfo.class);
-                adapter.notifyDataSetChanged();
+                if(finalInfoList != null && finalInfoList.size() > 0){
+                    adapter.notifyDataSetChanged();
+                }else {
+                    NotConnection();
+                    listView.setPullRefreshEnable(true);
+                }
             } catch (DbException e) {
                 e.printStackTrace();
             }
@@ -292,12 +295,16 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK && requestCode == 502) {
-            listView.startRefresh();
-            pageIndex = 1;
-            HttpClient.getInstance().twitterList(pageIndex, pageSize, callback);
+            if(NetworkUtil.hasConnection(context)){
+                listView.startRefresh();
+                pageIndex = 1;
+                HttpClient.getInstance().twitterList(pageIndex, pageSize, callback);
+            }
         } else if (requestCode == 505) {
-            pageIndex = 1;
-            HttpClient.getInstance().twitterList(pageIndex, pageSize, callback);
+            if(NetworkUtil.hasConnection(context)){
+                pageIndex = 1;
+                HttpClient.getInstance().twitterList(pageIndex, pageSize, callback);
+            }
         }
     }
 
@@ -361,16 +368,26 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
 
     @Override
     public void onRefresh(int id) {
-        pageIndex = 1;
-        listView.startRefresh();
-        listView.setPullRefreshEnable(false);
-        HttpClient.getInstance().twitterList(pageIndex, pageSize, callback);
+        if(NetworkUtil.hasConnection(context)){
+            pageIndex = 1;
+            listView.startRefresh();
+            listView.setPullRefreshEnable(false);
+            HttpClient.getInstance().twitterList(pageIndex, pageSize, callback);
+        }else {
+            NotConnection();
+        }
+
     }
 
     @Override
     public void onLoadMore(int id) {
-        pageIndex++;
-        HttpClient.getInstance().twitterList(pageIndex, pageSize, loadMoreCallback);
+        if(NetworkUtil.hasConnection(context)){
+            pageIndex++;
+            HttpClient.getInstance().twitterList(pageIndex, pageSize, loadMoreCallback);
+        }else {
+            NotConnection();
+        }
+
     }
 
     class MyAdapter extends BaseAdapter implements PinnedSectionListView.PinnedSectionListAdapter {
@@ -442,11 +459,16 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
                     @Override
                     public void onClick(View v) {
                         currentPosition = position;
-                        if (info.isLike()) {
-                            HttpClient.getInstance().twitterCancelSupport(info.getId(), twitterCancelSupportCallback);
-                        } else {
-                            HttpClient.getInstance().twitterSupport(info.getId(), twitterSupportCallback);
+                        if(NetworkUtil.hasConnection(context)){
+                            if (info.isLike()) {
+                                HttpClient.getInstance().twitterCancelSupport(info.getId(), twitterCancelSupportCallback);
+                            } else {
+                                HttpClient.getInstance().twitterSupport(info.getId(), twitterSupportCallback);
+                            }
+                        }else{
+                            NotConnection();
                         }
+
                     }
                 });
 

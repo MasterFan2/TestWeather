@@ -15,7 +15,10 @@ public class TwitterInfo implements Serializable{
     public static final int ITEM = 0;
     public static final int SECTION = 1;
 
-    @Column(name = "id", isId = true)
+    @Column(name = "autoId", isId = true)
+    private int autoId;
+
+    @Column(name = "id")
     private int id;
 
     @Column(name = "commentNum")
@@ -45,6 +48,14 @@ public class TwitterInfo implements Serializable{
 
     @Column(name = "type")
     private int type;
+
+    public int getAutoId() {
+        return autoId;
+    }
+
+    public void setAutoId(int autoId) {
+        this.autoId = autoId;
+    }
 
     public boolean isLike() {
         return isLike;

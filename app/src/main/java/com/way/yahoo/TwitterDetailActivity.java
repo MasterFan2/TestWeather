@@ -28,15 +28,18 @@ import com.way.ui.swipeback.SwipeBackActivity;
 import com.way.utils.Dbutils;
 import com.way.utils.HardwareUtil;
 import com.way.utils.NetworkUtil;
+import com.way.utils.S;
 import com.way.widget.MaterialRippleLayout;
 
 import org.xutils.DbManager;
+import org.xutils.db.sqlite.WhereBuilder;
 import org.xutils.ex.DbException;
 import org.xutils.x;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import retrofit.Callback;
@@ -63,7 +66,7 @@ public class TwitterDetailActivity extends SwipeBackActivity implements View.OnC
     private MyAdapter adapter;
 
     private TwitterInfo info;
-    private ArrayList<Comments> commentsList = new ArrayList<>();
+    private List<Comments> commentsList = new ArrayList<>();
 
     private boolean currentIsModify = false;
 
@@ -79,15 +82,10 @@ public class TwitterDetailActivity extends SwipeBackActivity implements View.OnC
 
         db = x.getDb(Dbutils.getConfig());
 
-        setSwipeBackEnable(false);
-
-//        statusBar = findViewById(R.id.status_bar);
-//        setStatusBar();
-
         findViewById(R.id.header_left).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(currentIsModify){
+                if (currentIsModify) {
                     Intent intent = new Intent();
                     intent.putExtra("modify", "true");
                     setResult(13, intent);
@@ -99,37 +97,58 @@ public class TwitterDetailActivity extends SwipeBackActivity implements View.OnC
 
         info = (TwitterInfo) getIntent().getSerializableExtra("info");
 
-        if (info != null && info.getComments() != null && info.getComments().size() > 0) {
-            commentsList = info.getComments();
-            for (Comments comments: commentsList){
-                try {
-                    List<CommentLikeStatus> likeTempList = db.selector(CommentLikeStatus.class).where("twitterId", "=", comments.getId()).findAll();
-                    if(likeTempList != null && likeTempList.size() > 0){
-                        comments.setIsLike(true);
-                    }else {
-                        comments.setIsLike(false);
-                    }
-                } catch (DbException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+        headerView = LayoutInflater.from(this).inflate(R.layout.twitter_header, null);
 
-        headerView = LayoutInflater.from(this).inflate(R.layout.item_comment, null);
-        headerView.setEnabled(false);
+        headHolder = new ViewHolder(headerView);
+        headerView.findViewById(R.id.root_view).setBackgroundColor(getResources().getColor(android.R.color.white));
+
+        headHolder.contentImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, BigPicActivity.class);
+                intent.putExtra("url", info.getImgs());
+                startActivity(intent);
+            }
+        });
 
         contentEdit = (EditText) findViewById(R.id.input_edit);
         sendBtn = (MaterialRippleLayout) findViewById(R.id.send_btn);
         sendBtn.setOnClickListener(this);
         listView = (ListView) findViewById(R.id.listView);
 
-
-
         adapter = new MyAdapter();
         listView.setAdapter(adapter);
         listView.addHeaderView(headerView);
 
-        bindData();
+        if(NetworkUtil.hasConnection(context)){
+            HttpClient.getInstance().twitterDetail(info.getId(), twitterDetailRespCallback);
+        }else {
+            bindData();
+            try {
+                List<Comments> localCommentsList = db.selector(Comments.class).where("twitterId", "=", info.getId()).findAll();
+                if(localCommentsList != null && localCommentsList.size() > 0){
+                    commentsList = localCommentsList;
+                    for (Comments comments : commentsList) {
+                        try {
+                            List<CommentLikeStatus> likeTempList = db.selector(CommentLikeStatus.class).where("twitterId", "=", comments.getId()).findAll();
+                            if (likeTempList != null && likeTempList.size() > 0) {
+                                comments.setIsLike(true);
+                            } else {
+                                comments.setIsLike(false);
+                            }
+                        } catch (DbException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    Collections.sort(commentsList);
+                    adapter.notifyDataSetChanged();
+                }
+            } catch (DbException e) {
+                getDataError("获取本地数据错误");
+                e.printStackTrace();
+            }
+        }
+
     }
 
     public void setStatusBar() {
@@ -161,7 +180,6 @@ public class TwitterDetailActivity extends SwipeBackActivity implements View.OnC
      */
     private void bindData() {
         if (info != null) {
-            headHolder = new ViewHolder(headerView);
             headHolder.descTxt.setText(info.getContent());
             headHolder.commentNumTxt.setText(info.getCommentNum() + "");
             headHolder.goodNumTxt.setText(info.getSupportNum() + "");
@@ -264,19 +282,53 @@ public class TwitterDetailActivity extends SwipeBackActivity implements View.OnC
         public void success(TwitterDetailResp twitterDetailResp, Response response) {
             if(twitterDetailResp != null){
                 info = twitterDetailResp.getResult();
+                headHolder.descTxt.setText(info.getContent());
+                headHolder.commentNumTxt.setText(info.getCommentNum() + "");
+                headHolder.goodNumTxt.setText(info.getSupportNum() + "");
+                try {
+                    headHolder.timeTxt.setText(sdfHourMinute.format(sdf.parse(info.getDateCreated())));
+                } catch (ParseException e) {
+                    headHolder.timeTxt.setText(info.getDateCreated());
+                    e.printStackTrace();
+                }
+
+                if (info.isLike())
+                    headHolder.goodImg.setImageResource(R.drawable.icon_like_highlighted);
+                else headHolder.goodImg.setImageResource(R.drawable.icon_like);
+
+                Picasso.with(context).load(info.getImgs()).into(headHolder.contentImg);
+
                 if (info != null && info.getComments() != null && info.getComments().size() > 0) {
                     commentsList = info.getComments();
+                    try {
+                        List<Comments> localCommentsList = db.selector(Comments.class).where("twitterId", "=", info.getId()).findAll();
+                        if(localCommentsList != null && localCommentsList.size() > 0){
+                            db.delete(Comments.class, WhereBuilder.b("twitterId", "=", info.getId()));
+                        }
+                    } catch (DbException e) {
+                        e.printStackTrace();
+                    }
                     for (Comments comments: commentsList){
+                        comments.setTwitterId(info.getId());
                         try {
+                            //对比是否保存过。 保存过为赞过
                             List<CommentLikeStatus> likeTempList = db.selector(CommentLikeStatus.class).where("twitterId", "=", comments.getId()).findAll();
                             if(likeTempList != null && likeTempList.size() > 0){
                                 comments.setIsLike(true);
                             }else {
                                 comments.setIsLike(false);
                             }
+                            db.save(comments);//保存评论到 本地数据库
                         } catch (DbException e) {
                             e.printStackTrace();
                         }
+                    }//end for
+
+                    try {
+                        List<Comments> localCommentsList = db.selector(Comments.class).where("twitterId", "=", info.getId()).findAll();
+                        S.o(":::" + (localCommentsList == null));
+                    } catch (DbException e) {
+                        e.printStackTrace();
                     }
                 }
                 headHolder.commentNumTxt.setText(info.getCommentNum() + "");

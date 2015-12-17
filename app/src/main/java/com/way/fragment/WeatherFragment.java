@@ -1,8 +1,14 @@
 package com.way.fragment;
 
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.List;
 
 import org.json.JSONException;
+import org.xutils.DbManager;
+import org.xutils.ex.DbException;
+import org.xutils.x;
 
 import android.app.Fragment;
 import android.content.ContentResolver;
@@ -30,6 +36,7 @@ import com.way.adapter.WeatherListAdapter;
 import com.way.beans.City;
 import com.way.common.util.NetUtil;
 import com.way.common.util.SystemUtils;
+import com.way.common.util.T;
 import com.way.common.util.TimeUtils;
 import com.way.common.util.WeatherIconUtils;
 import com.way.db.CityProvider;
@@ -38,6 +45,9 @@ import com.way.fragment.BaseFragment.ABaseTask;
 import com.way.net.HttpClient;
 import com.way.net.bean.TwitterMain;
 import com.way.net.bean.TwitterMainResp;
+import com.way.ui.view.WeatherTypefacedTextView;
+import com.way.utils.Dbutils;
+import com.way.utils.NetworkUtil;
 import com.way.weather.plugin.bean.Forecast;
 import com.way.weather.plugin.bean.RealTime;
 import com.way.weather.plugin.bean.WeatherInfo;
@@ -77,9 +87,18 @@ public class WeatherFragment extends Fragment implements ITaskManager,SwipeRefre
 	private TextView mCurFeelsTempTV;
 	private TextView mCurWeatherCopyTV;
 
+
+	private WeatherTypefacedTextView timeTxt;
+
 	private ContentResolver mContentResolver;
 	private MainActivity mActivity;
 	private City mCurCity;
+
+	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	private SimpleDateFormat sdfNow = new SimpleDateFormat("MM/dd HH:mm");
+
+	//cache
+	private DbManager db;
 
 	public WeatherFragment() {
 	}
@@ -96,6 +115,9 @@ public class WeatherFragment extends Fragment implements ITaskManager,SwipeRefre
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		taskManager = new TaskManager();
+
+		db = x.getDb(Dbutils.getConfig());
+
 		if (savedInstanceState != null)
 			taskManager.restore(savedInstanceState);
 		mActivity = (MainActivity) getActivity();
@@ -111,9 +133,29 @@ public class WeatherFragment extends Fragment implements ITaskManager,SwipeRefre
 
 				headImg.setVisibility(View.VISIBLE);
 				commentsTxt.setVisibility(View.VISIBLE);
+				timeTxt.setVisibility(View.VISIBLE);
 
 				Picasso.with(getActivity()).load(data.getImgs()).placeholder(R.mipmap.img_default).into(headImg);
 				commentsTxt.setText(data.getContent());
+
+				try {
+					timeTxt.setText(sdfNow.format(sdf.parse(data.getDateCreated())));
+				} catch (ParseException e) {
+					timeTxt.setText(data.getDateCreated());
+					e.printStackTrace();
+				}
+
+				try {
+					List<TwitterMain> mainList = db.findAll(TwitterMain.class);
+
+					if(mainList != null && mainList.size() > 0){
+						db.dropTable(TwitterMain.class);
+					}
+
+					db.save(data);
+				} catch (DbException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 
@@ -224,7 +266,35 @@ public class WeatherFragment extends Fragment implements ITaskManager,SwipeRefre
 					// } else {
 					// loadWeatherInfoFromLocal();
 					// }
-			HttpClient.getInstance().getMainCommentsImages(cb);
+			if(NetworkUtil.hasConnection(getActivity())){
+				HttpClient.getInstance().getMainCommentsImages(cb);
+			}else{
+				try {
+					TwitterMain localTwitter = db.findFirst(TwitterMain.class);
+					if(localTwitter != null){
+						headImg.setVisibility(View.VISIBLE);
+						commentsTxt.setVisibility(View.VISIBLE);
+						timeTxt.setVisibility(View.VISIBLE);
+
+						Picasso.with(getActivity()).load(localTwitter.getImgs()).placeholder(R.mipmap.img_default).into(headImg);
+						commentsTxt.setText(localTwitter.getContent());
+
+						try {
+							timeTxt.setText(sdfNow.format(sdf.parse(localTwitter.getDateCreated())));
+						} catch (ParseException e) {
+							timeTxt.setText(localTwitter.getDateCreated());
+							e.printStackTrace();
+						}
+					}else{
+						T.showLong(getActivity(), "当前无网络, 请检查!");
+					}
+
+				} catch (DbException e) {
+					e.printStackTrace();
+				}
+
+
+			}
 		} else {
 			// ViewGroup mRootParent = (ViewGroup) mRootView.getParent();
 			// if (mRootParent != null) {
@@ -305,6 +375,7 @@ public class WeatherFragment extends Fragment implements ITaskManager,SwipeRefre
 
 		headImg 	= (ImageView) mListHeaderView.findViewById(R.id.home_head_img);
 		commentsTxt	= (TextView) mListHeaderView.findViewById(R.id.home_head_comment_txt);
+		timeTxt     = (WeatherTypefacedTextView) mListHeaderView.findViewById(R.id.home_time_txt);
 
 		headImg.setOnClickListener(this);
 		commentsTxt.setOnClickListener(this);
@@ -312,8 +383,7 @@ public class WeatherFragment extends Fragment implements ITaskManager,SwipeRefre
 		// 获取屏幕高度
 		int displayHeight = SystemUtils.getDisplayHeight(getActivity());
 		// HeaderView高度=屏幕高度-标题栏高度
-		mHeaderHeight = displayHeight - getResources().getDimensionPixelSize(
-						R.dimen.abs__action_bar_default_height);
+		mHeaderHeight = displayHeight - getResources().getDimensionPixelSize(R.dimen.abs__action_bar_default_height);
 		mListHeaderView.setLayoutParams(new LayoutParams(
 				LayoutParams.MATCH_PARENT, mHeaderHeight));
 		// 计算背景View的高度，适当比屏幕高度多一点，

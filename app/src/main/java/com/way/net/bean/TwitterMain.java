@@ -1,17 +1,45 @@
 package com.way.net.bean;
 
+import org.xutils.db.annotation.Column;
+import org.xutils.db.annotation.Table;
+
 /**
  * Created by Administrator on 2015/12/12.
  */
+@Table(name = "TwitterMain")
 public class TwitterMain {
 
+    @Column(name = "autoId", isId = true)
+    private int autoId;
+
+    @Column(name = "id")
     private int id;
+
+    @Column(name = "commentNum")
     private int commentNum;
+
+    @Column(name = "content")
     private String content;
+
+    @Column(name = "dateCreated")
     private String dateCreated;
+
+    @Column(name = "imgs")
     private String imgs;
+
+    @Column(name = "lastUpdated")
     private String lastUpdated;
+
+    @Column(name = "supportNum")
     private int supportNum;
+
+    public int getAutoId() {
+        return autoId;
+    }
+
+    public void setAutoId(int autoId) {
+        this.autoId = autoId;
+    }
 
     public int getId() {
         return id;
@@ -68,6 +96,8 @@ public class TwitterMain {
     public void setSupportNum(int supportNum) {
         this.supportNum = supportNum;
     }
+
+    public TwitterMain(){}
 
     public TwitterMain(int id, int commentNum, String content, String dateCreated, String imgs, String lastUpdated, int supportNum) {
 

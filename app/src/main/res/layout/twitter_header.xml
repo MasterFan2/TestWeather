@@ -24,22 +24,22 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:paddingLeft="16dp"
-                    android:paddingRight="16dp"
-                    android:paddingTop="10dp"
                     >
                     <ImageView
                         android:id="@+id/content_img"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
                         android:layout_gravity="center"
-                        android:src="@drawable/ic_cloudy_big" />
+                        android:scaleType="centerCrop"
+                        android:src="@mipmap/img_default" />
 
                     <TextView
                         android:id="@+id/desc_txt"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
+                        android:paddingLeft="16dp"
+                        android:paddingRight="16dp"
                         android:text="-"
                         android:textColor="@color/gray_900"
                         android:textSize="18sp" />

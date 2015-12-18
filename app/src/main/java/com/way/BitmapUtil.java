@@ -16,7 +16,7 @@ import java.io.FileInputStream;
  */
 public class BitmapUtil {
 
-    private static final long MAX_SIZE = 614400;//最大文件 ， 如果超过这个大小就要压缩
+    private static final long MAX_SIZE = 409600;//最大文件 ， 如果超过这个大小就要压缩
 
     public static String saveUrl = Environment.getExternalStorageDirectory().getAbsolutePath() + "/temp_img.jpg";
 

@@ -2,6 +2,7 @@ package com.way.yahoo;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -12,6 +13,7 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -24,9 +26,11 @@ import com.way.net.bean.TwitterInfo;
 import com.way.net.bean.TwitterLikeStatus;
 import com.way.net.bean.TwitterResp;
 import com.way.ui.swipeback.SwipeBackActivity;
+import com.way.utils.Conf;
 import com.way.utils.Dbutils;
 import com.way.utils.HardwareUtil;
 import com.way.utils.NetworkUtil;
+import com.way.utils.SystemBarTintManager;
 import com.way.widget.WaitDialog;
 import com.way.widget.component.MasterListView;
 
@@ -54,7 +58,7 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
     private MyAdapter adapter;
 
     private ImageView leftImg, rightImg;
-//    private View statusBar;
+    private View statusBar;
 
     private Context context;
     private ArrayList<DatBean> finalData = new ArrayList<>();
@@ -85,8 +89,11 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
         waitDialog = new WaitDialog.Builder(context).create();
 
         //init widget
-//        statusBar = findViewById(R.id.status_bar);
-//        setStatusBar();
+        statusBar = findViewById(R.id.status_bar);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, Conf.statusBar_height);
+        statusBar.setLayoutParams(params);
+
+        setStatusBar();
         listView = (PinnedSectionListView) findViewById(R.id.listView);
         listView.setPullLoadEnable(false);
         listView.setPullRefreshEnable(false);
@@ -130,17 +137,15 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
     }
 
     public void setStatusBar() {
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-//            setTranslucentStatus(true);
-//            statusBar.setVisibility(View.VISIBLE);
-//        } else {
-//            statusBar.setVisibility(View.GONE);
-//        }
-//        SystemBarTintManager tintManager = new SystemBarTintManager(this);
-//        tintManager.setStatusBarTintEnabled(true);
-//        tintManager.setStatusBarTintResource(R.color.red);//通知栏所需颜色
-//        tintManager.setTintColor(R.color.green);
-//        tintManager.setNavigationBarTintColor(R.color.yellow);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            setTranslucentStatus(true);
+            statusBar.setVisibility(View.VISIBLE);
+        } else {
+            statusBar.setVisibility(View.GONE);
+        }
+        SystemBarTintManager tintManager = new SystemBarTintManager(this);
+        tintManager.setStatusBarTintEnabled(true);
+        tintManager.setStatusBarTintResource(R.color.title_blue);//通知栏所需颜色
     }
 
     private void setTranslucentStatus(boolean on) {

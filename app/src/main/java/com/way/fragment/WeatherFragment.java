@@ -77,7 +77,7 @@ public class WeatherFragment extends Fragment implements ITaskManager,SwipeRefre
 
 	//图片 和文字描述
 	private ImageView headImg;
-	private TextView  commentsTxt;
+	private WeatherTypefacedTextView  commentsTxt;
 
 	// 当前天气的View
 	private ImageView mCurWeatherIV;
@@ -374,7 +374,7 @@ public class WeatherFragment extends Fragment implements ITaskManager,SwipeRefre
 		mListHeaderView = LayoutInflater.from(getActivity()).inflate(R.layout.weather_current_condition, null);
 
 		headImg 	= (ImageView) mListHeaderView.findViewById(R.id.home_head_img);
-		commentsTxt	= (TextView) mListHeaderView.findViewById(R.id.home_head_comment_txt);
+		commentsTxt	= (WeatherTypefacedTextView) mListHeaderView.findViewById(R.id.home_head_comment_txt);
 		timeTxt     = (WeatherTypefacedTextView) mListHeaderView.findViewById(R.id.home_time_txt);
 
 		headImg.setOnClickListener(this);

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <dimen name="default_status_bar_height">24.0dip</dimen>
+
     <dimen name="uv_listPreferredItemHeightSmall">64.0dip</dimen>
     <dimen name="account_logo_bottomMargin">20.0dip</dimen>
     <dimen name="account_loginScreen_topPadding">30.0dip</dimen>

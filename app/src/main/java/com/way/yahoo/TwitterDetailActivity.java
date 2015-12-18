@@ -2,6 +2,7 @@ package com.way.yahoo;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -12,6 +13,7 @@ import android.view.WindowManager;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -25,10 +27,12 @@ import com.way.net.bean.Resp;
 import com.way.net.bean.TwitterDetailResp;
 import com.way.net.bean.TwitterInfo;
 import com.way.ui.swipeback.SwipeBackActivity;
+import com.way.utils.Conf;
 import com.way.utils.Dbutils;
 import com.way.utils.HardwareUtil;
 import com.way.utils.NetworkUtil;
 import com.way.utils.S;
+import com.way.utils.SystemBarTintManager;
 import com.way.widget.MaterialRippleLayout;
 
 import org.xutils.DbManager;
@@ -55,7 +59,7 @@ public class TwitterDetailActivity extends SwipeBackActivity implements View.OnC
 
     private ListView listView;
     private EditText contentEdit;
-//    private View statusBar;
+    private View statusBar;
     private MaterialRippleLayout sendBtn;
 
     private View headerView;
@@ -94,6 +98,11 @@ public class TwitterDetailActivity extends SwipeBackActivity implements View.OnC
                 finish();
             }
         });
+
+        statusBar = findViewById(R.id.status_bar);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, Conf.statusBar_height);
+        statusBar.setLayoutParams(params);
+        setStatusBar();
 
         info = (TwitterInfo) getIntent().getSerializableExtra("info");
 
@@ -152,15 +161,15 @@ public class TwitterDetailActivity extends SwipeBackActivity implements View.OnC
     }
 
     public void setStatusBar() {
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-//            setTranslucentStatus(true);
-//            statusBar.setVisibility(View.VISIBLE);
-//        }else {
-//            statusBar.setVisibility(View.GONE);
-//        }
-//        SystemBarTintManager tintManager = new SystemBarTintManager(this);
-//        tintManager.setStatusBarTintEnabled(true);
-//        tintManager.setStatusBarTintResource(R.color.title_blue);//通知栏所需颜色
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            setTranslucentStatus(true);
+            statusBar.setVisibility(View.VISIBLE);
+        }else {
+            statusBar.setVisibility(View.GONE);
+        }
+        SystemBarTintManager tintManager = new SystemBarTintManager(this);
+        tintManager.setStatusBarTintEnabled(true);
+        tintManager.setStatusBarTintResource(R.color.title_blue);//通知栏所需颜色
     }
 
     private void setTranslucentStatus(boolean on) {

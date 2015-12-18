@@ -14,6 +14,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -56,7 +57,7 @@ public class AddTwitterActivity extends SwipeBackActivity implements View.OnClic
     private ImageView addImg;
     private EditText inputEdit;
     private TextView contentLenTxt;
-//    private View statusBar;
+    private View statusBar;
 
     private MTDialog dialog;
     private WaitDialog waitDialog;
@@ -74,8 +75,10 @@ public class AddTwitterActivity extends SwipeBackActivity implements View.OnClic
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_twitter);
 
-//        statusBar = findViewById(R.id.status_bar);
-//        setStatusBar();
+        statusBar = findViewById(R.id.status_bar);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, Conf.statusBar_height);
+        statusBar.setLayoutParams(params);
+        setStatusBar();
 
         waitDialog = new WaitDialog.Builder(context).create();
 
@@ -135,15 +138,15 @@ public class AddTwitterActivity extends SwipeBackActivity implements View.OnClic
     }
 
     public void setStatusBar() {
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-//            setTranslucentStatus(true);
-//            statusBar.setVisibility(View.VISIBLE);
-//        }else {
-//            statusBar.setVisibility(View.GONE);
-//        }
-//        SystemBarTintManager tintManager = new SystemBarTintManager(this);
-//        tintManager.setStatusBarTintEnabled(true);
-//        tintManager.setStatusBarTintResource(R.color.title_blue);//通知栏所需颜色
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            setTranslucentStatus(true);
+            statusBar.setVisibility(View.VISIBLE);
+        }else {
+            statusBar.setVisibility(View.GONE);
+        }
+        SystemBarTintManager tintManager = new SystemBarTintManager(this);
+        tintManager.setStatusBarTintEnabled(true);
+        tintManager.setStatusBarTintResource(R.color.title_blue);//通知栏所需颜色
     }
 
     private void setTranslucentStatus(boolean on) {

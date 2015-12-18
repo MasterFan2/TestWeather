@@ -15,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -33,6 +34,7 @@ import com.way.common.util.SystemUtils;
 import com.way.common.util.T;
 import com.way.util.blur.jni.BitmapUtils;
 import com.way.util.blur.jni.FrostedGlassUtil;
+import com.way.utils.Conf;
 import com.way.utils.SystemBarTintManager;
 
 import net.simonvt.menudrawer.MenuDrawer;
@@ -63,6 +65,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPag
 	private WeatherPagerAdapter mFragmentAdapter;
 	private List<City> mTmpCities;
 
+	private View statusBar;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -92,6 +96,13 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPag
 	}
 
 	private void initViews() {
+
+
+		statusBar = findViewById(R.id.status_bar);
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, Conf.statusBar_height);
+		statusBar.setLayoutParams(params);
+		setStatusBar();
+
 		setSwipeBackEnable(false);
 		mBlurImageView = (ImageView) findViewById(R.id.blur_overlay_img);
 		mRootView = (FrameLayout) findViewById(R.id.root_view);
@@ -114,6 +125,29 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPag
 		findViewById(R.id.sidebarButton).setOnClickListener(this);
 //		mShareBtn = (ImageView) findViewById(R.id.shareButton);
 //		mShareBtn.setOnClickListener(this);
+	}
+	public void setStatusBar() {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+			setTranslucentStatus(true);
+			statusBar.setVisibility(View.VISIBLE);
+		}else {
+			statusBar.setVisibility(View.GONE);
+		}
+		SystemBarTintManager tintManager = new SystemBarTintManager(this);
+		tintManager.setStatusBarTintEnabled(true);
+		tintManager.setStatusBarTintResource(R.color.title_blue);//通知栏所需颜色
+	}
+
+	private void setTranslucentStatus(boolean on) {
+		Window win = getWindow();
+		WindowManager.LayoutParams winParams = win.getAttributes();
+		final int bits = WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
+		if (on) {
+			winParams.flags |= bits;
+		} else {
+			winParams.flags &= ~bits;
+		}
+		win.setAttributes(winParams);
 	}
 
 	@Override

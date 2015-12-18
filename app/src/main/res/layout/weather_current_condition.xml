@@ -8,15 +8,19 @@
     <RelativeLayout
         android:id="@+id/home_head_layout"
         android:layout_width="match_parent"
-        android:layout_height="240dp">
+        android:layout_height="300dp">
+
+        <!-- content image -->
         <ImageView
             android:id="@+id/home_head_img"
             android:layout_width="match_parent"
-            android:layout_height="240dp"
+            android:layout_height="300dp"
             android:scaleType="centerCrop"
             android:src="@mipmap/img_default"
             android:visibility="gone"
             />
+
+        <!-- time -->
         <com.way.ui.view.WeatherTypefacedTextView
             android:id="@+id/home_time_txt"
             style="@style/Label.Shadow.Medium"
@@ -98,7 +102,6 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="vertical"
-            android:layout_marginBottom="30dp"
             >
             <!-- 天气图标 -->
             <ImageView
@@ -195,12 +198,12 @@
     </LinearLayout>
 
     <!-- 评论文字 -->
-    <TextView
+    <com.way.ui.view.WeatherTypefacedTextView
         android:id="@+id/home_head_comment_txt"
         android:layout_above="@id/main_bottom"
+        android:layout_below="@id/home_head_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/home_head_layout"
         android:layout_marginTop="16dp"
         android:ellipsize="end"
         android:maxLines="3"
@@ -212,5 +215,5 @@
         android:visibility="gone"
         android:background="@drawable/module_bg"
         android:textColor="@android:color/white"
-        android:textSize="25sp" />
+        android:textSize="18sp" />
 </RelativeLayout>

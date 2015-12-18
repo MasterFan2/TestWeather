@@ -2,13 +2,21 @@ package com.way.yahoo;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
 import com.umeng.analytics.MobclickAgent;
+import com.way.utils.S;
+
+import java.io.File;
+import java.io.FileInputStream;
 
 public class SplashActivity extends Activity {
 	private static final int ACTIVITY_TIMEOUT_GOTO_NEXT = 0;
@@ -29,6 +37,7 @@ public class SplashActivity extends Activity {
 		setContentView(R.layout.splash_activity_layout);
 		mHandler.sendEmptyMessageDelayed(ACTIVITY_TIMEOUT_GOTO_NEXT, ACTIVITY_TIME);
 	}
+
 	@Override
 	public void onBackPressed() {
 		//super.onBackPressed();

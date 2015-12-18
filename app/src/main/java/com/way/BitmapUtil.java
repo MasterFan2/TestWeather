@@ -8,11 +8,15 @@ import android.os.Environment;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 
 /**
  * Created by 13510 on 2015/11/18.
  */
 public class BitmapUtil {
+
+    private static final long MAX_SIZE = 614400;//最大文件 ， 如果超过这个大小就要压缩
 
     public static String saveUrl = Environment.getExternalStorageDirectory().getAbsolutePath() + "/temp_img.jpg";
 
@@ -35,7 +39,29 @@ public class BitmapUtil {
         return bitmap;
     }
 
+    private static long getFileSizes(File f) {
+        if(f.exists()){
+            try {
+                long length = 0;
+                if (f.exists()) {
+                    FileInputStream fis = new FileInputStream(f);
+                    length = fis.available();
+                } else {
+                    f.createNewFile();
+                }
+                return length;
+            } catch (Exception e){
+                return -1;
+            }
+        }else{
+            return -1;
+        }
+    }
+
     public static Bitmap getimage(String srcPath) {
+        if(getFileSizes(new File(srcPath)) <= MAX_SIZE){
+            return BitmapFactory.decodeFile(srcPath);
+        }
         BitmapFactory.Options newOpts = new BitmapFactory.Options();
         //开始读入图片，此时把options.inJustDecodeBounds 设回true了
         newOpts.inJustDecodeBounds = true;

@@ -183,6 +183,7 @@ public class AddTwitterActivity extends SwipeBackActivity implements View.OnClic
 
                 picUrl = selectedPhotos.get(0);
 
+
                 Bitmap bmp = BitmapUtil.getimage(picUrl);
 
                 File file = new File(BitmapUtil.saveUrl);

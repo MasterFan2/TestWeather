@@ -176,5 +176,9 @@
     <string name="xlistview_footer_hint_ready">松开载入更多</string>
     <string name="xlistview_tishi_1">上次更新:</string>
     <string name="xlistview_tishi_2">上次更新:从未</string>
+    <string name="title_activity_big_pic">BigPicActivity</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
     <!-- end Master Refresh ListView -->
 </resources>

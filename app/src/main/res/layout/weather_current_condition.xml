@@ -4,14 +4,35 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 
-    <ImageView
-        android:id="@+id/home_head_img"
+    <!-- 顶部图片-->
+    <RelativeLayout
+        android:id="@+id/home_head_layout"
         android:layout_width="match_parent"
-        android:layout_height="240dp"
-        android:scaleType="centerCrop"
-        android:src="@mipmap/img_default"
-        android:visibility="gone"
-        />
+        android:layout_height="240dp">
+        <ImageView
+            android:id="@+id/home_head_img"
+            android:layout_width="match_parent"
+            android:layout_height="240dp"
+            android:scaleType="centerCrop"
+            android:src="@mipmap/img_default"
+            android:visibility="gone"
+            />
+        <com.way.ui.view.WeatherTypefacedTextView
+            android:id="@+id/home_time_txt"
+            style="@style/Label.Shadow.Medium"
+            android:ellipsize="middle"
+            android:gravity="center"
+            android:maxWidth="120.0dip"
+            android:paddingBottom="0.0dip"
+            android:text="0/0 0:0"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
+            android:visibility="invisible"
+            weather:typeface="fonts/Roboto-Regular.ttf" />
+    </RelativeLayout>
+
 
     <ImageView
         android:id="@+id/flickr_icon"
@@ -42,7 +63,6 @@
         android:layout_marginRight="8dp"
         android:visibility="gone"
         weather:typeface="fonts/Roboto-Regular.ttf" />
-    android:textColor="#ffdcdcdc"
 
     <ImageView
         android:id="@+id/copyright_icon"
@@ -180,7 +200,7 @@
         android:layout_above="@id/main_bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/home_head_img"
+        android:layout_below="@id/home_head_layout"
         android:layout_marginTop="16dp"
         android:ellipsize="end"
         android:maxLines="3"

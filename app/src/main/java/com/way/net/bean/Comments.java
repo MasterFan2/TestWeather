@@ -5,14 +5,23 @@ import org.xutils.db.annotation.Column;
 import org.xutils.db.annotation.Table;
 
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Comparator;
+import java.util.Date;
 
 /**
  * Created by Administrator on 2015/12/11.
  */
 @Table(name = "Comments")
-public class Comments implements Serializable {
+public class Comments implements Serializable, Comparable<Comments> {
 
-    @Column(name = "id", isId = true)
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+    @Column(name = "autoId", isId = true)
+    private int autoId;
+
+    @Column(name = "id")
     private int id;
 
     @Column(name = "content")
@@ -36,6 +45,25 @@ public class Comments implements Serializable {
     @Column(name = "isLike")
     private boolean isLike;
 
+    @Column(name = "twitterId")
+    private int twitterId;
+
+    public int getAutoId() {
+        return autoId;
+    }
+
+    public void setAutoId(int autoId) {
+        this.autoId = autoId;
+    }
+
+    public int getTwitterId() {
+        return twitterId;
+    }
+
+    public void setTwitterId(int twitterId) {
+        this.twitterId = twitterId;
+    }
+
     public boolean isLike() {
         return isLike;
     }
@@ -44,7 +72,8 @@ public class Comments implements Serializable {
         this.isLike = isLike;
     }
 
-    public Comments(){}
+    public Comments() {
+    }
 
     public int getId() {
         return id;
@@ -111,5 +140,31 @@ public class Comments implements Serializable {
         this.supportNum = supportNum;
         this.twitter = twitter;
         this.userinfo = userinfo;
+    }
+
+    private Date getBirthday(String strDate) {
+        try {
+            return sdf.parse(strDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public int compareTo(Comments comments) {
+        Date d1 = getBirthday(comments.getDateCreated());
+        Date d2 = getBirthday(this.getDateCreated());
+
+        if (d1 == null && d2 == null)
+            return 0;
+
+        if (d1 == null)
+            return -1;
+
+        if (d2 == null)
+            return 1;
+
+        return d1.compareTo(d2);
     }
 }

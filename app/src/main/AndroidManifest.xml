@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.way.yahoo">
+    package="com.way.yahoo" >
 
     <!-- 这个权限用于进行网络定位 -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -30,11 +30,11 @@
         android:name=".MasterApplication"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme" >
         <activity
             android:name=".SplashActivity"
             android:label="@string/app_name"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -101,23 +101,15 @@
             android:value="W9xG4m71Ek8xz2GyhZvGiuWb" />
 
         <activity
-        android:name=".ImageActivity"
-        android:theme="@style/AppTheme"
-        >
+            android:name=".ImageActivity"
+            android:theme="@style/AppTheme" >
+        </activity>
+        <activity android:name=".CommentsActivity" >
         </activity>
         <activity
-        android:name=".CommentsActivity"
-        >
-        </activity>
-
-        <activity
-        android:theme="@style/myTheme"
-        android:name="photopicker.PhotoPickerActivity"
-        />
-
-        <activity
-        android:name="photopicker.PhotoPagerActivity"
-        />
+            android:name="photopicker.PhotoPickerActivity"
+            android:theme="@style/myTheme" />
+        <activity android:name="photopicker.PhotoPagerActivity" />
         <!-- umeng -->
         <meta-data
             android:name="UMENG_APPKEY"
@@ -135,16 +127,21 @@
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <activity
             android:name=".TwitterListActivity"
-            android:theme="@style/SecondAppTheme"
-            android:label="@string/title_activity_image_comment" />
+            android:label="@string/title_activity_image_comment"
+            android:theme="@style/SecondAppTheme" />
         <activity
             android:name=".AddTwitterActivity"
-            android:theme="@style/SecondAppTheme"
-            android:label="@string/title_activity_add_conment" />
+            android:label="@string/title_activity_add_conment"
+            android:theme="@style/SecondAppTheme" />
         <activity
             android:name=".TwitterDetailActivity"
+            android:label="@string/title_activity_comment_detail"
+            android:theme="@style/SecondAppTheme" />
+        <activity
+            android:name=".BigPicActivity"
             android:theme="@style/SecondAppTheme"
-            android:label="@string/title_activity_comment_detail"></activity>
+            android:label="@string/title_activity_big_pic" >
+        </activity>
     </application>
 
 </manifest>

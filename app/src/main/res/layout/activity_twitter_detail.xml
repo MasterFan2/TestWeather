@@ -94,8 +94,8 @@
             android:layout_height="match_parent"
             android:layout_above="@id/input_layout"
             android:background="@color/gray_twitters_comment"
-            android:divider="@android:color/white"
-            android:dividerHeight="0.15dp" />
+            android:divider="@color/gray_400"
+            android:dividerHeight="0.09dp" />
     </RelativeLayout>
 </LinearLayout>
 

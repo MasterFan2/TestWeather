@@ -42,6 +42,10 @@ public class SwipeBackActivity extends FragmentActivity implements SwipeBackActi
 		T.showShort(context, msg);
 	}
 
+	public void NotConnection(){
+		getDataError("当前无网络连接，请检查!");
+	}
+
 	@Override
 	public SwipeBackLayout getSwipeBackLayout() {
 		return mHelper.getSwipeBackLayout();

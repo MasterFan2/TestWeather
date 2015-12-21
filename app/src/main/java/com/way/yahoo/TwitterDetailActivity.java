@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -82,6 +83,7 @@ public class TwitterDetailActivity extends SwipeBackActivity implements View.OnC
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_twitter_detail);
+
         context = this;
 
         db = x.getDb(Dbutils.getConfig());
@@ -100,9 +102,9 @@ public class TwitterDetailActivity extends SwipeBackActivity implements View.OnC
         });
 
         statusBar = findViewById(R.id.status_bar);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, Conf.statusBar_height);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, Conf.statusBar_height);
         statusBar.setLayoutParams(params);
-        setStatusBar();
+        setStatusBar();//
 
         info = (TwitterInfo) getIntent().getSerializableExtra("info");
 
@@ -163,13 +165,16 @@ public class TwitterDetailActivity extends SwipeBackActivity implements View.OnC
     public void setStatusBar() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             setTranslucentStatus(true);
-            statusBar.setVisibility(View.VISIBLE);
+//            statusBar.setVisibility(View.VISIBLE);
         }else {
-            statusBar.setVisibility(View.GONE);
+//            statusBar.setVisibility(View.GONE);
         }
         SystemBarTintManager tintManager = new SystemBarTintManager(this);
         tintManager.setStatusBarTintEnabled(true);
-        tintManager.setStatusBarTintResource(R.color.title_blue);//通知栏所需颜色
+        tintManager.setNavigationBarTintEnabled(true);
+
+        tintManager.setStatusBarTintColor(getResources().getColor(R.color.title_blue));//通知栏所需颜色
+//        tintManager.setNavigationBarTintColor(R.color.title_blue);
     }
 
     private void setTranslucentStatus(boolean on) {

@@ -480,19 +480,16 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
                 //set support number
                 holder.descTxt.setText(info.getContent());
                 if (info.getSupportNum() <= 0) {
-                    holder.goodNumTxt.setVisibility(View.GONE);
+                    holder.goodNumTxt.setText("赞");
                 } else {
-                    holder.goodNumTxt.setVisibility(View.VISIBLE);
                     holder.goodNumTxt.setText("" + info.getSupportNum());
                 }
 
                 if (info.getCommentNum() <= 0) {
-                    holder.commentNumTxt.setVisibility(View.GONE);
+                    holder.commentNumTxt.setText("评论");
                 } else {
-                    holder.commentNumTxt.setVisibility(View.VISIBLE);
                     holder.commentNumTxt.setText("" + info.getCommentNum());
                 }
-
 
                 //set time
                 try {

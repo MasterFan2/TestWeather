@@ -204,6 +204,8 @@
     <color name="gray_twitters_comment">#eef0f3</color>
 
     <color name="title_blue">#4fc2e9</color>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
 
     <color name="section_blue">#9dd9ee</color>
 

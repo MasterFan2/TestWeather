@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -12,7 +13,7 @@ import com.way.common.util.T;
 import com.way.utils.SystemBarTintManager;
 import com.way.yahoo.R;
 
-public class SwipeBackActivity extends FragmentActivity implements SwipeBackActivityBase {
+public class SwipeBackActivity extends AppCompatActivity implements SwipeBackActivityBase {
 	private SwipeBackActivityHelper mHelper;
 	public Context context;
 

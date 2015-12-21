@@ -136,7 +136,9 @@
         <activity
             android:name=".TwitterDetailActivity"
             android:label="@string/title_activity_comment_detail"
-            android:theme="@style/SecondAppTheme" />
+            android:windowSoftInputMode="adjustResize"
+            android:configChanges="keyboardHidden|orientation"
+            android:theme="@style/BaseAppTheme" />
         <activity
             android:name=".BigPicActivity"
             android:theme="@style/SecondAppTheme"

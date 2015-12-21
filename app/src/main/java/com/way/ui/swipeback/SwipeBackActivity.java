@@ -13,7 +13,7 @@ import com.way.common.util.T;
 import com.way.utils.SystemBarTintManager;
 import com.way.yahoo.R;
 
-public class SwipeBackActivity extends AppCompatActivity implements SwipeBackActivityBase {
+public class SwipeBackActivity extends FragmentActivity implements SwipeBackActivityBase {
 	private SwipeBackActivityHelper mHelper;
 	public Context context;
 

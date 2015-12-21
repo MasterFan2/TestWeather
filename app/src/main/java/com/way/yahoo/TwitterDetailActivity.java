@@ -27,6 +27,7 @@ import com.way.net.bean.Comments;
 import com.way.net.bean.Resp;
 import com.way.net.bean.TwitterDetailResp;
 import com.way.net.bean.TwitterInfo;
+import com.way.net.bean.TwitterLikeStatus;
 import com.way.ui.swipeback.SwipeBackActivity;
 import com.way.utils.Conf;
 import com.way.utils.Dbutils;
@@ -60,7 +61,7 @@ public class TwitterDetailActivity extends SwipeBackActivity implements View.OnC
 
     private ListView listView;
     private EditText contentEdit;
-    private View statusBar;
+    //    private View statusBar;
     private MaterialRippleLayout sendBtn;
 
     private View headerView;
@@ -101,10 +102,10 @@ public class TwitterDetailActivity extends SwipeBackActivity implements View.OnC
             }
         });
 
-        statusBar = findViewById(R.id.status_bar);
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, Conf.statusBar_height);
-        statusBar.setLayoutParams(params);
-        setStatusBar();//
+//        statusBar = findViewById(R.id.status_bar);
+//        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, Conf.statusBar_height);
+//        statusBar.setLayoutParams(params);
+//        setStatusBar();//
 
         info = (TwitterInfo) getIntent().getSerializableExtra("info");
 
@@ -131,13 +132,13 @@ public class TwitterDetailActivity extends SwipeBackActivity implements View.OnC
         listView.setAdapter(adapter);
         listView.addHeaderView(headerView);
 
-        if(NetworkUtil.hasConnection(context)){
+        if (NetworkUtil.hasConnection(context)) {
             HttpClient.getInstance().twitterDetail(info.getId(), twitterDetailRespCallback);
-        }else {
+        } else {
             bindData();
             try {
                 List<Comments> localCommentsList = db.selector(Comments.class).where("twitterId", "=", info.getId()).findAll();
-                if(localCommentsList != null && localCommentsList.size() > 0){
+                if (localCommentsList != null && localCommentsList.size() > 0) {
                     commentsList = localCommentsList;
                     for (Comments comments : commentsList) {
                         try {
@@ -166,7 +167,7 @@ public class TwitterDetailActivity extends SwipeBackActivity implements View.OnC
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             setTranslucentStatus(true);
 //            statusBar.setVisibility(View.VISIBLE);
-        }else {
+        } else {
 //            statusBar.setVisibility(View.GONE);
         }
         SystemBarTintManager tintManager = new SystemBarTintManager(this);
@@ -221,10 +222,10 @@ public class TwitterDetailActivity extends SwipeBackActivity implements View.OnC
             return;
         }
 
-        if(NetworkUtil.hasConnection(context)){
+        if (NetworkUtil.hasConnection(context)) {
             //对微博评论
             HttpClient.getInstance().commentTwitter(info.getId(), content, HardwareUtil.getDeviceUniqueCode(context), callback);
-        }else{
+        } else {
             T.showLong(context, "当前无网络连接， 请检查");
         }
     }
@@ -264,14 +265,80 @@ public class TwitterDetailActivity extends SwipeBackActivity implements View.OnC
             goodImg = (ImageView) view.findViewById(R.id.good_img);
             goodNumTxt = (TextView) view.findViewById(R.id.good_number_txt);
             commentNumTxt = (TextView) view.findViewById(R.id.comment_number_txt);
+
+            goodImg.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (NetworkUtil.hasConnection(context)) {
+                        if (info != null) {
+                            if (info.isLike()) {
+                                HttpClient.getInstance().twitterCancelSupport(info.getId(), twitterCancelSupportCallback);
+                            } else {
+                                HttpClient.getInstance().twitterSupport(info.getId(), twitterSupportCallback);
+                            }
+                        } else {
+                            getDataError("没有数据");
+                        }
+                    } else {
+                        NotConnection();
+                    }
+                }
+            });
         }
     }
+
+    private Callback<Resp> twitterCancelSupportCallback = new Callback<Resp>() {
+        @Override
+        public void success(Resp resp, Response response) {
+            if (resp.getCode() == 200) {
+                T.showShort(context, "取消成功!");
+                    try {
+                        db.delete(TwitterLikeStatus.class, WhereBuilder.b("twitterId", "=", info.getId()));//save(new TwitterLikeStatus(info.getId(), HardwareUtil.getDeviceUniqueCode(context)));
+                    } catch (DbException e) {
+                        e.printStackTrace();
+                    }
+                HttpClient.getInstance().twitterDetail(info.getId(), twitterDetailRespCallback);
+            } else {
+                T.showShort(context, resp.getMsg());
+            }
+        }
+
+        @Override
+        public void failure(RetrofitError error) {
+            getDataError("取消失败!");
+        }
+    };
+
+    private Callback<Resp> twitterSupportCallback = new Callback<Resp>() {
+        @Override
+        public void success(Resp resp, Response response) {
+            if (resp.getCode() == 200) {
+                T.showShort(context, "赞成功!");
+                try {
+                    db.save(new TwitterLikeStatus(info.getId(), HardwareUtil.getDeviceUniqueCode(context)));
+                } catch (DbException e) {
+                    e.printStackTrace();
+                }
+
+                HttpClient.getInstance().twitterDetail(info.getId(), twitterDetailRespCallback);
+
+            } else {
+                T.showShort(context, resp.getMsg());
+            }
+        }
+
+        @Override
+        public void failure(RetrofitError error) {
+            getDataError("赞失败!");
+        }
+    };
+    //////////////////////////////////////////////////////////////////////////////////////////////
 
     private Callback<Resp> twitterCommentSupportCallback = new Callback<Resp>() {
         @Override
         public void success(Resp resp, Response response) {
-            if(resp.getCode() == 200){
-                Comments comments =  commentsList.get(currentPosition);
+            if (resp.getCode() == 200) {
+                Comments comments = commentsList.get(currentPosition);
                 comments.setSupportNum(comments.getSupportNum() + 1);
                 comments.setIsLike(true);
                 try {
@@ -280,8 +347,10 @@ public class TwitterDetailActivity extends SwipeBackActivity implements View.OnC
                     e.printStackTrace();
                 }
                 currentIsModify = true;
-
+                getDataError("赞成功!");
                 HttpClient.getInstance().twitterDetail(info.getId(), twitterDetailRespCallback);
+            }else{
+                getDataError("赞失败!");
             }
         }
 
@@ -294,11 +363,36 @@ public class TwitterDetailActivity extends SwipeBackActivity implements View.OnC
     private Callback<TwitterDetailResp> twitterDetailRespCallback = new Callback<TwitterDetailResp>() {
         @Override
         public void success(TwitterDetailResp twitterDetailResp, Response response) {
-            if(twitterDetailResp != null){
+            if (twitterDetailResp != null) {
                 info = twitterDetailResp.getResult();
+
+                List<TwitterLikeStatus> likeStatusList = null;
+                try {
+                    likeStatusList = db.findAll(TwitterLikeStatus.class);
+                    if (likeStatusList != null && likeStatusList.size() > 0) {
+                        List<TwitterLikeStatus> likeTempList = db.selector(TwitterLikeStatus.class).where("twitterId", "=", info.getId()).findAll();
+                        if (likeTempList != null && likeTempList.size() > 0)
+                            info.setIsLike(true);
+                        else
+                            info.setIsLike(false);
+
+                    }
+                } catch (DbException e) {
+                    e.printStackTrace();
+                }
+
                 headHolder.descTxt.setText(info.getContent());
-                headHolder.commentNumTxt.setText(info.getCommentNum() + "");
-                headHolder.goodNumTxt.setText(info.getSupportNum() + "");
+                if (info.getCommentNum() <= 0) {
+                    headHolder.commentNumTxt.setText("评论");
+                } else {
+                    headHolder.commentNumTxt.setText(info.getCommentNum() + "");
+                }
+
+                if (info.getSupportNum() <= 0) {
+                    headHolder.goodNumTxt.setText("赞");
+                } else {
+                    headHolder.goodNumTxt.setText(info.getSupportNum() + "");
+                }
                 try {
                     headHolder.timeTxt.setText(sdfHourMinute.format(sdf.parse(info.getDateCreated())));
                 } catch (ParseException e) {
@@ -310,26 +404,27 @@ public class TwitterDetailActivity extends SwipeBackActivity implements View.OnC
                     headHolder.goodImg.setImageResource(R.drawable.icon_like_highlighted);
                 else headHolder.goodImg.setImageResource(R.drawable.icon_like);
 
+
                 Picasso.with(context).load(info.getImgs()).into(headHolder.contentImg);
 
                 if (info != null && info.getComments() != null && info.getComments().size() > 0) {
                     commentsList = info.getComments();
                     try {
                         List<Comments> localCommentsList = db.selector(Comments.class).where("twitterId", "=", info.getId()).findAll();
-                        if(localCommentsList != null && localCommentsList.size() > 0){
+                        if (localCommentsList != null && localCommentsList.size() > 0) {
                             db.delete(Comments.class, WhereBuilder.b("twitterId", "=", info.getId()));
                         }
                     } catch (DbException e) {
                         e.printStackTrace();
                     }
-                    for (Comments comments: commentsList){
+                    for (Comments comments : commentsList) {
                         comments.setTwitterId(info.getId());
                         try {
                             //对比是否保存过。 保存过为赞过
                             List<CommentLikeStatus> likeTempList = db.selector(CommentLikeStatus.class).where("twitterId", "=", comments.getId()).findAll();
-                            if(likeTempList != null && likeTempList.size() > 0){
+                            if (likeTempList != null && likeTempList.size() > 0) {
                                 comments.setIsLike(true);
-                            }else {
+                            } else {
                                 comments.setIsLike(false);
                             }
                             db.save(comments);//保存评论到 本地数据库
@@ -345,7 +440,6 @@ public class TwitterDetailActivity extends SwipeBackActivity implements View.OnC
                         e.printStackTrace();
                     }
                 }
-                headHolder.commentNumTxt.setText(info.getCommentNum() + "");
                 adapter.notifyDataSetChanged();
             }
         }
@@ -359,7 +453,7 @@ public class TwitterDetailActivity extends SwipeBackActivity implements View.OnC
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        if(currentIsModify){
+        if (currentIsModify) {
             Intent intent = new Intent();
             intent.putExtra("modify", "true");
             setResult(13, intent);
@@ -369,6 +463,7 @@ public class TwitterDetailActivity extends SwipeBackActivity implements View.OnC
     }
 
     private int currentPosition = -1;
+
     class MyAdapter extends BaseAdapter {
 
         @Override
@@ -400,22 +495,44 @@ public class TwitterDetailActivity extends SwipeBackActivity implements View.OnC
             }
 
             holder.contentTxt.setText(comments.getContent());
-            holder.goodNumTxt.setText(comments.getSupportNum() + "");
 
-            if(comments.isLike())  holder.goodImg.setImageResource(R.drawable.icon_like_highlighted);
-            else                   holder.goodImg.setImageResource(R.drawable.icon_like);
+            if(comments.getSupportNum() <= 0){
+                holder.goodNumTxt.setText("赞");
+            }else{
+                holder.goodNumTxt.setText(comments.getSupportNum() + "");
+            }
+
+            if (comments.isLike())
+                holder.goodImg.setImageResource(R.drawable.icon_like_highlighted);
+            else holder.goodImg.setImageResource(R.drawable.icon_like);
 
             holder.goodImg.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(NetworkUtil.hasConnection(context)){
-                        if(!comments.isLike()) {
-                            currentPosition = position;
-                            HttpClient.getInstance().twitterCommentSupport(comments.getId(), twitterCommentSupportCallback);
-                        }else{
-                            T.showLong(context, "您已经赞过啦.");
+                    if (NetworkUtil.hasConnection(context)) {
+                        try {
+                            List<CommentLikeStatus> localList = db.selector(CommentLikeStatus.class).where("twitterId", "=", comments.getId()).findAll();
+                            if (localList != null && localList.size() > 0) {//已经存储过
+                                if (comments.isLike()) {
+                                    comments.setIsLike(false);
+                                    comments.setSupportNum(comments.getSupportNum() > 0 ? comments.getSupportNum() - 1 : 0);
+                                    T.showLong(context, "取消赞");
+                                } else {
+                                    comments.setIsLike(true);
+                                    comments.setSupportNum(comments.getSupportNum() + 1);
+                                    T.showLong(context, "赞成功");
+                                }
+                                adapter.notifyDataSetChanged();
+                            } else {                //没有赞过
+                                currentPosition = position;
+                                HttpClient.getInstance().twitterCommentSupport(comments.getId(), twitterCommentSupportCallback);
+                            }
+
+                        } catch (DbException e) {
+                            e.printStackTrace();
                         }
-                    }else{
+
+                    } else {
                         T.showLong(context, "当前无网络连接， 请检查");
                     }
 

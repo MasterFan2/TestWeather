@@ -138,7 +138,7 @@
             android:label="@string/title_activity_comment_detail"
             android:windowSoftInputMode="adjustResize"
             android:configChanges="keyboardHidden|orientation"
-            android:theme="@style/BaseAppTheme" />
+            android:theme="@style/SecondAppTheme" />
         <activity
             android:name=".BigPicActivity"
             android:theme="@style/SecondAppTheme"

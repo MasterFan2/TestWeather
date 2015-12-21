@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@color/gray_100"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:clipToPadding="true"
-    android:fitsSystemWindows="true"
     android:orientation="vertical">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/title_blue"
-        android:orientation="vertical"
-        >
+    <!--<RelativeLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:background="@color/title_blue"-->
+        <!--android:orientation="vertical"-->
+        <!-->-->
 
-        <View
-            android:id="@+id/status_bar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            />
+        <!--<View-->
+            <!--android:id="@+id/status_bar"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:visibility="gone"-->
+            <!--/>-->
 
         <RelativeLayout
             android:id="@+id/header"
@@ -45,7 +44,7 @@
                 android:textColor="@color/gray_100"
                 android:textSize="20sp"/>
         </RelativeLayout>
-    </RelativeLayout>
+    <!--</RelativeLayout>-->
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -91,6 +90,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:background="@drawable/blue_button_background"
+                    android:textColor="@android:color/white"
                     android:text="发送"/>
             </com.way.widget.MaterialRippleLayout>
 

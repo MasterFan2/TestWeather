@@ -124,6 +124,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/blue_button_background"
+            android:textColor="@android:color/white"
             android:text="发  布"/>
     </com.way.widget.MaterialRippleLayout>
 </LinearLayout>

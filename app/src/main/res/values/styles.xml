@@ -2,7 +2,7 @@
 
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar"></style>
 
-    <style name="SecondAppTheme" parent="@style/BaseAppTheme">
+    <style name="SecondAppTheme" parent="AppTheme">
         <item name="android:windowIsTranslucent">true</item>
     </style>
 

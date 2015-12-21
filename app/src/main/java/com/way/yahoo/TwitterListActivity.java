@@ -94,6 +94,7 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
         statusBar.setLayoutParams(params);
 
         setStatusBar();
+
         listView = (PinnedSectionListView) findViewById(R.id.listView);
         listView.setPullLoadEnable(false);
         listView.setPullRefreshEnable(false);

@@ -419,13 +419,11 @@ public class WeatherFragment extends Fragment implements ITaskManager,SwipeRefre
 	@Override
 	public void onResume() {
 		super.onResume();
-		MobclickAgent.onPageStart("WeatherFragment"); //统计页面
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
-		MobclickAgent.onPageEnd("WeatherFragment"); //统计页面
 	}
 
 	// ListView滑动监听，更新背景模糊度和移动距离

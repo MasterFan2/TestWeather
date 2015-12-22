@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -17,7 +18,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
 import com.umeng.analytics.MobclickAgent;
 import com.way.BitmapUtil;
 import com.way.common.util.SystemUtils;
@@ -38,6 +39,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import photopicker.PhotoPickerActivity;
@@ -54,6 +56,8 @@ public class AddTwitterActivity extends SwipeBackActivity implements View.OnClic
 
     private final int INPUT_TEXT_LENGHT = 140;//输入字数限制
 
+    private final String BASE_DIR = Environment.getExternalStorageDirectory().getAbsolutePath() + "/weather_img/";
+
     private ImageView addImg;
     private EditText inputEdit;
     private TextView contentLenTxt;
@@ -69,11 +73,22 @@ public class AddTwitterActivity extends SwipeBackActivity implements View.OnClic
 
     //上传图片
     private String picUrl = "";
+    public  String uploadUrl = "";
+
+    private Calendar calendar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_twitter);
+
+        //创建存放文件夹
+        File dir = new File(BASE_DIR);
+        if(!dir.exists()){
+            dir.mkdir();
+        }
+
+        calendar = Calendar.getInstance();
 
         statusBar = findViewById(R.id.status_bar);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, Conf.statusBar_height);
@@ -183,14 +198,23 @@ public class AddTwitterActivity extends SwipeBackActivity implements View.OnClic
 
             if (selectedPhotos != null && selectedPhotos.size() > 0) {
                 int width = SystemUtils.getDisplayWidth(this);
+                addImg.setImageResource(R.mipmap.img_default);
+
+                uploadUrl = BASE_DIR +(calendar.get(Calendar.MONTH) + "-" +calendar.get(Calendar.DAY_OF_MONTH) +  "-"
+                        +calendar.get(Calendar.HOUR_OF_DAY) +  "-" +calendar.get(Calendar.MINUTE) +  "-" +calendar.get(Calendar.SECOND))+".jpg";
 
                 picUrl = selectedPhotos.get(0);
 
-
+                //compress
                 Bitmap bmp = BitmapUtil.getimage(picUrl);
 
-                File file = new File(BitmapUtil.saveUrl);
-                if (file.exists()) file.delete();
+                File file = new File(uploadUrl);
+                if (file.exists()) {
+                    boolean isOk = file.delete();
+                    if(isOk){
+                        T.showShort(context, "delete ok!!");
+                    }
+                }
                 try {
                     FileOutputStream out = new FileOutputStream(file);
                     bmp.compress(Bitmap.CompressFormat.JPEG, 100, out);
@@ -202,8 +226,18 @@ public class AddTwitterActivity extends SwipeBackActivity implements View.OnClic
                     e.printStackTrace();
                 }
 
-                Picasso.with(context).load(new File(BitmapUtil.saveUrl)).placeholder(R.mipmap.img_default).error(R.mipmap.img_default).into(addImg);
-                picUrl = BitmapUtil.saveUrl;
+                Glide.with(context)
+                        .load(new File(picUrl))
+                        .centerCrop()
+                        .dontAnimate()
+                        .thumbnail(0.5f)
+                        .override(width / 3, width / 3)
+                        .placeholder(R.mipmap.img_default)
+                        .error(R.mipmap.img_default)
+                        .into(addImg);
+
+//                Picasso.with(context).load(new File(uploadUrl)).placeholder(R.mipmap.img_default).error(R.mipmap.img_default).into(addImg);
+//                picUrl = uploadUrl;
             }
         }
     }
@@ -211,7 +245,7 @@ public class AddTwitterActivity extends SwipeBackActivity implements View.OnClic
     @Override
     public void onBackPressed() {
         if(!TextUtils.isEmpty(picUrl)){
-            File file = new File(BitmapUtil.saveUrl);
+            File file = new File(uploadUrl);
             if(file.exists() || !TextUtils.isEmpty(inputEdit.getText().toString())) {
                 dialog.show();
                 return;
@@ -236,7 +270,7 @@ public class AddTwitterActivity extends SwipeBackActivity implements View.OnClic
         }
 
         //
-        TypedFile typedFile = new TypedFile("image/jpg", new File(BitmapUtil.saveUrl));
+        TypedFile typedFile = new TypedFile("image/jpg", new File(uploadUrl));
 
         //
         waitDialog.show();
@@ -250,6 +284,8 @@ public class AddTwitterActivity extends SwipeBackActivity implements View.OnClic
                 T.showLong(context, "发布成功");
                 if(waitDialog != null && waitDialog.isShowing()) waitDialog.dismiss();
                 setResult(RESULT_OK);
+                File file = new File(uploadUrl);
+                if(file.exists()) file.delete();
                 finish();
             } else {
                 T.showLong(context, resp.getMsg());
@@ -258,6 +294,7 @@ public class AddTwitterActivity extends SwipeBackActivity implements View.OnClic
 
         @Override
         public void failure(RetrofitError error) {
+            if(waitDialog != null && waitDialog.isShowing()) waitDialog.dismiss();
             getDataError("上传失败");
         }
     };
@@ -267,7 +304,7 @@ public class AddTwitterActivity extends SwipeBackActivity implements View.OnClic
         switch (v.getId()) {
             case R.id.header_left:
                 if(!TextUtils.isEmpty(picUrl)){
-                    File file = new File(BitmapUtil.saveUrl);
+                    File file = new File(uploadUrl);
                     if(file.exists() || !TextUtils.isEmpty(inputEdit.getText().toString())) {
                         dialog.show();
                         return;
@@ -303,6 +340,12 @@ public class AddTwitterActivity extends SwipeBackActivity implements View.OnClic
     protected void onResume() {
         MobclickAgent.onResume(this);
         super.onResume();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        uploadUrl = "";
     }
 
     @Override

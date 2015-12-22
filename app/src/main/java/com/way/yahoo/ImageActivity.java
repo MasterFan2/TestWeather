@@ -64,6 +64,8 @@ import retrofit.client.Response;
 
 public class ImageActivity extends SwipeBackActivity implements OnClickListener {
 
+    private String saveUrl;
+
     //网络数据
     private ImageResult dataList;
 
@@ -357,7 +359,7 @@ public class ImageActivity extends SwipeBackActivity implements OnClickListener 
                     if(dialog != null && dialog.isShowing()) dialog.dismiss();
                     footLayout.setVisibility(View.VISIBLE);
                     loadingIndicatorView.setVisibility(View.INVISIBLE);
-                    File file = new File(BitmapUtil.saveUrl);
+                    File file = new File(saveUrl);
                     if(file.exists()) file.delete();
                     T.showShort(context, "上传成功");
                     getData();
@@ -603,7 +605,7 @@ public class ImageActivity extends SwipeBackActivity implements OnClickListener 
 
                 Bitmap bmp = BitmapUtil.getimage(picUrl);
 
-                File file = new File(BitmapUtil.saveUrl);
+                File file = new File(saveUrl);
                 if(file.exists()) file.delete();
                 try {
                     FileOutputStream out = new FileOutputStream(file);
@@ -616,8 +618,8 @@ public class ImageActivity extends SwipeBackActivity implements OnClickListener 
                     e.printStackTrace();
                 }
 
-                Picasso.with(context).load(new File(BitmapUtil.saveUrl)).placeholder(R.mipmap.img_default).error(R.mipmap.img_default).into(contentImg);
-                picUrl = BitmapUtil.saveUrl;
+                Picasso.with(context).load(new File(saveUrl)).placeholder(R.mipmap.img_default).error(R.mipmap.img_default).into(contentImg);
+                picUrl = saveUrl;
 
 //                Picasso.with(context).load(selectedPhotos.get(0)).placeholder(R.mipmap.img_default).into(contentImg);
                 //

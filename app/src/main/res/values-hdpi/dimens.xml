@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <dimen name="home_image_height">300dp</dimen>
+
     <dimen name="weather_topbar_padding">48.0dip</dimen>
     <dimen name="weather_weather_info_flippertext_textsize">28.0sp</dimen>
     <dimen name="weather_temperature_desc">14.0sp</dimen>

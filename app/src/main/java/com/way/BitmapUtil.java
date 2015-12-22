@@ -18,8 +18,6 @@ public class BitmapUtil {
 
     private static final long MAX_SIZE = 409600;//最大文件 ， 如果超过这个大小就要压缩
 
-    public static String saveUrl = Environment.getExternalStorageDirectory().getAbsolutePath() + "/temp_img.jpg";
-
     public static Bitmap zoomImage(Bitmap bgimage, double newWidth, double newHeight) {
 
         // 获取这个图片的宽和高

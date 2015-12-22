@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <dimen name="home_image_height">320dp</dimen>
+
+
     <dimen name="city_manager_tiny_height">160.0dip</dimen>
     
     <dimen name="weather_topbar_padding">48.0dip</dimen>

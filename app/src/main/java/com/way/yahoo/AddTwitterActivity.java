@@ -235,9 +235,6 @@ public class AddTwitterActivity extends SwipeBackActivity implements View.OnClic
                         .placeholder(R.mipmap.img_default)
                         .error(R.mipmap.img_default)
                         .into(addImg);
-
-//                Picasso.with(context).load(new File(uploadUrl)).placeholder(R.mipmap.img_default).error(R.mipmap.img_default).into(addImg);
-//                picUrl = uploadUrl;
             }
         }
     }

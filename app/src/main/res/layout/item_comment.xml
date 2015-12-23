@@ -28,10 +28,10 @@
                     <ImageView
                         android:id="@+id/content_img"
                         android:layout_width="wrap_content"
-                        android:layout_height="200dp"
+                        android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_marginTop="5dp"
-                        android:scaleType="centerCrop"
+                        android:scaleType="centerInside"
                         android:src="@drawable/ic_cloudy_big" />
 
                     <TextView

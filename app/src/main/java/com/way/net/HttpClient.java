@@ -123,6 +123,11 @@ public class HttpClient {
         @GET("/twitterComment/support")
         void twitterCommentSupport(@Query("id")int id, Callback<Resp> cb);
 
+        //【new】 对微博评论取消赞
+        @GET("/twitterComment/cancelsupport")
+        void twitterCommentCancelSupport(@Query("id")int id, Callback<Resp> cb);
+
+
         //【new】 微博详情
         @GET("/twitter/detail")
         void twitterDetail(@Query("id")int id, Callback<TwitterDetailResp> cb);
@@ -227,6 +232,15 @@ public class HttpClient {
      */
     public void twitterCommentSupport(int id, Callback<Resp> cb){
         netInterface.twitterCommentSupport(id, cb);
+    }
+
+    /**
+     * 对微博评论取消赞
+     * @param id
+     * @param cb
+     */
+    public void twitterCommentCancelSupport(int id, Callback<Resp> cb){
+        netInterface.twitterCommentCancelSupport(id, cb);
     }
 
     /**

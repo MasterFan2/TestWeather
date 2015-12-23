@@ -17,6 +17,7 @@
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
             android:src="@mipmap/img_default"
+            android:visibility="gone"
             />
 
         <!-- time -->
@@ -105,10 +106,9 @@
             <!-- 天气图标 -->
             <ImageView
                 android:id="@+id/main_icon"
-                android:layout_width="80dp"
-                android:layout_height="55dp"
+                android:layout_width="50dp"
+                android:layout_height="35dp"
                 android:layout_alignParentLeft="true"
-                android:layout_marginBottom="@dimen/current_condition_icon_margin_bottom"
                 android:layout_marginLeft="2.0dip"
                 android:layout_marginRight="@dimen/current_condition_icon_right_margin"
                 android:adjustViewBounds="true"
@@ -130,14 +130,12 @@
                     style="@style/Label.Shadow"
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
-                    android:layout_marginBottom="@dimen/high_low_text_margin_bottom"
                     android:text="~"
                     weather:typeface="fonts/Roboto-Light.ttf" />
                 <!-- 最高温 -->
                 <com.way.ui.view.WeatherTypefacedTextView
                     android:id="@+id/temp_high"
                     style="@style/Label.Shadow"
-                    android:layout_marginBottom="@dimen/high_low_text_margin_bottom"
                     android:text="--°"
                     weather:typeface="fonts/Roboto-Light.ttf" />
             </LinearLayout>
@@ -160,7 +158,7 @@
                     android:layout_alignParentLeft="true"
                     android:layout_marginRight="0.0dip"
                     android:text="--"
-                    android:textSize="70sp"
+                    android:textSize="50sp"
                     weather:typeface="fonts/Roboto-Thin.ttf" />
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -170,8 +168,8 @@
 
                 <ImageView
                     android:id="@+id/degree_icon"
-                    android:layout_width="@dimen/degree_icon_size"
-                    android:layout_height="@dimen/degree_icon_size"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
                     android:layout_alignTop="@id/temperature"
                     android:layout_marginBottom="10.0dip"
                     android:layout_marginLeft="5.0dip"
@@ -209,6 +207,7 @@
         android:layout_marginLeft="8dp"
         android:layout_marginBottom="12dp"
         android:text="-"
+        android:visibility="gone"
         android:background="@drawable/module_bg"
         android:textColor="@android:color/white"
         android:textSize="18sp" />

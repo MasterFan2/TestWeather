@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -54,16 +56,21 @@ import retrofit.client.Response;
  */
 public class TwitterListActivity extends SwipeBackActivity implements View.OnClickListener, MasterListView.OnRefreshListener {
 
+    private final int NOTIFY_CHANGE = 0x01;//刷新显示
+    private final int NOTIFY_PAGE = 0x02;//判断是否有下一页
+
+
     private PinnedSectionListView listView;
     private MyAdapter adapter;
 
     private ImageView leftImg, rightImg;
     private View statusBar;
 
-    private Context context;
-    private ArrayList<DatBean> finalData = new ArrayList<>();
-    private List<TwitterInfo> finalInfoList = new ArrayList<>();
-    private ArrayList<TwitterInfo> tempList = new ArrayList<>();
+    private Context context;//
+    private List<TwitterInfo> displayList = new ArrayList<>();// main show data
+    private List<TwitterInfo> sortList = new ArrayList<>();// only for sort
+    private List<TwitterInfo> tempList = new ArrayList<>();//temp don't sort 存放第一次或每次加载更多的数据
+
 
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private SimpleDateFormat sdfMonthDay = new SimpleDateFormat("MM月dd日");
@@ -74,6 +81,8 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
     //-------------------------page----------------------
     private int pageSize = 30;
     private int pageIndex = 1;
+
+    private Handler handler;
 
     private DbManager db;
 
@@ -103,7 +112,7 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 Intent intent = new Intent(context, TwitterDetailActivity.class);
-                TwitterInfo info = finalInfoList.get(position - 1);
+                TwitterInfo info = displayList.get(position - 1);
                 intent.putExtra("info", info);
                 startActivityForResult(intent, 505);
             }
@@ -118,16 +127,35 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
         adapter = new MyAdapter();
         listView.setAdapter(adapter);
 
+        handler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                switch (msg.what) {
+                    case NOTIFY_CHANGE:
+                        if (msg.arg1 >= pageSize) {
+                            listView.setPullLoadEnable(true);
+                        } else {
+                            listView.setPullLoadEnable(false);
+                        }
+                        adapter.notifyDataSetChanged();
+                        break;
+                    case NOTIFY_PAGE:
+
+                        break;
+                }
+            }
+        };
+
 
         if (NetworkUtil.hasConnection(context)) {
             waitDialog.show();
             HttpClient.getInstance().twitterList(pageIndex, pageSize, callback);
         } else {
             try {
-                finalInfoList = db.findAll(TwitterInfo.class);
-                if(finalInfoList != null && finalInfoList.size() > 0){
+                displayList = db.findAll(TwitterInfo.class);
+                if (displayList != null && displayList.size() > 0) {
                     adapter.notifyDataSetChanged();
-                }else {
+                } else {
                     NotConnection();
                     listView.setPullRefreshEnable(true);
                 }
@@ -163,47 +191,73 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
 
     //-----------------------------------------
     String tempDate = null;
+    ///load more
     private Callback<TwitterResp> loadMoreCallback = new Callback<TwitterResp>() {
         @Override
-        public void success(TwitterResp resp, Response response) {
-            tempList.clear();
-            if (resp != null) {
+        public void success(final TwitterResp resp, Response response) {
+            if (resp != null && resp.getResult() != null && resp.getResult().size() > 0) {
 
-                for (TwitterInfo info : resp.getResult()) {
+                tempList.addAll(resp.getResult());
+                sortList.clear();
+                ///sort
+                for (TwitterInfo info : tempList) {
                     String t = info.getDateCreated().split(" ")[0];
-                    if (TextUtils.isEmpty(tempDate) || !t.equals(tempDate)) {//第一次
-                        tempList.add(new TwitterInfo(TwitterInfo.SECTION, info.getDateCreated()));
+
+                    ///set is support
+                    try {
+                        List<TwitterLikeStatus> likeStatusList = db.findAll(TwitterLikeStatus.class);
+                        if (likeStatusList != null && likeStatusList.size() > 0) {
+                            List<TwitterLikeStatus> likeTempList = db.selector(TwitterLikeStatus.class).where("twitterId", "=", info.getId()).findAll();
+                            if (likeTempList != null && likeTempList.size() > 0)
+                                info.setIsLike(true);
+                            else
+                                info.setIsLike(false);
+                        }
+                    } catch (DbException e) {
+                        e.printStackTrace();
+                    }
+                    /////////sort////////
+                    if (TextUtils.isEmpty(tempDate) || !t.equals(tempDate)) {//time first
+
+                        ///add section
+                        sortList.add(new TwitterInfo(TwitterInfo.SECTION, info.getDateCreated()));
                         info.setType(TwitterInfo.ITEM);
-                        tempList.add(info);
+
+                        ///add info
+                        sortList.add(info);
                         tempDate = t;
                     } else if (t.equals(tempDate)) {
                         info.setType(TwitterInfo.ITEM);
-                        tempList.add(info);
+                        sortList.add(info);//add info
                     }
                 }
 
+                tempDate = null;
+                displayList = sortList;
+
+
+                /// cache
+                try {
+                    List<TwitterInfo> localList = db.findAll(TwitterInfo.class);
+                    if (localList != null && localList.size() > 0) {
+                        db.dropTable(TwitterInfo.class);
+                    }
+                    for (TwitterInfo twitterInfo : displayList) {
+                        db.save(twitterInfo);
+                    }
+                } catch (DbException e) {
+                    e.printStackTrace();
+                }
+
+                /// has next?
+//                int size = resp.getResult() == null ? 0 : resp.getResult().size();
+//                Message msg = handler.obtainMessage(NOTIFY_CHANGE, size, 0);
+//                msg.sendToTarget();
                 if (resp.getResult() != null && resp.getResult().size() >= pageSize) {
                     listView.setPullLoadEnable(true);
                 } else {
                     listView.setPullLoadEnable(false);
                 }
-
-                List<TwitterLikeStatus> likeStatusList = null;
-                try {
-                    likeStatusList = db.findAll(TwitterLikeStatus.class);
-                    if (likeStatusList != null && likeStatusList.size() > 0) {
-                        for (TwitterInfo info : tempList) {
-                            List<TwitterLikeStatus> likeTempList = db.selector(TwitterLikeStatus.class).where("twitterId", "=", info.getId()).findAll();
-                            if (likeTempList != null && likeTempList.size() > 0)
-                                info.setIsLike(true);
-                            else info.setIsLike(false);
-                        }
-                    }
-                    finalInfoList.addAll(tempList);
-                } catch (DbException e) {
-                    e.printStackTrace();
-                }
-
                 adapter.notifyDataSetChanged();
             } else {
                 listView.setPullLoadEnable(false);
@@ -216,45 +270,60 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
         }
     };
 
+
+    ///first page or refresh
     private Callback<TwitterResp> callback = new Callback<TwitterResp>() {
         @Override
         public void success(TwitterResp resp, Response response) {
             tempList.clear();
+            sortList.clear();
             if (waitDialog != null && waitDialog.isShowing()) waitDialog.dismiss();
-            if (resp != null) {
-                for (TwitterInfo info : resp.getResult()) {
+            if (resp != null && resp.getResult() != null && resp.getResult().size() > 0) {
+
+                ///sort
+                tempList = resp.getResult();
+
+                for (TwitterInfo info : tempList) {
                     String t = info.getDateCreated().split(" ")[0];
-                    if (TextUtils.isEmpty(tempDate) || !t.equals(tempDate)) {//第一次
-                        tempList.add(new TwitterInfo(TwitterInfo.SECTION, info.getDateCreated()));
+
+                    ///set is support
+                    try {
+                        List<TwitterLikeStatus> likeStatusList = db.findAll(TwitterLikeStatus.class);
+                        if (likeStatusList != null && likeStatusList.size() > 0) {
+                            List<TwitterLikeStatus> likeTempList = db.selector(TwitterLikeStatus.class).where("twitterId", "=", info.getId()).findAll();
+                            if (likeTempList != null && likeTempList.size() > 0)
+                                info.setIsLike(true);
+                            else
+                                info.setIsLike(false);
+                        }
+                    } catch (DbException e) {
+                        e.printStackTrace();
+                    }
+                    /////////sort////////
+                    if (TextUtils.isEmpty(tempDate) || !t.equals(tempDate)) {//time first
+
+                        ///add section
+                        sortList.add(new TwitterInfo(TwitterInfo.SECTION, info.getDateCreated()));
                         info.setType(TwitterInfo.ITEM);
-                        tempList.add(info);
+
+                        ///add info
+                        sortList.add(info);
                         tempDate = t;
                     } else if (t.equals(tempDate)) {
                         info.setType(TwitterInfo.ITEM);
-                        tempList.add(info);
+                        sortList.add(info);//add info
                     }
                 }
+
+                ///has next page
                 if (resp.getResult() != null && resp.getResult().size() >= pageSize) {
                     listView.setPullLoadEnable(true);
                 } else {
                     listView.setPullLoadEnable(false);
                 }
 
-                try {
-                    List<TwitterLikeStatus> likeStatusList = db.findAll(TwitterLikeStatus.class);
-                    if (likeStatusList != null && likeStatusList.size() > 0) {
-                        for (TwitterInfo info : tempList) {
-                            List<TwitterLikeStatus> likeTempList = db.selector(TwitterLikeStatus.class).where("twitterId", "=", info.getId()).findAll();
-                            if (likeTempList != null && likeTempList.size() > 0)
-                                info.setIsLike(true);
-                            else info.setIsLike(false);
-                        }
-                    }
-                } catch (DbException e) {
-                    e.printStackTrace();
-                }
-
-                finalInfoList = tempList;
+                tempDate = null;
+                displayList = sortList;
                 adapter.notifyDataSetChanged();
                 listView.setPullRefreshEnable(true);
                 listView.stopRefresh();
@@ -262,12 +331,10 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
                 //cache
                 try {
                     List<TwitterInfo> localList = db.findAll(TwitterInfo.class);
-                    if(localList != null && localList.size() > 0){
+                    if (localList != null && localList.size() > 0) {
                         db.dropTable(TwitterInfo.class);
                     }
-
-
-                    for (TwitterInfo twitterInfo : finalInfoList) {
+                    for (TwitterInfo twitterInfo : displayList) {
                         db.save(twitterInfo);
                     }
                 } catch (DbException e) {
@@ -301,13 +368,13 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK && requestCode == 502) {
-            if(NetworkUtil.hasConnection(context)){
+            if (NetworkUtil.hasConnection(context)) {
                 listView.startRefresh();
                 pageIndex = 1;
                 HttpClient.getInstance().twitterList(pageIndex, pageSize, callback);
             }
         } else if (requestCode == 505) {
-            if(NetworkUtil.hasConnection(context)){
+            if (NetworkUtil.hasConnection(context)) {
                 pageIndex = 1;
                 HttpClient.getInstance().twitterList(pageIndex, pageSize, callback);
             }
@@ -320,7 +387,7 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
             if (resp.getCode() == 200) {
                 T.showShort(context, "赞成功!");
                 if (currentPosition != -1) {
-                    TwitterInfo info = finalInfoList.get(currentPosition);
+                    TwitterInfo info = displayList.get(currentPosition);
                     info.setSupportNum(info.getSupportNum() + 1);
                     info.setIsLike(true);
                     try {
@@ -347,7 +414,7 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
             if (resp.getCode() == 200) {
                 T.showShort(context, "取消成功!");
                 if (currentPosition != -1) {
-                    TwitterInfo info = finalInfoList.get(currentPosition);
+                    TwitterInfo info = displayList.get(currentPosition);
                     info.setSupportNum(info.getSupportNum() - 1);
                     info.setIsLike(false);
                     try {
@@ -374,12 +441,12 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
 
     @Override
     public void onRefresh(int id) {
-        if(NetworkUtil.hasConnection(context)){
+        if (NetworkUtil.hasConnection(context)) {
             pageIndex = 1;
             listView.startRefresh();
             listView.setPullRefreshEnable(false);
             HttpClient.getInstance().twitterList(pageIndex, pageSize, callback);
-        }else {
+        } else {
             NotConnection();
         }
 
@@ -387,10 +454,10 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
 
     @Override
     public void onLoadMore(int id) {
-        if(NetworkUtil.hasConnection(context)){
+        if (NetworkUtil.hasConnection(context)) {
             pageIndex++;
             HttpClient.getInstance().twitterList(pageIndex, pageSize, loadMoreCallback);
-        }else {
+        } else {
             NotConnection();
         }
 
@@ -405,12 +472,12 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
 
         @Override
         public int getItemViewType(int position) {
-            return finalInfoList.get(position).getType();
+            return displayList.get(position).getType();
         }
 
         @Override
         public int getCount() {
-            return finalInfoList == null ? 0 : finalInfoList.size();
+            return displayList == null ? 0 : displayList.size();
         }
 
         @Override
@@ -425,7 +492,7 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
 
         @Override
         public View getView(final int position, View convertView, ViewGroup parent) {
-            final TwitterInfo info = finalInfoList.get(position);
+            final TwitterInfo info = displayList.get(position);
 
 
             if (getItemViewType(position) == DatBean.SECTION) {//section
@@ -465,13 +532,13 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
                     @Override
                     public void onClick(View v) {
                         currentPosition = position;
-                        if(NetworkUtil.hasConnection(context)){
+                        if (NetworkUtil.hasConnection(context)) {
                             if (info.isLike()) {
                                 HttpClient.getInstance().twitterCancelSupport(info.getId(), twitterCancelSupportCallback);
                             } else {
                                 HttpClient.getInstance().twitterSupport(info.getId(), twitterSupportCallback);
                             }
-                        }else{
+                        } else {
                             NotConnection();
                         }
 

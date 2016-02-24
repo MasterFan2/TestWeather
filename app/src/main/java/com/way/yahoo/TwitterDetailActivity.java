@@ -129,8 +129,8 @@ public class TwitterDetailActivity extends SwipeBackActivity implements View.OnC
         listView = (ListView) findViewById(R.id.listView);
 
         adapter = new MyAdapter();
-        listView.setAdapter(adapter);
         listView.addHeaderView(headerView);
+        listView.setAdapter(adapter);
 
         if (NetworkUtil.hasConnection(context)) {
             HttpClient.getInstance().twitterDetail(info.getId(), twitterDetailRespCallback);
@@ -257,6 +257,7 @@ public class TwitterDetailActivity extends SwipeBackActivity implements View.OnC
         ImageView goodImg;
         TextView goodNumTxt;
         TextView commentNumTxt;
+        LinearLayout supportLayout;
 
         public ViewHolder(View view) {
             contentImg = (ImageView) view.findViewById(R.id.content_img);
@@ -265,8 +266,9 @@ public class TwitterDetailActivity extends SwipeBackActivity implements View.OnC
             goodImg = (ImageView) view.findViewById(R.id.good_img);
             goodNumTxt = (TextView) view.findViewById(R.id.good_number_txt);
             commentNumTxt = (TextView) view.findViewById(R.id.comment_number_txt);
+            supportLayout = (LinearLayout) view.findViewById(R.id.support_layout);
 
-            goodImg.setOnClickListener(new View.OnClickListener() {
+            supportLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     if (NetworkUtil.hasConnection(context)) {
@@ -532,7 +534,7 @@ public class TwitterDetailActivity extends SwipeBackActivity implements View.OnC
                 holder.goodImg.setImageResource(R.drawable.icon_like_highlighted);
             else holder.goodImg.setImageResource(R.drawable.icon_like);
 
-            holder.goodImg.setOnClickListener(new View.OnClickListener() {
+            holder.rightLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (NetworkUtil.hasConnection(context)) {
@@ -555,11 +557,13 @@ public class TwitterDetailActivity extends SwipeBackActivity implements View.OnC
             ImageView goodImg;
             TextView goodNumTxt;
             TextView contentTxt;
+            LinearLayout rightLayout;
 
             public ViewHolder(View view) {
                 goodImg = (ImageView) view.findViewById(R.id.subcomment_good_img);
                 goodNumTxt = (TextView) view.findViewById(R.id.subcomment_good_num_txt);
                 contentTxt = (TextView) view.findViewById(R.id.subcomment_content_txt);
+                rightLayout= (LinearLayout) view.findViewById(R.id.right_layout);
             }
         }
     }

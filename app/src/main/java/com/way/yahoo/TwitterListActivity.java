@@ -528,7 +528,7 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
                     holder.goodImg.setImageResource(R.drawable.icon_like);
                 }
 
-                holder.goodImg.setOnClickListener(new View.OnClickListener() {
+                holder.supportLayout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         currentPosition = position;
@@ -591,6 +591,7 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
             ImageView goodImg;
             TextView goodNumTxt;
             TextView commentNumTxt;
+            LinearLayout supportLayout;
 //            MaterialRippleLayout mrl;
 
             public ViewHolder(View view) {
@@ -600,6 +601,7 @@ public class TwitterListActivity extends SwipeBackActivity implements View.OnCli
                 goodImg = (ImageView) view.findViewById(R.id.good_img);
                 goodNumTxt = (TextView) view.findViewById(R.id.good_number_txt);
                 commentNumTxt = (TextView) view.findViewById(R.id.comment_number_txt);
+                supportLayout = (LinearLayout) view.findViewById(R.id.support_layout);
 //                mrl = (MaterialRippleLayout) view.findViewById(R.id.comment_mrl);
             }
         }

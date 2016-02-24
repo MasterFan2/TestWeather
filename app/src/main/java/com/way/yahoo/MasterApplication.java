@@ -4,8 +4,11 @@ import android.app.Application;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+import com.baidu.android.pushservice.PushConstants;
+import com.baidu.android.pushservice.PushManager;
 import com.way.common.util.SystemUtils;
 import com.way.net.HttpClient;
+import com.way.receiver.Utils;
 import com.way.utils.Conf;
 
 import org.xutils.x;
@@ -41,6 +44,10 @@ public class MasterApplication extends Application {
         mApplication = this;
         SystemUtils.copyDB(this);// 程序第一次运行将数据库copy过去
         HttpClient.getInstance().init(this);
+
+        PushManager.startWork(getApplicationContext(),
+                PushConstants.LOGIN_TYPE_API_KEY,
+                Utils.getMetaValue(this, "api_key"));
     }
 
     /**

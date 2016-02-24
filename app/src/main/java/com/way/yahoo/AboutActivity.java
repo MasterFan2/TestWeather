@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.ListFragment;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
@@ -39,6 +40,8 @@ public class AboutActivity extends SwipeBackActivity {
 				finish();
 			}
 		});
+
+		ListFragment fragment = null;
 	}
 
 //	private Bitmap getA(Bitmap bmp, double newWidth, double newHeight){
@@ -77,6 +80,7 @@ public class AboutActivity extends SwipeBackActivity {
 		BitmapFactory.Options newOpts = new BitmapFactory.Options();
 		//开始读入图片，此时把options.inJustDecodeBounds 设回true了
 		newOpts.inJustDecodeBounds = true;
+
 		Bitmap bitmap = BitmapFactory.decodeFile(srcPath,newOpts);//此时返回bm为空
 
 		newOpts.inJustDecodeBounds = false;

@@ -67,6 +67,7 @@ public class CommentsActivity extends SwipeBackActivity {
                 finish();
             }
         });
+
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         editText = (EditText) findViewById(R.id.comments_editText);

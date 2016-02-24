@@ -5,11 +5,11 @@ android {
     buildToolsVersion "23.0.1"
 
     defaultConfig {
-        applicationId "com.masterfan.weather"
+        applicationId "com.way.yahoo"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 3   //第二
-        versionName "1.0.2"
+        versionCode 4   //
+        versionName "1.0.3"
     }
     buildTypes {
         release {
@@ -36,7 +36,7 @@ dependencies {
 
     compile 'com.umeng.analytics:analytics:latest.integration' //友盟
 
-    compile 'org.xutils:xutils:3.1.+'//xUtils
+    compile 'org.xutils:xutils:3.2.2'//xUtils
 
 
     compile 'com.android.support:appcompat-v7:23.1.0'

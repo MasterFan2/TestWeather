@@ -6,11 +6,13 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.baidu.android.pushservice.PushMessageReceiver;
+import com.way.notify.TestPushMessageNotification;
 import com.way.yahoo.MainActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -62,27 +64,48 @@ public class BDPushReceiver  extends PushMessageReceiver {
     @Override
     public void onMessage(Context context, String message,
                           String customContentString) {
-        String messageString = "透传消息 message=\"" + message
-                + "\" customContentString=" + customContentString;
+        String messageString = ":::" + message;
         Log.d(TAG, messageString);
 
         // 自定义内容获取方式，mykey和myvalue对应透传消息推送时自定义内容中设置的键和值
-        if (!TextUtils.isEmpty(customContentString)) {
+        if (!TextUtils.isEmpty(message)) {
             JSONObject customJson = null;
             try {
-                customJson = new JSONObject(customContentString);
-                String myvalue = null;
-                if (!customJson.isNull("mykey")) {
-                    myvalue = customJson.getString("mykey");
-                }
+                customJson = new JSONObject(message);
+                String title   = new String(customJson.getString("title").getBytes(), "UTF-8");
+                String content = new String(customJson.getString("content").getBytes(), "UTF-8");
+                int toPage     = customJson.getInt("to");
+
+                TestPushMessageNotification.notify(context, title, content, toPage, 0);
             } catch (JSONException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
+                System.out.println(e.getMessage());
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
             }
         }
-
         // Demo更新界面展示代码，应用请在这里加入自己的处理逻辑
-        updateContent(context, messageString);
+        //        updateContent(context, messageString);
+    }
+
+    public String decodeUnicode(final String dataStr) {
+        int start = 0;
+        int end = 0;
+        final StringBuffer buffer = new StringBuffer();
+        while (start > -1) {
+            end = dataStr.indexOf("\\u", start + 2);
+            String charStr = "";
+            if (end == -1) {
+                charStr = dataStr.substring(start + 2, dataStr.length());
+            } else {
+                charStr = dataStr.substring(start + 2, end);
+            }
+            char letter = (char) Integer.parseInt(charStr, 16); // 16进制parse整形字符串。
+            buffer.append(new Character(letter).toString());
+            start = end;
+        }
+        return buffer.toString();
     }
 
     /**

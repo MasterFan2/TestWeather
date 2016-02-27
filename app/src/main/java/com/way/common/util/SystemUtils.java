@@ -23,6 +23,7 @@ import android.view.WindowManager.LayoutParams;
 import com.way.beans.City;
 import com.way.db.CityProvider;
 import com.way.db.CityProvider.CityConstants;
+import com.way.utils.S;
 
 public class SystemUtils {
 
@@ -120,7 +121,7 @@ public class SystemUtils {
 	}
 
 	public static void copyDB(Context context) {
-		L.i("liweiping", "copyDB begin....");
+		S.o("copyDB begin....");
 		// 如果不是第一次运行程序，直接返回
 		if (!PreferenceUtils.getPrefBoolean(context, "isFirstRun", true))
 			return;
@@ -141,11 +142,12 @@ public class SystemUtils {
 			// fos.write(buffer, 0, len);
 			fos.close();
 			is.close();
-			L.i("liweiping", "copyDB finish....");
+			S.o(":::>copyDB finish....");
 			CityProvider.createTmpCityTable(context);
 			PreferenceUtils.setPrefBoolean(context, "isFirstRun", false);
 		} catch (Exception e) {
 			e.printStackTrace();
+			S.o(":::>" + e.getMessage());
 		}
 	}
 

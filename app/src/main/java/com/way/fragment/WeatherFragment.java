@@ -30,6 +30,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.baidu.android.pushservice.PushConstants;
+import com.baidu.android.pushservice.PushManager;
 import com.squareup.picasso.Picasso;
 import com.umeng.analytics.MobclickAgent;
 import com.way.adapter.WeatherListAdapter;
@@ -45,9 +47,11 @@ import com.way.fragment.BaseFragment.ABaseTask;
 import com.way.net.HttpClient;
 import com.way.net.bean.TwitterMain;
 import com.way.net.bean.TwitterMainResp;
+import com.way.receiver.Utils;
 import com.way.ui.view.WeatherTypefacedTextView;
 import com.way.utils.Dbutils;
 import com.way.utils.NetworkUtil;
+import com.way.utils.S;
 import com.way.weather.plugin.bean.Forecast;
 import com.way.weather.plugin.bean.RealTime;
 import com.way.weather.plugin.bean.WeatherInfo;
@@ -127,6 +131,11 @@ public class WeatherFragment extends Fragment implements ITaskManager,SwipeRefre
 	Callback<TwitterMainResp> cb = new Callback<TwitterMainResp>() {
 		@Override
 		public void success(TwitterMainResp mainResp, Response response) {
+
+			S.o(":::读取数据完成, 开始接收推送消息");
+			PushManager.startWork(getActivity(),
+					PushConstants.LOGIN_TYPE_API_KEY,
+					Utils.getMetaValue(getActivity(), "api_key"));
 			if(mainResp != null){
 
 				data = mainResp.getTopTwitter();
@@ -546,9 +555,9 @@ public class WeatherFragment extends Fragment implements ITaskManager,SwipeRefre
 			return;
 		}
 		isLoaded = true;
-		if (weatherInfo.isNewData())
-			Toast.makeText(mActivity, mCurCity.getName() + " 刷新成功...",
-					Toast.LENGTH_SHORT).show();
+//		if (weatherInfo.isNewData())
+//			Toast.makeText(mActivity, mCurCity.getName() + " 刷新成功...",
+//					Toast.LENGTH_SHORT).show();//显示 重庆 刷新成功...
 		RealTime realTime = weatherInfo.getRealTime();
 		Forecast forecast = weatherInfo.getForecast();
 

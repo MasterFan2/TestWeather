@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.LayoutInflater;
@@ -19,6 +21,8 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.baidu.android.pushservice.PushConstants;
+import com.baidu.android.pushservice.PushManager;
 import com.umeng.analytics.MobclickAgent;
 import com.umeng.update.UmengUpdateAgent;
 import com.viewpagerindicator.CirclePageIndicator;
@@ -32,9 +36,11 @@ import com.way.common.util.L;
 import com.way.common.util.PreferenceUtils;
 import com.way.common.util.SystemUtils;
 import com.way.common.util.T;
+import com.way.receiver.Utils;
 import com.way.util.blur.jni.BitmapUtils;
 import com.way.util.blur.jni.FrostedGlassUtil;
 import com.way.utils.Conf;
+import com.way.utils.S;
 import com.way.utils.SystemBarTintManager;
 
 import net.simonvt.menudrawer.MenuDrawer;
@@ -75,6 +81,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPag
 		mMenuDrawer.setContentView(R.layout.activity_main);
 		initViews();
 	}
+
 
 	/**
 	 * 连续按两次返回键就退出
@@ -153,18 +160,23 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPag
 	@Override
 	protected void onResume() {
 		super.onResume();
+
 		MobclickAgent.onResume(this);
 		mTmpCities = getTmpCities();
 		if (!mTmpCities.isEmpty()) {
+			S.o(":::onResume::更新UI");
 			updateUI();
 		} else {
 
 			//如果第一次运行应用就需要定位
 			if(PreferenceUtils.getPrefBoolean(this, FIRST_RUN_APP, true)){
+				S.o(":::onResume::第一次运行应用就需要定位:到QueryCityActivity");
 				Intent intent = new Intent(MainActivity.this, QueryCityActivity.class);
 				intent.putExtra("first", "true");
 				startActivity(intent);
 				PreferenceUtils.setPrefBoolean(this, FIRST_RUN_APP, false);
+			}else {
+				S.o(":::onResume::非第一次运行");
 			}
 		}
 	}

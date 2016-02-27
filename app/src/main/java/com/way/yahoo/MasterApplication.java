@@ -44,10 +44,6 @@ public class MasterApplication extends Application {
         mApplication = this;
         SystemUtils.copyDB(this);// 程序第一次运行将数据库copy过去
         HttpClient.getInstance().init(this);
-
-        PushManager.startWork(getApplicationContext(),
-                PushConstants.LOGIN_TYPE_API_KEY,
-                Utils.getMetaValue(this, "api_key"));
     }
 
     /**

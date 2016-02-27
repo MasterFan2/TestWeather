@@ -6,72 +6,79 @@
     android:orientation="vertical"
     android:id="@+id/root_view"
     >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!--<com.way.widget.MaterialRippleLayout-->
+        <!--android:id="@+id/comment_mrl"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--app:rippleAlpha="0.2"-->
+        <!--app:rippleColor_="@color/title_blue"-->
+        <!--app:rippleDelayClick="false"-->
+        <!--app:rippleHover="true"-->
+        <!--app:rippleOverlay="true">-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_marginTop="5dp"
+            >
+            <ImageView
+                android:id="@+id/content_img"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:scaleType="center"
+                android:src="@mipmap/img_default" />
 
-            <!--<com.way.widget.MaterialRippleLayout-->
-                <!--android:id="@+id/comment_mrl"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--app:rippleAlpha="0.2"-->
-                <!--app:rippleColor_="@color/title_blue"-->
-                <!--app:rippleDelayClick="false"-->
-                <!--app:rippleHover="true"-->
-                <!--app:rippleOverlay="true">-->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginTop="5dp"
-                    >
-                    <ImageView
-                        android:id="@+id/content_img"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:scaleType="center"
-                        android:src="@mipmap/img_default" />
-
-                    <TextView
-                        android:id="@+id/desc_txt"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:paddingLeft="16dp"
-                        android:paddingRight="16dp"
-                        android:text="-"
-                        android:textColor="@color/gray_900"
-                        android:textSize="18sp" />
-                </LinearLayout>
-                <!--</com.way.widget.MaterialRippleLayout>-->
-            <RelativeLayout
+            <TextView
+                android:id="@+id/desc_txt"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
-                >
+                android:text="-"
+                android:textColor="@color/gray_900"
+                android:textSize="18sp" />
+        </LinearLayout>
+        <!--</com.way.widget.MaterialRippleLayout>-->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="8dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            >
 
-                <TextView
-                    android:id="@+id/time_txt"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="8dp"
-                    android:gravity="center"
-                    android:singleLine="true"
-                    android:text="12:19"
-                    android:textColor="@color/gray_600"
-                    android:textSize="12sp" />
+            <TextView
+                android:id="@+id/time_txt"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:singleLine="true"
+                android:text="12:19"
+                android:textColor="@color/gray_600"
+                android:textSize="12sp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:gravity="center"
+                android:orientation="horizontal">
 
                 <LinearLayout
+                    android:id="@+id/support_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:gravity="center"
-                    android:orientation="horizontal">
-
+                    android:orientation="horizontal"
+                    android:paddingRight="10dp"
+                    >
                     <ImageView
                         android:id="@+id/good_img"
                         android:layout_width="wrap_content"
@@ -87,31 +94,30 @@
                         android:singleLine="true"
                         android:text="20"
                         android:textColor="@color/gray_600" />
-
-                    <View
-                        android:layout_width="0.15dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginBottom="8dp"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:layout_marginTop="8dp"
-                        android:background="@color/gray_400" />
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:padding="10dp"
-                        android:src="@drawable/ic_comment_nor" />
-
-                    <TextView
-                        android:id="@+id/comment_number_txt"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:singleLine="true"
-                        android:text="20"
-                        android:textColor="@color/gray_600" />
                 </LinearLayout>
-            </RelativeLayout>
-        </LinearLayout>
+
+                <View
+                    android:layout_width="0.15dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/gray_400" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_comment_nor" />
+
+                <TextView
+                    android:id="@+id/comment_number_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:text="20"
+                    android:textColor="@color/gray_600" />
+            </LinearLayout>
+        </RelativeLayout>
+    </LinearLayout>
 </LinearLayout>

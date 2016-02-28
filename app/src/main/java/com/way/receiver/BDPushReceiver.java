@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.baidu.android.pushservice.PushMessageReceiver;
 import com.way.notify.TestPushMessageNotification;
+import com.way.utils.S;
 import com.way.yahoo.MainActivity;
 
 import org.json.JSONException;
@@ -65,7 +66,8 @@ public class BDPushReceiver  extends PushMessageReceiver {
     public void onMessage(Context context, String message,
                           String customContentString) {
         String messageString = ":::" + message;
-        Log.d(TAG, messageString);
+
+        S.o("::RRR:>>"+messageString);
 
         // 自定义内容获取方式，mykey和myvalue对应透传消息推送时自定义内容中设置的键和值
         if (!TextUtils.isEmpty(message)) {

@@ -128,14 +128,25 @@ public class WeatherFragment extends Fragment implements ITaskManager,SwipeRefre
 		mContentResolver = getActivity().getContentResolver();
 	}
 
+	///callback
+	public interface OnDataReceive {
+		void onDataReceived();
+	}
+	public static OnDataReceive onDataReceive;
+
+	public static void setOnDataReceive(OnDataReceive onDataReceive) {
+		WeatherFragment.onDataReceive = onDataReceive;
+	}
+
 	Callback<TwitterMainResp> cb = new Callback<TwitterMainResp>() {
 		@Override
 		public void success(TwitterMainResp mainResp, Response response) {
 
 			S.o(":::读取数据完成, 开始接收推送消息");
-			PushManager.startWork(getActivity(),
-					PushConstants.LOGIN_TYPE_API_KEY,
-					Utils.getMetaValue(getActivity(), "api_key"));
+			if(onDataReceive != null) {
+				onDataReceive.onDataReceived();
+			}
+
 			if(mainResp != null){
 
 				data = mainResp.getTopTwitter();

@@ -36,6 +36,7 @@ import com.way.common.util.L;
 import com.way.common.util.PreferenceUtils;
 import com.way.common.util.SystemUtils;
 import com.way.common.util.T;
+import com.way.fragment.WeatherFragment;
 import com.way.receiver.Utils;
 import com.way.util.blur.jni.BitmapUtils;
 import com.way.util.blur.jni.FrostedGlassUtil;
@@ -48,7 +49,7 @@ import net.simonvt.menudrawer.MenuDrawer.OnDrawerStateChangeListener;
 
 import java.util.List;
 
-public class MainActivity extends BaseActivity implements OnClickListener, OnPageChangeListener {
+public class MainActivity extends BaseActivity implements OnClickListener, OnPageChangeListener,WeatherFragment.OnDataReceive {
 	public static final String FIRST_RUN_APP = "firstRunApp";
 	private static final String INSTANCESTATE_TAB = "tab_index";
 	private String mShareNormalStr = "#简洁天气#提醒您:今天%s,%s,%s,%s,";// 日期、城市、天气、温度
@@ -80,6 +81,16 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPag
 		initMenuDrawer();
 		mMenuDrawer.setContentView(R.layout.activity_main);
 		initViews();
+
+		WeatherFragment.setOnDataReceive(this);
+	}
+
+	private void startReceiveMsg(){
+		S.o("::: 数据读取完成,开始推送");
+		//
+		PushManager.startWork(getApplicationContext(),
+				PushConstants.LOGIN_TYPE_API_KEY,
+				Utils.getMetaValue(getApplicationContext(), "api_key"));
 	}
 
 
@@ -484,4 +495,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPag
 		}
 	}
 
+	@Override
+	public void onDataReceived() {
+		startReceiveMsg();
+	}
 }

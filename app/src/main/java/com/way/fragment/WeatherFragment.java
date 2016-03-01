@@ -139,7 +139,6 @@ public class WeatherFragment extends Fragment implements ITaskManager,SwipeRefre
 		@Override
 		public void success(TwitterMainResp mainResp, Response response) {
 
-			S.o(":::读取数据完成, 开始接收推送消息");
 			if(onDataReceive != null) {
 				onDataReceive.onDataReceived();
 			}

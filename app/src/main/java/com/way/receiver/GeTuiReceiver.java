@@ -1,16 +1,27 @@
 package com.way.receiver;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.BottomSheetDialog;
 import android.util.Log;
 
 import com.igexin.sdk.PushConsts;
 import com.igexin.sdk.PushManager;
 import com.way.common.util.T;
 import com.way.utils.S;
+import com.way.yahoo.MainActivity;
+import com.way.yahoo.R;
+import com.way.yahoo.TwitterListActivity;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
 
 /**
  * Created by 13510 on 2016/3/1.
@@ -27,7 +38,7 @@ public class GeTuiReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Bundle bundle = intent.getExtras();
         Log.d("GetuiSdkDemo", "onReceive() action=" + bundle.getInt("action"));
-
+        NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         switch (bundle.getInt(PushConsts.CMD_ACTION)) {
             case PushConsts.GET_MSG_DATA:
                 // 获取透传数据
@@ -50,9 +61,51 @@ public class GeTuiReceiver extends BroadcastReceiver {
                     payloadData.append("\n");
 
                     S.o(":::>" + data);
-//                    if (GetuiSdkDemoActivity.tLogView != null) {
-//                        GetuiSdkDemoActivity.tLogView.append(data + "\n");
-//                    }
+
+                    JSONObject customJson = null;
+                    try {
+                        customJson = new JSONObject(data);
+                        String title = new String(customJson.getString("title").getBytes(), "UTF-8");
+                        String content = new String(customJson.getString("content").getBytes(), "UTF-8");
+                        int toPage = customJson.getInt("to");
+
+                        Intent notifyIntent;
+                        if (toPage == 1) {//home page.
+                            notifyIntent = new Intent(context, MainActivity.class);
+                        } else {          //list page
+                            notifyIntent = new Intent(context, TwitterListActivity.class);
+                        }
+
+                        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,
+                                notifyIntent, 0);
+                        // 下面需兼容Android 2.x版本是的处理方式
+                        // Notification notify1 = new Notification(R.drawable.message,
+                        // "TickerText:" + "您有新短消息，请注意查收！", System.currentTimeMillis());
+                        Notification notify3 = null;
+                        Notification.Builder builder = new Notification.Builder(context)
+                                .setSmallIcon(R.drawable.ic_launcher)
+                                .setTicker("看天穿衣提示")
+                                .setContentTitle(title)
+                                .setContentText(content)
+                                .setContentIntent(pendingIntent); // 需要注意build()是在APIlevel16及之后增加的，API11可以使用getNotificatin()来替代
+
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                            notify3 = builder.build();
+                        } else {
+                            notify3 = builder.getNotification();
+                        }
+
+                        notify3.flags |= Notification.FLAG_AUTO_CANCEL; // FLAG_AUTO_CANCEL表明当通知被用户点击时，通知将被清除。
+                        notify3.defaults |= Notification.DEFAULT_SOUND;
+                        manager.notify(199, notify3);
+//                TestPushMessageNotification.notify(context, title, content, toPage, 0);
+                    } catch (JSONException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                        System.out.println(e.getMessage());
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
                 }
                 break;
 

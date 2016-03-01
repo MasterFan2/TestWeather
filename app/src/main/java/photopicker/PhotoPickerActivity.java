@@ -8,7 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import com.umeng.analytics.MobclickAgent;
@@ -67,24 +66,18 @@ public class PhotoPickerActivity extends AppCompatActivity {
 
     setContentView(R.layout.activity_photo_picker);
 
-    findViewById(R.id.back_img).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        finish();
-      }
-    });
-//    Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
-//    setSupportActionBar(mToolbar);
-//    setTitle("图片选择");
+    Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
+    setSupportActionBar(mToolbar);
+    setTitle("图片选择");
 
-//    ActionBar actionBar = getSupportActionBar();
-//
-//    assert actionBar != null;
-//    actionBar.setDisplayHomeAsUpEnabled(true);
-//
-//    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//      actionBar.setElevation(25);
-//    }
+    ActionBar actionBar = getSupportActionBar();
+
+    assert actionBar != null;
+    actionBar.setDisplayHomeAsUpEnabled(true);
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      actionBar.setElevation(25);
+    }
 
     maxCount = getIntent().getIntExtra(EXTRA_MAX_COUNT, DEFAULT_MAX_COUNT);
 

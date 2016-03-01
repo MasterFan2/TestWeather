@@ -5,7 +5,28 @@
     android:orientation="vertical"
     tools:context="${relativePackage}.${activityClass}">
 
-  <include layout="@layout/picker_toolbar" />
+  <!--<include layout="@layout/picker_toolbar" />-->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/title_blue"
+        >
+        <ImageView
+            android:id="@+id/back_img"
+            android:layout_width="60dp"
+            android:layout_height="match_parent"
+            android:src="@mipmap/ic_back"
+            android:layout_alignParentLeft="true"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="图片选择"
+            android:gravity="center"
+            android:textColor="@android:color/white"
+            android:layout_centerInParent="true"
+            />
+    </RelativeLayout>
 
   <FrameLayout
       android:id="@+id/container"

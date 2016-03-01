@@ -1,13 +1,19 @@
 package com.way.yahoo;
 
+import android.app.Notification;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -21,10 +27,8 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.baidu.android.pushservice.PushConstants;
-import com.baidu.android.pushservice.PushManager;
+import com.igexin.sdk.PushManager;
 import com.umeng.analytics.MobclickAgent;
-import com.umeng.update.UmengUpdateAgent;
 import com.viewpagerindicator.CirclePageIndicator;
 import com.way.adapter.ParallaxPagerTransformer;
 import com.way.adapter.SideMenuAdapter;
@@ -37,6 +41,7 @@ import com.way.common.util.PreferenceUtils;
 import com.way.common.util.SystemUtils;
 import com.way.common.util.T;
 import com.way.fragment.WeatherFragment;
+import com.way.receiver.GeTuiReceiver;
 import com.way.receiver.Utils;
 import com.way.util.blur.jni.BitmapUtils;
 import com.way.util.blur.jni.FrostedGlassUtil;
@@ -50,6 +55,13 @@ import net.simonvt.menudrawer.MenuDrawer.OnDrawerStateChangeListener;
 import java.util.List;
 
 public class MainActivity extends BaseActivity implements OnClickListener, OnPageChangeListener,WeatherFragment.OnDataReceive {
+
+	// SDK参数，会自动从Manifest文件中读取，第三方无需修改下列变量，请修改AndroidManifest.xml文件中相应的meta-data信息。
+	// 修改方式参见个推SDK文档
+	private String appkey = "";
+	private String appsecret = "";
+	private String appid = "";
+
 	public static final String FIRST_RUN_APP = "firstRunApp";
 	private static final String INSTANCESTATE_TAB = "tab_index";
 	private String mShareNormalStr = "#简洁天气#提醒您:今天%s,%s,%s,%s,";// 日期、城市、天气、温度
@@ -82,15 +94,53 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPag
 		mMenuDrawer.setContentView(R.layout.activity_main);
 		initViews();
 
-		WeatherFragment.setOnDataReceive(this);
+		// 从AndroidManifest.xml的meta-data中读取SDK配置信息
+		String packageName = getApplicationContext().getPackageName();
+		try {
+			ApplicationInfo appInfo = getPackageManager().getApplicationInfo(packageName, PackageManager.GET_META_DATA);
+			if (appInfo.metaData != null) {
+				appid = appInfo.metaData.getString("PUSH_APPID");
+				appsecret = appInfo.metaData.getString("PUSH_APPSECRET");
+				appkey = (appInfo.metaData.get("PUSH_APPKEY") != null) ? appInfo.metaData.get("PUSH_APPKEY").toString() : null;
+			}
+		} catch (PackageManager.NameNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		// SDK初始化，第三方程序启动时，都要进行SDK初始化工作
+		Log.d("GetuiSdkDemo", "initializing sdk...");
+		PushManager.getInstance().initialize(this.getApplicationContext());
+
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		GeTuiReceiver.payloadData.delete(0, GeTuiReceiver.payloadData.length());
 	}
 
 	private void startReceiveMsg(){
 		S.o("::: 数据读取完成,开始推送");
 		//
-		PushManager.startWork(getApplicationContext(),
-				PushConstants.LOGIN_TYPE_API_KEY,
-				Utils.getMetaValue(getApplicationContext(), "api_key"));
+//		PushManager.startWork(getApplicationContext(),
+//				PushConstants.LOGIN_TYPE_API_KEY,
+//				Utils.getMetaValue(getApplicationContext(), "api_key"));
+
+//		CustomPushNotificationBuilder cBuilder = new CustomPushNotificationBuilder(
+//				getResources().getIdentifier(
+//						"notification_custom_builder", "layout", getPackageName()),
+//				getResources().getIdentifier("notification_icon", "id", getPackageName()),
+//				getResources().getIdentifier("notification_title", "id", getPackageName()),
+//				getResources().getIdentifier("notification_text", "id", getPackageName()));
+//		cBuilder.setNotificationFlags(Notification.FLAG_AUTO_CANCEL);
+//		cBuilder.setNotificationDefaults(Notification.DEFAULT_VIBRATE);
+//		cBuilder.setStatusbarIcon(this.getApplicationInfo().icon);
+//		cBuilder.setLayoutDrawable(getResources().getIdentifier(
+//				"simple_notification_icon", "drawable", getPackageName()));
+//		cBuilder.setNotificationSound(Uri.withAppendedPath(
+//				MediaStore.Audio.Media.INTERNAL_CONTENT_URI, "6").toString());
+//		// 推送高级设置，通知栏样式设置为下面的ID
+//		PushManager.setNotificationBuilder(this, 1, cBuilder);
 	}
 
 

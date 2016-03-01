@@ -79,7 +79,7 @@ public class TestPushMessageNotification {
 
                         // Set required fields, including the small icon, the
                         // notification title, and text.
-                .setSmallIcon(R.drawable.ic_stat_push_message)
+//                .setSmallIcon(R.drawable.ic_stat_push_message)
                 .setContentTitle(title)
                 .setContentText(text)
 
@@ -122,7 +122,8 @@ public class TestPushMessageNotification {
                         // later.
                 .setStyle(new NotificationCompat.BigPictureStyle().bigPicture(picture)
                         .setBigContentTitle(title)
-                        .setSummaryText("Dummy summary text"))
+                        .setSummaryText(strContent)
+                )
 
                         // Automatically dismiss the notification when it is touched.
                 .setAutoCancel(true);

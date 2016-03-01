@@ -4,8 +4,6 @@ import android.app.Application;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
-import com.baidu.android.pushservice.PushConstants;
-import com.baidu.android.pushservice.PushManager;
 import com.way.common.util.SystemUtils;
 import com.way.net.HttpClient;
 import com.way.receiver.Utils;

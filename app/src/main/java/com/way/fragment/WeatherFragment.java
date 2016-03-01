@@ -30,10 +30,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.baidu.android.pushservice.PushConstants;
-import com.baidu.android.pushservice.PushManager;
 import com.squareup.picasso.Picasso;
-import com.umeng.analytics.MobclickAgent;
 import com.way.adapter.WeatherListAdapter;
 import com.way.beans.City;
 import com.way.common.util.NetUtil;

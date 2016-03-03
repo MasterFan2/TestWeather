@@ -113,7 +113,7 @@ public class GeTuiReceiver extends BroadcastReceiver {
                 // 获取ClientID(CID)
                 // 第三方应用需要将CID上传到第三方服务器，并且将当前用户帐号和CID进行关联，以便日后通过用户帐号查找CID进行消息推送
                 String cid = bundle.getString("clientid");
-                T.showShort(context, "绑定成功:" + cid);
+//                T.showShort(context, "绑定成功:" + cid);
                 break;
 
             case PushConsts.THIRDPART_FEEDBACK:

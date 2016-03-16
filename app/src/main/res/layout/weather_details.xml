@@ -185,17 +185,38 @@
             android:layout_alignParentLeft="true"
             android:layout_below="@id/wind_tv" />
 
-        <com.way.ui.view.WeatherTypefacedTextView
-            android:id="@+id/weather_details_foot_tv"
-            android:layout_width="fill_parent"
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="30dip"
-            android:layout_alignParentLeft="true"
+            android:gravity="center_vertical"
             android:layout_below="@id/dotline4"
-            android:gravity="bottom|right"
-            android:paddingTop="4dip"
-            android:text="中国天气网"
-            android:textColor="@android:color/white"
-            android:textSize="@dimen/text_md"
-            weather:typeface="fonts/Roboto-Light.ttf" />
+            >
+            <com.way.ui.view.WeatherTypefacedTextView
+                android:id="@+id/weather_details_foot_desc"
+                android:layout_width="wrap_content"
+                android:layout_height="30dip"
+                android:layout_alignParentLeft="true"
+                android:paddingTop="4dip"
+                android:gravity="center_vertical"
+                android:text="数据来源于中国天气网"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/text_sm"
+                android:layout_marginLeft="10dp"
+                weather:typeface="fonts/Roboto-Light.ttf"
+                />
+            <com.way.ui.view.WeatherTypefacedTextView
+                android:id="@+id/weather_details_foot_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="30dip"
+                android:paddingTop="4dip"
+                android:text="中国天气网"
+                android:gravity="center_vertical"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/text_md"
+                weather:typeface="fonts/Roboto-Light.ttf"
+                android:layout_alignParentRight="true"
+                />
+
+        </RelativeLayout>
     </RelativeLayout>
 </com.way.ui.view.WeatherDetailsView>

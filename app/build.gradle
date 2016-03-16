@@ -8,8 +8,9 @@ android {
         applicationId "com.masterfan.weather"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 5   //4
-        versionName "1.0.4"//1.0.3
+        versionCode 6   //4
+        versionName "1.0.5"//1.0.3
+        //1.0.5 [6]  2016-3-17 00:06
     }
     buildTypes {
         release {
